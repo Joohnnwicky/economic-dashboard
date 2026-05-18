@@ -13,7 +13,7 @@
 - [ ] **API-06**: 中国央行利率数据源集�?- [ ] **API-07**: API限流机制实现（防止配额耗尽�?- [ ] **API-08**: 数据缓存层实现（TanStack Query配置�?
 ### 数据处理
 
-- [ ] **DATA-01**: 统一数据格式规范化层（NormalizedIndicator接口�?- [ ] **DATA-02**: UTC时间标准化处�?- [ ] **DATA-03**: 同比（YoY）自动计算功�?- [ ] **DATA-04**: 环比（MoM）自动计算功�?- [ ] **DATA-05**: 历史数据降采样策略（防止大数据崩溃）
+- [ ] **DATA-01**: 统一数据格式规范化层（NormalizedIndicator接口�?- [ ] **DATA-02**: UTC时间标准化处�?- [x] **DATA-03**: 同比（YoY）自动计算功�?- [x] **DATA-04**: 环比（MoM）自动计算功�?- [ ] **DATA-05**: 历史数据降采样策略（防止大数据崩溃）
 - [ ] **DATA-06**: 数据刷新时间戳显�?
 ### 核心指标展示
 
@@ -34,8 +34,8 @@
 
 - [ ] **CHART-01**: ECharts图表组件封装（echarts-for-react集成�?- [ ] **CHART-02**: 历史走势折线图实�?- [x] **CHART-03**: 时间范围选择器（1D�?W�?M�?M�?M�?Y、ALL�?- [ ] **CHART-04**: 图表放大/缩小交互功能
 - [ ] **CHART-05**: 图表悬停提示工具（显示精确值）
-- [ ] **CHART-06**: 双Y轴图表支持（跨市场对比）
-- [ ] **CHART-07**: 多指标叠加图表实�?- [ ] **CHART-08**: 图表数据缩放组件（dataZoom�?- [ ] **CHART-09**: 事件标记功能（FOMC会议等）
+- [x] **CHART-06**: 双Y轴图表支持（跨市场对比）
+- [x] **CHART-07**: 多指标叠加图表实�?- [ ] **CHART-08**: 图表数据缩放组件（dataZoom�?- [ ] **CHART-09**: 事件标记功能（FOMC会议等）
 
 ### 界面布局
 
@@ -54,9 +54,9 @@
 
 ### 数据导出
 
-- [ ] **EXPORT-01**: CSV格式数据导出功能
-- [ ] **EXPORT-02**: Excel格式数据导出功能
-- [ ] **EXPORT-03**: UTF-8编码导出（Excel兼容�?
+- [x] **EXPORT-01**: CSV格式数据导出功能
+- [x] **EXPORT-02**: Excel格式数据导出功能
+- [x] **EXPORT-03**: UTF-8编码导出（Excel兼容�?
 ---
 
 ## v2 Requirements
@@ -109,12 +109,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-08 | Phase 1 | Pending |
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Complete |
+| DATA-04 | Phase 2 | Complete |
 | DATA-05 | Phase 1 | Pending |
 | DATA-06 | Phase 1 | Pending |
 | IND-01 | Phase 1 | Pending |
-| IND-02 | Phase 2 | Pending |
+| IND-02 | Phase 3 | Pending |
 | IND-03 | Phase 1 | Complete |
 | IND-04 | Phase 2 | Pending |
 | IND-05 | Phase 1 | Complete |
@@ -134,8 +134,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHART-03 | Phase 1 | Complete |
 | CHART-04 | Phase 3 | Pending |
 | CHART-05 | Phase 1 | Pending |
-| CHART-06 | Phase 2 | Pending |
-| CHART-07 | Phase 2 | Pending |
+| CHART-06 | Phase 2 | Complete |
+| CHART-07 | Phase 2 | Complete |
 | CHART-08 | Phase 3 | Pending |
 | CHART-09 | Phase 3 | Pending |
 | UI-01 | Phase 1 | Pending |
@@ -152,9 +152,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REAL-03 | Phase 1 | Complete |
 | REAL-04 | Phase 1 | Pending |
 | REAL-05 | Phase 1 | Pending |
-| EXPORT-01 | Phase 2 | Pending |
-| EXPORT-02 | Phase 2 | Pending |
-| EXPORT-03 | Phase 2 | Pending |
+| EXPORT-01 | Phase 2 | Complete |
+| EXPORT-02 | Phase 2 | Complete |
+| EXPORT-03 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 56 total

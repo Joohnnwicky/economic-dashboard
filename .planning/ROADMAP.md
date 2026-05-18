@@ -40,7 +40,7 @@ Plans:
 ### Phase 2: Cross-Market Analysis
 **Goal**: 用户能进行跨市场对比分析，查看就业和通胀细分数据，导出数据
 **Depends on**: Phase 1
-**Requirements**: API-05, API-06, DATA-03, DATA-04, IND-02, IND-04, IND-06, IND-07, IND-10~12, IND-16, CHART-06, CHART-07, UI-06, EXPORT-01~03
+**Requirements**: API-05, API-06, DATA-03, DATA-04, IND-04, IND-06, IND-07, IND-10~12, IND-16, CHART-06, CHART-07, UI-06, EXPORT-01~03
 **Success Criteria** (what must be TRUE):
   1. User can overlay multiple indicators on one chart with dual Y-axis (e.g., Fed rate + Bitcoin price)
   2. User can view employment sub-metrics (labor participation rate, wage growth) alongside NFP
@@ -50,7 +50,7 @@ Plans:
 **Plans**: 4 plans in 4 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Cross-Market Foundation: YoY/MoM utilities, dual Y-axis charts, export infrastructure (7 reqs)
+- [x] 02-01-PLAN.md — Cross-Market Foundation: YoY/MoM utilities, dual Y-axis charts, export infrastructure (7 reqs)
 - [ ] 02-02-PLAN.md — Chinese Market Integration: A-share indices, PBOC rates (6 reqs)
 - [ ] 02-03-PLAN.md — Employment/Inflation Sub-Metrics: BLS/FRED sub-series, YoY/MoM displays (4 reqs)
 - [ ] 02-04-PLAN.md — Export UI & Overlay Comparison: Dialog, integration, final verification (2 reqs)
@@ -58,7 +58,7 @@ Plans:
 ### Phase 3: Professional Experience
 **Goal**: 专业级图表交互体验，支持图表缩放、事件标记和加密货币实时WebSocket推送
 **Depends on**: Phase 2
-**Requirements**: CHART-04, CHART-08, CHART-09, REAL-01, REAL-02
+**Requirements**: IND-02, CHART-04, CHART-08, CHART-09, REAL-01, REAL-02
 **Success Criteria** (what must be TRUE):
   1. User can zoom in/out on charts using dataZoom slider to examine specific time periods
   2. User sees FOMC meeting date markers on interest rate charts for historical context
@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Data Infrastructure | 5/5 | Complete | 2026-05-18 |
-| 2. Cross-Market Analysis | 0/4 | Not started | - |
+| 2. Cross-Market Analysis | 0/4 | Planned | - |
 | 3. Professional Experience | 0/TBD | Not started | - |
 
 ---
