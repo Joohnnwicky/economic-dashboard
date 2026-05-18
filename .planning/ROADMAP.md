@@ -64,7 +64,12 @@ Plans:
   2. User sees FOMC meeting date markers on interest rate charts for historical context
   3. User sees cryptocurrency prices update in real-time (1-second intervals) without manual page refresh
   4. WebSocket connection auto-reconnects after network interruption with exponential backoff
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — WebSocket Real-Time Infrastructure: Binance WebSocket, connection indicator, TanStack Query integration (2 reqs: REAL-01, REAL-02)
+- [ ] 03-02-PLAN.md — Chart dataZoom Enhancement: LineChart and MultiSeriesChart slider, dark theme styling (2 reqs: CHART-04, CHART-08)
+- [ ] 03-03-PLAN.md — FOMC Event Markers: FOMC detection utility, FedRateChart with scatter series, historical decision context (2 reqs: IND-02, CHART-09)
 
 ## Progress
 
@@ -75,7 +80,7 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Core Data Infrastructure | 5/5 | Complete | 2026-05-18 |
 | 2. Cross-Market Analysis | 4/4 | Complete | 2026-05-18 |
-| 3. Professional Experience | 0/TBD | Not started | - |
+| 3. Professional Experience | 0/3 | Planned | - |
 
 ---
 
@@ -85,3 +90,4 @@ Phases execute in numeric order: 1 → 2 → 3
 *Plans created: 2026-05-18*
 *Phase 2 plans finalized: 2026-05-18*
 *Phase 2 completed: 2026-05-18*
+*Phase 3 plans created: 2026-05-18*
