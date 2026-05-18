@@ -30,11 +30,12 @@ export function useCryptoWebSocket(): WebSocketState {
     retryCount: 0,
   });
 
-  // Refs for cleanup (prevents memory leaks)
+  // Refs for cleanup and state tracking (prevents stale closures)
   const btcWsRef = useRef<WebSocket | null>(null);
   const ethWsRef = useRef<WebSocket | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
   const heartbeatRef = useRef<number | null>(null);
+  const retryCountRef = useRef<number>(0); // Track retry count in ref to avoid stale closure
 
   /**
    * Calculate exponential backoff delay with jitter (D-15)
@@ -105,6 +106,8 @@ export function useCryptoWebSocket(): WebSocketState {
     wsRef.current = new WebSocket(url);
 
     wsRef.current.onopen = () => {
+      // Reset retry count on successful connection
+      retryCountRef.current = 0;
       setState({ status: 'connected', retryCount: 0 });
 
       // Start heartbeat (D-06)
@@ -136,13 +139,17 @@ export function useCryptoWebSocket(): WebSocketState {
       }
 
       // Exponential backoff reconnection (D-15, D-16)
-      if (state.retryCount < 5) {
-        setState((prev) => ({
-          status: 'connecting',
-          retryCount: prev.retryCount + 1,
-        }));
+      // Use ref to avoid stale closure issue
+      const currentRetryCount = retryCountRef.current;
 
-        const delay = getBackoffDelay(state.retryCount);
+      if (currentRetryCount < 5) {
+        retryCountRef.current = currentRetryCount + 1;
+        setState({
+          status: 'connecting',
+          retryCount: retryCountRef.current,
+        });
+
+        const delay = getBackoffDelay(currentRetryCount);
 
         retryTimeoutRef.current = window.setTimeout(() => {
           createConnection(
