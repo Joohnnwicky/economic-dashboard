@@ -13,7 +13,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Data Infrastructure** - 建立可靠的数据获取管道和基础展示能力
-- [ ] **Phase 2: Cross-Market Analysis** - 跨市场对比、细分数据展示、数据导出
+- [x] **Phase 2: Cross-Market Analysis** - 跨市场对比、细分数据展示、数据导出
 - [ ] **Phase 3: Professional Experience** - 高级图表交互、事件标记、实时WebSocket
 
 ## Phase Details
@@ -52,8 +52,8 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Cross-Market Foundation: YoY/MoM utilities, dual Y-axis charts, export infrastructure (7 reqs)
 - [x] 02-02-PLAN.md — Chinese Market Integration: A-share indices, PBOC rates (6 reqs)
-- [ ] 02-03-PLAN.md — Employment/Inflation Sub-Metrics: BLS/FRED sub-series, YoY/MoM displays (4 reqs)
-- [ ] 02-04-PLAN.md — Export UI & Overlay Comparison: Dialog, integration, final verification (2 reqs)
+- [x] 02-03-PLAN.md — Employment/Inflation Sub-Metrics: BLS/FRED sub-series, YoY/MoM displays (4 reqs)
+- [x] 02-04-PLAN.md — Export UI & Overlay Comparison: Dialog, integration, final verification (2 reqs)
 
 ### Phase 3: Professional Experience
 **Goal**: 专业级图表交互体验，支持图表缩放、事件标记和加密货币实时WebSocket推送
@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Data Infrastructure | 5/5 | Complete | 2026-05-18 |
-| 2. Cross-Market Analysis | 0/4 | Planned | - |
+| 2. Cross-Market Analysis | 4/4 | Complete | 2026-05-18 |
 | 3. Professional Experience | 0/TBD | Not started | - |
 
 ---
@@ -84,3 +84,4 @@ Phases execute in numeric order: 1 → 2 → 3
 *Granularity: coarse (3 phases)*
 *Plans created: 2026-05-18*
 *Phase 2 plans finalized: 2026-05-18*
+*Phase 2 completed: 2026-05-18*
