@@ -4,8 +4,11 @@ import { EmploymentPanel } from '../indicators/EmploymentPanel';
 import { InflationPanel } from '../indicators/InflationPanel';
 import { USIndicesPanel } from '../indicators/USIndicesPanel';
 import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
+import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
+import { EmploymentSubMetricsPanel } from './EmploymentSubMetricsPanel';
+import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
 import { DARK_THEME } from '../../constants/colors';
 
 export function Dashboard() {
@@ -21,7 +24,9 @@ export function Dashboard() {
           <div className="space-y-4">
             <FedRatePanel />
             <EmploymentPanel />
+            <EmploymentSubMetricsPanel />
             <InflationPanel />
+            <InflationSubMetricsPanel />
           </div>
 
           {/* Right Column: Market Data */}
@@ -29,6 +34,7 @@ export function Dashboard() {
             <CryptoPanel />
             <USIndicesPanel />
             <ChineseIndicesPanel />
+            <PBOCRatePanel />
           </div>
         </div>
 
