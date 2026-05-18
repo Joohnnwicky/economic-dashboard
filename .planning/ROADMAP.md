@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Core Data Infrastructure
 **Goal**: 建立可靠的数据获取管道，用户能查看核心经济指标的实时走势和基础图表
 **Depends on**: Nothing (first phase)
-**Requirements**: API-01~08, DATA-01, DATA-02, DATA-05, DATA-06, IND-01, IND-03, IND-05, IND-08, IND-09, IND-13~15, CHART-01~03, CHART-05, UI-01~05, UI-07~09, REAL-03~05
+**Requirements**: API-01~04, API-07, API-08, DATA-01, DATA-02, DATA-05, DATA-06, IND-01, IND-03, IND-05, IND-08, IND-09, IND-13~15, CHART-01~03, CHART-05, UI-01~05, UI-07~09, REAL-03, REAL-04, REAL-05
 **Success Criteria** (what must be TRUE):
   1. User can view Federal Reserve interest rate trend chart with 1-year history
   2. User can see real-time Bitcoin and Ethereum prices updating every minute
@@ -40,7 +40,7 @@ Plans:
 ### Phase 2: Cross-Market Analysis
 **Goal**: 用户能进行跨市场对比分析，查看就业和通胀细分数据，导出数据
 **Depends on**: Phase 1
-**Requirements**: DATA-03, DATA-04, IND-02, IND-04, IND-06, IND-07, IND-10~12, IND-16, CHART-06, CHART-07, UI-06, EXPORT-01~03
+**Requirements**: API-05, API-06, DATA-03, DATA-04, IND-02, IND-04, IND-06, IND-07, IND-10~12, IND-16, CHART-06, CHART-07, UI-06, EXPORT-01~03
 **Success Criteria** (what must be TRUE):
   1. User can overlay multiple indicators on one chart with dual Y-axis (e.g., Fed rate + Bitcoin price)
   2. User can view employment sub-metrics (labor participation rate, wage growth) alongside NFP
