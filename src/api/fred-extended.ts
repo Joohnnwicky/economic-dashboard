@@ -13,6 +13,9 @@ const PCE_SERIES = {
   PCEPILFE: 'PCEPILFE', // Core PCE (ex food/energy)
 } as const;
 
+// FOMC target rate series (per D-13)
+export const FRED_FOMC_TARGET_UPPER = 'DFEDTARU'; // Federal Funds Target Range - Upper Bound
+
 function calculateStartDate(timeRange: TimeRange): Date {
   const now = new Date();
   switch (timeRange) {
@@ -78,6 +81,51 @@ export async function getPCEData(seriesId: string, timeRange: TimeRange = '1Y'):
       name,
       value: current?.value ?? 0,
       unit: 'index',
+      timestamp: current?.timestamp ?? new Date(),
+      historical,
+    };
+  }, RATE_LIMITS.FRED);
+}
+
+/**
+ * Fetch FOMC target rate upper bound (DFEDTARU) for FOMC meeting detection.
+ * Used to detect rate change points where FOMC meetings occurred (per D-13).
+ * TimeRange defaults to '1Y' (past 1 year) per D-14.
+ */
+export async function getFOMCTargetRates(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
+  const apiKey = import.meta.env.VITE_FRED_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('VITE_FRED_API_KEY not set in .env.local');
+  }
+
+  const endDate = new Date();
+  const startDate = calculateStartDate(timeRange);
+
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_FOMC_TARGET_UPPER}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+
+  return rateLimiter.call('FRED', async () => {
+    const response = await axios.get<FredSeriesResponse>(url);
+
+    if (!response.data?.observations) {
+      throw new Error('FRED response missing observations');
+    }
+
+    const historical: HistoricalDataPoint[] = response.data.observations
+      .filter((obs) => obs.value !== '.')
+      .map((obs) => ({
+        timestamp: parseUTCDate(obs.date),
+        value: parseFloat(obs.value),
+      }))
+      .reverse();
+
+    const current = historical[historical.length - 1];
+
+    return {
+      id: 'fomc-target-rate-upper',
+      name: '美联储目标利率上限',
+      value: current?.value ?? 0,
+      unit: '%',
       timestamp: current?.timestamp ?? new Date(),
       historical,
     };
