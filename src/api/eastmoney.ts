@@ -39,8 +39,10 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
   const secids = Object.values(CHINESE_INDEX_CODES).join(',');
 
   return rateLimiter.call('EastMoney', async () => {
+    // East Money requires cb= and ut= parameters for JSON response
+    // cb= (callback) empty for raw JSON, ut= is a tracking parameter
     const response = await axios.get<EastMoneyResponse>(
-      `${EASTMONEY_INDEX_URL}?fltt=2&secids=${secids}&fields=${EASTMONEY_INDEX_FIELDS}`
+      `${EASTMONEY_INDEX_URL}?fltt=2&invt=2&secids=${secids}&fields=${EASTMONEY_INDEX_FIELDS}&cb=&ut=b2884a393a59ad6400f92e6b8e9`
     );
 
     if (!response.data?.data?.diff || response.data.data.diff.length === 0) {

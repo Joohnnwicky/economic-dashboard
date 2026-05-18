@@ -22,11 +22,12 @@ export const BLS_SERIES = {
 export const ALPHA_VANTAGE_BASE_URL = isDev ? '/api/alphavantage' : 'https://www.alphavantage.co/query';
 
 // Alpha Vantage symbols for US indices
-// NOTE: Alpha Vantage uses specific symbols, not standard ticker symbols
+// NOTE: Alpha Vantage TIME_SERIES_DAILY API doesn't support index symbols directly.
+// Using ETF proxies: DIA (Dow), QQQ (Nasdaq-100), SPY (S&P 500)
 export const ALPHA_VANTAGE_SYMBOLS = {
-  DOW_JONES: 'DJI',           // Dow Jones Industrial Average
-  NASDAQ: 'NASDAQ',           // NASDAQ Composite
-  SP500: 'SPX',               // S&P 500
+  DOW_JONES: 'DIA',           // Dow Jones Industrial Average ETF
+  NASDAQ: 'QQQ',              // Nasdaq-100 ETF
+  SP500: 'SPY',               // S&P 500 ETF
 } as const;
 
 export const RATE_LIMITS = {
