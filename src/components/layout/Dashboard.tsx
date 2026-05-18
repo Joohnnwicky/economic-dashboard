@@ -1,0 +1,53 @@
+import { FedRatePanel } from '../indicators/FedRatePanel';
+import { CryptoPanel } from '../indicators/CryptoPanel';
+import { EmploymentPanel } from '../indicators/EmploymentPanel';
+import { InflationPanel } from '../indicators/InflationPanel';
+import { USIndicesPanel } from '../indicators/USIndicesPanel';
+import { FilterBar } from './FilterBar';
+import { OverlayPanel } from './OverlayPanel';
+import { DARK_THEME } from '../../constants/colors';
+
+export function Dashboard() {
+  return (
+    <main className="p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Global Filter Bar */}
+        <FilterBar />
+
+        {/* Responsive Grid Layout - 2 columns at lg breakpoint */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Left Column: Economic Indicators */}
+          <div className="space-y-4">
+            <FedRatePanel />
+            <EmploymentPanel />
+            <InflationPanel />
+          </div>
+
+          {/* Right Column: Market Data */}
+          <div className="space-y-4">
+            <CryptoPanel />
+            <USIndicesPanel />
+          </div>
+        </div>
+
+        {/* Cross-Market Comparison Section - Full width */}
+        <div className="mt-4">
+          <OverlayPanel />
+        </div>
+
+        {/* Footer */}
+        <footer
+          className="mt-8 text-center py-4 border-t"
+          style={{ borderColor: DARK_THEME.gridLine, color: DARK_THEME.textMuted }}
+        >
+          <p className="text-sm">
+            全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage
+          </p>
+          <p className="text-xs mt-2">
+            本工具仅供个人使用，数据可能存在延迟或误差
+          </p>
+        </footer>
+      </div>
+    </main>
+  );
+}

@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useFedRate } from './hooks/useFedRate';
-import { LineChart } from './components/charts/LineChart';
-import { GridPanel } from './components/layout/GridPanel';
 import { Header } from './components/layout/Header';
-import { FilterBar } from './components/layout/FilterBar';
-import { EmploymentPanel } from './components/indicators/EmploymentPanel';
-import { InflationPanel } from './components/indicators/InflationPanel';
-import { CryptoPanel } from './components/indicators/CryptoPanel';
-import { USIndicesPanel } from './components/indicators/USIndicesPanel';
-import { useDashboardStore } from './stores/dashboardStore';
+import { Dashboard } from './components/layout/Dashboard';
+import { ExportDialog } from './components/ui/ExportDialog';
 import { DARK_THEME } from './constants/colors';
+import { useFedRate } from './hooks/useFedRate';
+import { useCrypto } from './hooks/useCrypto';
+import { useEmploymentSubMetrics } from './hooks/useEmploymentSubMetrics';
+import { useInflationSubMetrics } from './hooks/useInflationSubMetrics';
+import { usePCEData } from './hooks/usePCEData';
+import { useChineseIndices } from './hooks/useChineseIndices';
+import { usePBOCRate } from './hooks/usePBOCRate';
+import { NormalizedIndicator } from './types/indicator';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,57 +24,51 @@ const queryClient = new QueryClient({
   },
 });
 
-function FedRatePanel() {
-  const timeRange = useDashboardStore((state) => state.timeRange);
-  const { data, isLoading, error, dataUpdatedAt } = useFedRate(timeRange);
+function AppContent() {
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+
+  // Gather available indicators for export dialog
+  const fedRate = useFedRate();
+  const crypto = useCrypto();
+  const employment = useEmploymentSubMetrics();
+  const inflation = useInflationSubMetrics();
+  const pce = usePCEData();
+  const chineseIndices = useChineseIndices();
+  const pbocRate = usePBOCRate();
+
+  // Combine all indicators for export
+  const allIndicators: NormalizedIndicator[] = [
+    fedRate.data ? [fedRate.data] : [],
+    crypto.data || [],
+    employment.data || [],
+    inflation.data || [],
+    pce.data || [],
+    chineseIndices.data || [],
+    pbocRate.data ? [pbocRate.data] : [],
+  ].flat();
 
   return (
-    <GridPanel
-      title="美联储利率"
-      isLoading={isLoading}
-      lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: DARK_THEME.background }}
     >
-      {error && (
-        <div className="p-2 bg-red-900/20 rounded text-red-400 mb-2">
-          加载失败: {error.message}
-        </div>
-      )}
-      {data && <LineChart data={data} timeRange={timeRange} />}
-    </GridPanel>
+      <Header onExportClick={() => setExportDialogOpen(true)} />
+      <Dashboard />
+
+      {/* Export Dialog Modal */}
+      <ExportDialog
+        isOpen={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        availableIndicators={allIndicators}
+      />
+    </div>
   );
 }
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div
-        className="min-h-screen"
-        style={{ backgroundColor: DARK_THEME.background }}
-      >
-        <Header />
-        <main className="p-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Filter Bar at top */}
-            <FilterBar />
-
-            {/* Grid layout for all panels */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Left column */}
-              <div className="space-y-4">
-                <FedRatePanel />
-                <CryptoPanel />
-                <USIndicesPanel />
-              </div>
-
-              {/* Right column */}
-              <div className="space-y-4">
-                <EmploymentPanel />
-                <InflationPanel />
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
+      <AppContent />
     </QueryClientProvider>
   );
 }
