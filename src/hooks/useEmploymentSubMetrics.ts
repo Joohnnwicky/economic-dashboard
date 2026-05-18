@@ -5,7 +5,7 @@ import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 
 // BLS series IDs for employment sub-metrics
 const EMPLOYMENT_SUB_SERIES = {
-  LABOR_PARTICIPATION: 'LNS11000000',     // Labor force participation rate (%)
+  LABOR_PARTICIPATION: 'LNS11300000',     // Labor force participation rate (%) - CORRECT series ID
   WAGE_GROWTH: 'CES0500000003',           // Average hourly earnings (USD)
 } as const;
 
@@ -79,7 +79,7 @@ export function useEmploymentSubMetrics() {
       },
     ],
     combine: (results) => {
-      const firstResult = results[0];
+      const [firstResult] = results;
       return {
         data: firstResult?.data ?? [],
         isLoading: firstResult?.isLoading ?? false,
