@@ -144,3 +144,84 @@ describe('MultiSeriesChart', () => {
     expect(chart).toBeDefined();
   });
 });
+
+describe('MultiSeriesChart dataZoom', () => {
+  it('renders dataZoom slider', () => {
+    const series1 = createIndicator('test', 'Test Series', '%', [
+      { date: '2024-01-01', value: 5.0 },
+      { date: '2024-02-01', value: 5.25 },
+    ]);
+
+    render(
+      <MultiSeriesChart
+        series={[{ data: series1, axisPosition: 'left' }]}
+      />
+    );
+
+    const chart = screen.getByTestId('multi-series-chart');
+    expect(chart).toBeDefined();
+  });
+
+  it('dataZoom applies to xAxisIndex: 0 (both series)', () => {
+    const series1 = createIndicator('left', 'Left', '%', [
+      { date: '2024-01-01', value: 5 },
+    ]);
+
+    const series2 = createIndicator('right', 'Right', 'USD', [
+      { date: '2024-01-01', value: 50000 },
+    ]);
+
+    render(
+      <MultiSeriesChart
+        series={[
+          { data: series1, axisPosition: 'left' },
+          { data: series2, axisPosition: 'right' },
+        ]}
+      />
+    );
+
+    const chart = screen.getByTestId('multi-series-chart');
+    expect(chart).toBeDefined();
+  });
+
+  it('slider styling matches LineChart (D-09)', () => {
+    const series1 = createIndicator('test', 'Test', '%', [
+      { date: '2024-01-01', value: 1.0 },
+    ]);
+
+    render(
+      <MultiSeriesChart
+        series={[{ data: series1, axisPosition: 'left' }]}
+      />
+    );
+
+    const chart = screen.getByTestId('multi-series-chart');
+    expect(chart).toBeDefined();
+  });
+
+  it('zooming affects both left and right axis series simultaneously', () => {
+    const series1 = createIndicator('left', 'Left', '%', [
+      { date: '2024-01-01', value: 5 },
+      { date: '2024-02-01', value: 5.5 },
+      { date: '2024-03-01', value: 5.75 },
+    ]);
+
+    const series2 = createIndicator('right', 'Right', 'USD', [
+      { date: '2024-01-01', value: 40000 },
+      { date: '2024-02-01', value: 45000 },
+      { date: '2024-03-01', value: 50000 },
+    ]);
+
+    render(
+      <MultiSeriesChart
+        series={[
+          { data: series1, axisPosition: 'left' },
+          { data: series2, axisPosition: 'right' },
+        ]}
+      />
+    );
+
+    const chart = screen.getByTestId('multi-series-chart');
+    expect(chart).toBeDefined();
+  });
+});

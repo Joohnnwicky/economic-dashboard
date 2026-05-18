@@ -115,7 +115,7 @@ export function MultiSeriesChart({
       left: '10%',
       right: hasRightAxis ? '15%' : '5%',
       top: showLegend ? '15%' : '10%',
-      bottom: '15%',
+      bottom: '20%',
     },
     legend: showLegend
       ? {
@@ -138,6 +138,29 @@ export function MultiSeriesChart({
       borderColor: DARK_THEME.gridLine,
       textStyle: { color: DARK_THEME.text },
     },
+    dataZoom: [
+      {
+        type: 'slider',
+        show: true,
+        xAxisIndex: 0,
+        start: 0,
+        end: 100,
+        height: 20,
+        bottom: 10,
+        backgroundColor: DARK_THEME.panel,
+        dataBackground: {
+          lineStyle: { color: DARK_THEME.accent[0] },
+          areaStyle: { color: DARK_THEME.accent[0], opacity: 0.3 },
+        },
+        fillerColor: 'rgba(88, 166, 255, 0.2)',
+        borderColor: DARK_THEME.gridLine,
+        handleStyle: {
+          color: DARK_THEME.accent[0],
+          borderColor: DARK_THEME.accent[0],
+        },
+        textStyle: { color: DARK_THEME.textMuted },
+      },
+    ],
   };
 
   return (
