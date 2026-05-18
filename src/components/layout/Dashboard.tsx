@@ -3,6 +3,7 @@ import { CryptoPanel } from '../indicators/CryptoPanel';
 import { EmploymentPanel } from '../indicators/EmploymentPanel';
 import { InflationPanel } from '../indicators/InflationPanel';
 import { USIndicesPanel } from '../indicators/USIndicesPanel';
+import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { DARK_THEME } from '../../constants/colors';
@@ -27,6 +28,7 @@ export function Dashboard() {
           <div className="space-y-4">
             <CryptoPanel />
             <USIndicesPanel />
+            <ChineseIndicesPanel />
           </div>
         </div>
 
@@ -41,7 +43,7 @@ export function Dashboard() {
           style={{ borderColor: DARK_THEME.gridLine, color: DARK_THEME.textMuted }}
         >
           <p className="text-sm">
-            全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage
+            全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage, 东方财富
           </p>
           <p className="text-xs mt-2">
             本工具仅供个人使用，数据可能存在延迟或误差

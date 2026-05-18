@@ -43,6 +43,12 @@ export default defineConfig({
         target: 'https://push2.eastmoney.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/eastmoney/, '/api'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('Referer', 'https://eastmoney.com/');
+            proxyReq.setHeader('User-Agent', 'Mozilla/5.0');
+          });
+        },
       },
     },
   },
