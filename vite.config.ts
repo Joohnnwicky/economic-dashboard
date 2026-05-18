@@ -13,11 +13,36 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/fred/, '/fred'),
       },
-      // BLS API 代理
+      // BLS API 代理 (POST 请求)
       '/api/bls': {
         target: 'https://api.bls.gov',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/bls/, '/publicAPI/v2'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            if (req.method === 'POST') {
+              proxyReq.setHeader('Content-Type', 'application/json');
+            }
+          });
+        },
+      },
+      // CoinGecko API 代理
+      '/api/coingecko': {
+        target: 'https://api.coingecko.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/coingecko/, '/api/v3'),
+      },
+      // Alpha Vantage API 代理
+      '/api/alphavantage': {
+        target: 'https://www.alphavantage.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/alphavantage/, '/query'),
+      },
+      // 东方财富 API 代理 (A股数据)
+      '/api/eastmoney': {
+        target: 'https://push2.eastmoney.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/eastmoney/, '/api'),
       },
     },
   },

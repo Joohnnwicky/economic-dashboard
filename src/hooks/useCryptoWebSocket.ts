@@ -124,7 +124,12 @@ export function useCryptoWebSocket(): WebSocketState {
       }, 30000);
     };
 
-    wsRef.current.onmessage = (event) => {
+    wsRef.current.onmessage = (event: MessageEvent) => {
+      // 忽略 ping/pong 响应（Binance 返回非 JSON）
+      if (event.data === 'ping' || event.data === 'pong' || !event.data.startsWith('{')) {
+        return;
+      }
+
       // Extract symbol from URL to determine which handler to use
       const isBtc = url.includes('btcusdt');
       const symbol = isBtc ? 'BTCUSDT' : 'ETHUSDT';

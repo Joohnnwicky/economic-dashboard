@@ -3,7 +3,11 @@ import { rateLimiter } from './rate-limiter';
 import { NormalizedIndicator } from '../types/indicator';
 import { CHINESE_INDEX_CODES, EASTMONEY_INDEX_FIELDS } from '../constants/chinese-indices';
 
-const EASTMONEY_INDEX_URL = 'https://push2.eastmoney.com/api/qt/ulist.np';
+// 开发环境使用代理，生产环境直接访问
+const isDev = import.meta.env.DEV;
+const EASTMONEY_INDEX_URL = isDev
+  ? '/api/eastmoney/qt/ulist.np'
+  : 'https://push2.eastmoney.com/api/qt/ulist.np';
 
 // Rate limit configuration for East Money (unofficial API)
 // Aggressive caching to prevent quota exhaustion and reduce risk of endpoint changes

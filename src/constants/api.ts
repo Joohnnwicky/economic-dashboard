@@ -3,7 +3,7 @@ const isDev = import.meta.env.DEV;
 
 export const FRED_BASE_URL = isDev ? '/api/fred' : 'https://api.stlouisfed.org/fred';
 export const FRED_FED_RATE_SERIES = 'FEDFUNDS';
-export const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
+export const COINGECKO_BASE_URL = isDev ? '/api/coingecko' : 'https://api.coingecko.com/api/v3';
 
 // BLS API configuration - CRITICAL: 25 calls/day FREE tier!
 // 开发环境使用代理路径
@@ -18,7 +18,8 @@ export const BLS_SERIES = {
 } as const;
 
 // Alpha Vantage API configuration - CRITICAL: 25 calls/day FREE tier!
-export const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
+// 开发环境使用代理路径
+export const ALPHA_VANTAGE_BASE_URL = isDev ? '/api/alphavantage' : 'https://www.alphavantage.co/query';
 
 // Alpha Vantage symbols for US indices
 // NOTE: Alpha Vantage uses specific symbols, not standard ticker symbols
