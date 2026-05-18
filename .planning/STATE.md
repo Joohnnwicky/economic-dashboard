@@ -2,16 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+current_plan: 02-02 (completed)
 status: executing
-stopped_at: Phase 2 planning complete
-last_updated: "2026-05-18T07:51:01.653Z"
-last_activity: 2026-05-18 — Phase 2 planning complete
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-05-18T08:17:04.000Z"
+last_activity: 2026-05-18 — Plan 02-02 complete (Chinese Market Integration)
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
-  percent: 67
+  completed_plans: 7
+  percent: 78
 ---
 
 # Project State
@@ -26,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 2 of 3 (Cross-Market Analysis) — **EXECUTING**
-Current Plan: 02-01 (completed)
-Status: 1 of 4 plans complete
-Last activity: 2026-05-18 — Plan 02-01 complete (Cross-Market Foundation)
+Current Plan: 02-02 (completed)
+Status: 2 of 4 plans complete
+Last activity: 2026-05-18 — Plan 02-02 complete (Chinese Market Integration)
 
-Progress: [███████░░░] 67%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -44,7 +45,7 @@ Progress: [███████░░░] 67%
 | Phase | Plans | Status | Avg/Plan |
 |-------|-------|--------|----------|
 | 1. Core Data Infrastructure | 5/5 | Complete | ~30 min |
-| 2. Cross-Market Analysis | 1/4 | In Progress | ~12 min (02-01) |
+| 2. Cross-Market Analysis | 2/4 | In Progress | ~12 min (02-01), ~13 min (02-02) |
 | 3. Professional Experience | 0/TBD | Not planned | - |
 
 ## Phase 2 Plan Summary
@@ -52,7 +53,7 @@ Progress: [███████░░░] 67%
 | Wave | Plan | Requirements | Tasks | Purpose |
 |------|------|--------------|-------|---------|
 | 1 | 02-01 | DATA-03, DATA-04, CHART-06, CHART-07, EXPORT-01~03 | 5 | **COMPLETE** - YoY/MoM, dual Y-axis, export infrastructure |
-| 2 | 02-02 | API-05, API-06, IND-10~12, IND-16 | 5 | Chinese Market: A-share indices, PBOC rates |
+| 2 | 02-02 | API-05, API-06, IND-10~12, IND-16 | 5 | **COMPLETE** - Chinese Market: A-share indices, PBOC rates |
 | 3 | 02-03 | IND-04, IND-06, IND-07 | 5 | Sub-metrics: Employment/inflation breakdown, PCE |
 | 4 | 02-04 | UI-06, CHART-07 | 5 + checkpoint | Integration: Export UI, overlay comparison |
 
@@ -69,6 +70,8 @@ Progress: [███████░░░] 67%
 - YoY/MoM: Use date-fns subYears/subMonths for leap year handling
 - Dual Y-axis: grid.right = 15% when right axis present for label visibility
 - Formula injection: Sanitize (=, +, -, @) prefixes in CSV/Excel exports
+- East Money API endpoint used (unofficial, aggressive 60-min caching)
+- PBOC rates stored as static JSON (no public API available)
 
 ### Pending Todos
 
@@ -76,9 +79,9 @@ None yet.
 
 ### Blockers/Concerns
 
-**Phase 2 Critical Risks (02-01 addressed):**
+**Phase 2 Critical Risks (02-01, 02-02 addressed):**
 
-1. East Money API unofficial - may change, needs caching (deferred to 02-02)
+1. East Money API unofficial - may change, needs caching - ✅ Addressed in 02-02 (60-min cache, rate limiting)
 2. **Timestamp alignment for cross-market overlay** - ✅ Addressed in 02-01 (alignTimestamps utility)
 3. **UTF-8 BOM for Excel Chinese character compatibility** - ✅ Addressed in 02-01 (export-csv.ts)
 
@@ -90,8 +93,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-18T07:00:00.000Z
-Stopped at: Phase 2 planning complete
+Last session: 2026-05-18T08:17:04.000Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 
 ## Next Steps

@@ -51,7 +51,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Cross-Market Foundation: YoY/MoM utilities, dual Y-axis charts, export infrastructure (7 reqs)
-- [ ] 02-02-PLAN.md — Chinese Market Integration: A-share indices, PBOC rates (6 reqs)
+- [x] 02-02-PLAN.md — Chinese Market Integration: A-share indices, PBOC rates (6 reqs)
 - [ ] 02-03-PLAN.md — Employment/Inflation Sub-Metrics: BLS/FRED sub-series, YoY/MoM displays (4 reqs)
 - [ ] 02-04-PLAN.md — Export UI & Overlay Comparison: Dialog, integration, final verification (2 reqs)
 
