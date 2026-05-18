@@ -10,9 +10,12 @@ import { parseUTCDate } from '../utils/utc';
 let alphaVantageCallCount = 0;
 const MAX_AV_CALLS_PER_DAY = 25;
 
-// Helper to map symbol to name
+// Helper to map ETF symbol to index name
 function getIndexName(symbol: string): string {
   const names: Record<string, string> = {
+    'DIA': '道琼斯指数 (DIA ETF)',
+    'QQQ': '纳斯达克指数 (QQQ ETF)',
+    'SPY': '标普500指数 (SPY ETF)',
     'DJI': '道琼斯指数',
     'NASDAQ': '纳斯达克指数',
     'SPX': '标普500指数',
