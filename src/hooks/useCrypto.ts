@@ -5,7 +5,10 @@ import { NormalizedIndicator } from '../types/indicator';
 
 /**
  * Hook for fetching current BTC and ETH prices
- * Auto-refetches every 60 seconds for real-time updates (REAL-03)
+ *
+ * Note: WebSocket updates this cache via setQueryData (D-02)
+ * Prices are updated in real-time by useCryptoWebSocket hook
+ * This hook reads from the same ['crypto-price'] cache
  */
 export function useCryptoPrice() {
   const query = useQuery({
@@ -15,7 +18,7 @@ export function useCryptoPrice() {
     },
     staleTime: 60 * 1000,        // 1 minute - crypto needs freshness
     gcTime: 5 * 60 * 1000,       // Keep in cache 5 min
-    refetchInterval: 60 * 1000,  // Auto refetch every 60s (REAL-03)
+    // refetchInterval removed - WebSocket provides real-time updates
     retry: 2,
     refetchOnWindowFocus: false,
   });

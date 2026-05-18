@@ -1,10 +1,16 @@
 import { useCryptoPrice, useCryptoHistories } from '../../hooks/useCrypto';
+import { useCryptoWebSocket } from '../../hooks/useCryptoWebSocket';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
+import { ConnectionIndicator } from '../ui/ConnectionIndicator';
 import { BTC, ETH } from '../../constants/indicators';
 import { DARK_THEME } from '../../constants/colors';
 
 export function CryptoPanel() {
+  // WebSocket connection for real-time updates (REAL-01)
+  const wsState = useCryptoWebSocket();
+
+  // Price data - WebSocket updates this cache via setQueryData (D-02)
   const { btcPrice, ethPrice, isLoading: priceLoading, error } = useCryptoPrice();
   const { btcHistory, ethHistory, isLoading: historyLoading } = useCryptoHistories();
 
@@ -12,9 +18,13 @@ export function CryptoPanel() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-        加密货币实时行情
-      </h3>
+      {/* Header with WebSocket connection indicator */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
+          加密货币实时行情
+        </h3>
+        <ConnectionIndicator status={wsState.status} />
+      </div>
 
       {error && (
         <div className="p-2 rounded" style={{ backgroundColor: 'rgba(248, 81, 73, 0.2)', color: DARK_THEME.accent[2] }}>
