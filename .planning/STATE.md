@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 02-02 (completed)
+current_plan: 02-03 (completed)
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-05-18T08:17:04.000Z"
-last_activity: 2026-05-18 — Plan 02-02 complete (Chinese Market Integration)
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-05-18T09:10:00.000Z"
+last_activity: 2026-05-18 — Plan 02-03 complete (Employment/Inflation Sub-Metrics)
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -31,7 +31,7 @@ Current Plan: 02-02 (completed)
 Status: 2 of 4 plans complete
 Last activity: 2026-05-18 — Plan 02-02 complete (Chinese Market Integration)
 
-Progress: [████████░░] 78%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -45,7 +45,7 @@ Progress: [████████░░] 78%
 | Phase | Plans | Status | Avg/Plan |
 |-------|-------|--------|----------|
 | 1. Core Data Infrastructure | 5/5 | Complete | ~30 min |
-| 2. Cross-Market Analysis | 2/4 | In Progress | ~12 min (02-01), ~13 min (02-02) |
+| 2. Cross-Market Analysis | 3/4 | In Progress | ~12 min (02-01), ~13 min (02-02), ~14 min (02-03) |
 | 3. Professional Experience | 0/TBD | Not planned | - |
 
 ## Phase 2 Plan Summary
@@ -54,7 +54,7 @@ Progress: [████████░░] 78%
 |------|------|--------------|-------|---------|
 | 1 | 02-01 | DATA-03, DATA-04, CHART-06, CHART-07, EXPORT-01~03 | 5 | **COMPLETE** - YoY/MoM, dual Y-axis, export infrastructure |
 | 2 | 02-02 | API-05, API-06, IND-10~12, IND-16 | 5 | **COMPLETE** - Chinese Market: A-share indices, PBOC rates |
-| 3 | 02-03 | IND-04, IND-06, IND-07 | 5 | Sub-metrics: Employment/inflation breakdown, PCE |
+| 3 | 02-03 | IND-04, IND-06, IND-07 | 5 | **COMPLETE** - Sub-metrics: Employment/inflation breakdown, PCE |
 | 4 | 02-04 | UI-06, CHART-07 | 5 + checkpoint | Integration: Export UI, overlay comparison |
 
 **Note:** IND-02 (FOMC meeting details) moved to Phase 3 per roadmap decision.
@@ -72,6 +72,10 @@ Progress: [████████░░] 78%
 - Formula injection: Sanitize (=, +, -, @) prefixes in CSV/Excel exports
 - East Money API endpoint used (unofficial, aggressive 60-min caching)
 - PBOC rates stored as static JSON (no public API available)
+- BLS series IDs verified: LNS11000000 (labor participation), CES0500000003 (hourly earnings)
+- CPI component series IDs ASSUMED: CUSR0000SAC (core), CUSR0000SEF (food), CUSR0000SEB (energy), CUSR0000SAM (medical)
+- FRED PCE series IDs verified: PCEPI (overall), PCEPILFE (core)
+- 30-min cache for BLS hooks (quota protection), 5-min cache for FRED hooks (standard)
 
 ### Pending Todos
 
@@ -93,8 +97,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-18T08:17:04.000Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-05-18T09:10:00.000Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
 
 ## Next Steps
