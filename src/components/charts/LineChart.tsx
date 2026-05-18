@@ -14,7 +14,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
   const option = {
     backgroundColor: DARK_THEME.background,
     textStyle: { color: DARK_THEME.text },
-    grid: { left: '10%', right: '5%', top: '10%', bottom: '15%' },
+    grid: { left: '10%', right: '5%', top: '10%', bottom: '20%' },
     xAxis: {
       type: 'category',
       data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
@@ -52,6 +52,29 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
         return `${point.name}<br/>${data.name}: ${formatPercentage(point.value)}`;
       },
     },
+    dataZoom: [
+      {
+        type: 'slider',
+        show: true,
+        xAxisIndex: 0,
+        start: 0,
+        end: 100,
+        height: 20,
+        bottom: 10,
+        backgroundColor: DARK_THEME.panel,
+        dataBackground: {
+          lineStyle: { color: DARK_THEME.accent[0] },
+          areaStyle: { color: DARK_THEME.accent[0], opacity: 0.3 },
+        },
+        fillerColor: 'rgba(88, 166, 255, 0.2)',
+        borderColor: DARK_THEME.gridLine,
+        handleStyle: {
+          color: DARK_THEME.accent[0],
+          borderColor: DARK_THEME.accent[0],
+        },
+        textStyle: { color: DARK_THEME.textMuted },
+      },
+    ],
   };
 
   return (
@@ -59,6 +82,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
       option={option}
       style={{ height: `${height}px`, width: '100%' }}
       opts={{ renderer: 'canvas' }}
+      data-testid="line-chart"
     />
   );
 }
