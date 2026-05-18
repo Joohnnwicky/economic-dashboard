@@ -30,7 +30,9 @@ This phase delivers professional-level chart interaction capabilities and WebSoc
 ## Implementation Decisions
 
 ### WebSocket Architecture
-- **D-01:** Use CoinGecko WebSocket endpoint (`ws://api.coingecko.net/api/v3/ws`) for real-time crypto prices
+- **D-01:** Use Binance WebSocket endpoint (`wss://stream.binance.com:9443/ws/btcusdt@trade`) for BTC real-time prices — FREE public endpoint, no subscription required
+  - ETH: `wss://stream.binance.com:9443/ws/ethusdt@trade`
+  - Note: Binance streams use lowercase symbol + usdt suffix (btcusdt, ethusdt)
 - **D-02:** WebSocket updates sync to TanStack Query cache via `setQueryData` — single data source for all components
 - **D-03:** Display WebSocket connection state indicator (green/red/yellow) — user knows if data is real-time
 - **D-04:** Architecture supports dynamic subscription management (future extension), but Phase 3 implements fixed BTC/ETH subscriptions
