@@ -19,3 +19,19 @@ export interface CoinGeckoPriceResponse {
 export interface CoinGeckoHistoryResponse {
   prices: Array<[number, number]>; // [timestamp, price]
 }
+
+// BLS API response structure
+export interface BLSResponse {
+  Results: {
+    series: Array<{
+      seriesID: string;
+      data: Array<{
+        year: string;
+        period: string;      // M01, M02, etc.
+        periodName: string;  // January, February, etc.
+        value: string;       // BLS returns strings!
+        footnotes: Array<{ code: string; text: string }>;
+      }>;
+    }>;
+  };
+}
