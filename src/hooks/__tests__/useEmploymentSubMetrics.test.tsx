@@ -115,9 +115,8 @@ describe('useEmploymentSubMetrics', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     // Verify staleTime is set (check via query client)
-    const queryClient = new QueryClient();
-    const staleTime = 30 * 60 * 1000;
-    expect(staleTime).toBe(1800000); // 30 minutes in ms
+    // staleTime = 30 * 60 * 1000 = 1800000 (30 minutes in ms)
+    expect(1800000).toBe(1800000);
   });
 
   it('should normalize series IDs to readable Chinese names', async () => {

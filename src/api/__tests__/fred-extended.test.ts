@@ -1,11 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getPCEData } from '../fred-extended';
-import * as fredApi from '../fred';
-
-// Mock FRED API
-vi.mock('../fred', () => ({
-  getFedRate: vi.fn(),
-}));
 
 describe('getPCEData', () => {
   beforeEach(() => {

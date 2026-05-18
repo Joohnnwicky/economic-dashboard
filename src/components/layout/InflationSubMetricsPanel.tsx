@@ -1,4 +1,3 @@
-import React from 'react';
 import { useInflationSubMetrics } from '../../hooks/useInflationSubMetrics';
 import { usePCEData } from '../../hooks/usePCEData';
 import { calculateYoY } from '../../utils/yoy-mom';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEmploymentSubMetrics } from '../../hooks/useEmploymentSubMetrics';
 import { calculateYoY, calculateMoM } from '../../utils/yoy-mom';
 import { formatPercentage } from '../../utils/formatters';
