@@ -1,9 +1,9 @@
 ---
-status: resolved
+status: testing
 phase: 03-professional-experience
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md]
 started: 2026-05-18T20:20:00.000Z
-updated: 2026-05-18T23:17:00.000Z
+updated: 2026-05-18T23:41:00.000Z
 ---
 
 ## Current Test
@@ -14,7 +14,7 @@ expected: |
   Auto-reconnect with exponential backoff when connection drops.
   After network interruption, indicator should briefly show "断开" then reconnect.
   After 5 failed attempts, indicator shows "连接失败" (red).
-awaiting: resolved - gap closure complete
+awaiting: user verification
 
 ## Session Notes
 
@@ -38,21 +38,21 @@ UAT testing revealed CORS, WebSocket, and API configuration bugs.
    - Fix: Created ChineseIndicesPanel and added to layout
    - Commit: fb1b668
 
-### New Issues Identified (2026-05-18T22:00)
-
 5. **Alpha Vantage symbols incorrect** - Code uses DJI, NASDAQ, SPX but Alpha Vantage TIME_SERIES_DAILY doesn't support index symbols
-   - Verified: IBM returns data, SPY returns data, but DJI returns empty `{}`
-   - Fix needed: Change symbols to ETF proxies: DIA (Dow), QQQ (Nasdaq), SPY (S&P 500)
-   - Files: src/constants/api.ts (ALPHA_VANTAGE_SYMBOLS)
+   - Fix: Changed to ETF proxies (DIA, QQQ, SPY)
+   - Commit: 106b285 (gap closure 03-04)
 
 6. **Eastmoney API endpoint not responding** - A股 indices data fetch fails
-   - Tested: push2.eastmoney.com/api/qt/ulist.np returns no data
-   - Possible: Endpoint changed, requires different headers, or blocking direct calls
-   - Files: src/api/eastmoney.ts, vite.config.ts
+   - Fix: Added cb=, ut=, invt=2 parameters to endpoint
+   - Commit: 106b285 (gap closure 03-04)
 
 7. **中国央行利率 has no dedicated panel** - PBOCRate data only used in OverlayPanel
-   - User expects standalone panel like other indicators
-   - Enhancement needed: Create PBOCRatePanel component
+   - Fix: Created PBOCRatePanel component and added to Dashboard
+   - Commit: 781fb6b (gap closure 03-05)
+
+8. **CPI/OverlayPanel spinning forever** - BLS series IDs incorrect + OverlayPanel cascade blocking
+   - Fix: Corrected BLS series IDs (CUSR0000SAF, CUSR0000SA0E), fixed OverlayPanel partial data display
+   - Commit: 2b94265
 
 ## Tests
 
