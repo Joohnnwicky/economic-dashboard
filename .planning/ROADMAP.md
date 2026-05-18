@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Walking Skeleton: Fed Rate slice (17 reqs)
-- [ ] 01-02-PLAN.md — Crypto Slice: BTC/ETH real-time prices (6 reqs)
+- [x] 01-02-PLAN.md — Crypto Slice: BTC/ETH real-time prices (6 reqs)
 - [x] 01-03-PLAN.md — Employment + Inflation Slice: BLS data with time selector (5 reqs)
 - [ ] 01-04-PLAN.md — US Indices Slice: Alpha Vantage integration (5 reqs)
 - [ ] 01-05-PLAN.md — Dashboard Integration: Layout, Theme, Polish (8 reqs)

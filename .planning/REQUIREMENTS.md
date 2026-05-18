@@ -9,7 +9,7 @@
 ### API基础设施
 
 - [ ] **API-01**: FRED API客户端实现（美联储利率数据获取）
-- [x] **API-02**: BLS API客户端实现（美国就业数据获取�?- [ ] **API-03**: CoinGecko API客户端实现（加密货币价格获取�?- [ ] **API-04**: Alpha Vantage API客户端实现（美股指数获取�?- [ ] **API-05**: 东方财富/新浪财经数据源集成（A股指数获取）
+- [x] **API-02**: BLS API客户端实现（美国就业数据获取�?- [x] **API-03**: CoinGecko API客户端实现（加密货币价格获取�?- [ ] **API-04**: Alpha Vantage API客户端实现（美股指数获取�?- [ ] **API-05**: 东方财富/新浪财经数据源集成（A股指数获取）
 - [ ] **API-06**: 中国央行利率数据源集�?- [ ] **API-07**: API限流机制实现（防止配额耗尽�?- [ ] **API-08**: 数据缓存层实现（TanStack Query配置�?
 ### 数据处理
 
@@ -22,8 +22,8 @@
 - [x] **IND-03**: 美国就业数据图表（NFP、失业率�?- [ ] **IND-04**: 就业分项指标展示（劳动参与率、工资增长）
 - [x] **IND-05**: CPI通胀数据图表
 - [ ] **IND-06**: 通胀分项数据展示（核心CPI、食�?能源/医疗�?- [ ] **IND-07**: PCE通胀数据展示
-- [ ] **IND-08**: 比特币实时价格及走势图表
-- [ ] **IND-09**: 以太坊实时价格及走势图表
+- [x] **IND-08**: 比特币实时价格及走势图表
+- [x] **IND-09**: 以太坊实时价格及走势图表
 - [ ] **IND-10**: 上证指数展示
 - [ ] **IND-11**: 深证成指展示
 - [ ] **IND-12**: 创业板指数展�?- [ ] **IND-13**: 道琼斯指数展�?- [ ] **IND-14**: 纳斯达克指数展示
@@ -42,14 +42,14 @@
 - [ ] **UI-01**: Dashboard整体布局框架
 - [ ] **UI-02**: 多面板网格布局（响应式2-3列）
 - [ ] **UI-03**: 暗色金融终端主题实现
-- [ ] **UI-04**: 指标卡片组件（关键数值展示）
+- [x] **UI-04**: 指标卡片组件（关键数值展示）
 - [x] **UI-05**: 筛选栏组件（时间范围、指标选择�?- [ ] **UI-06**: 数据导出对话�?- [ ] **UI-07**: 加载状态指示器
 - [ ] **UI-08**: 错误边界处理（单API失败不影响整体）
 - [ ] **UI-09**: 数据刷新状态指示（"上次更新"时间�?
 ### 实时更新
 
 - [ ] **REAL-01**: 加密货币WebSocket实时推送（秒级更新�?- [ ] **REAL-02**: WebSocket断线重连机制（指数退避）
-- [ ] **REAL-03**: 美股/A股分钟级轮询更新
+- [x] **REAL-03**: 美股/A股分钟级轮询更新
 - [ ] **REAL-04**: 经济指标分钟级轮询更�?- [ ] **REAL-05**: React 18状态更新优化（useTransition防卡顿）
 
 ### 数据导出
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | API-01 | Phase 1 | Pending |
 | API-02 | Phase 1 | Complete |
-| API-03 | Phase 1 | Pending |
+| API-03 | Phase 1 | Complete |
 | API-04 | Phase 1 | Pending |
 | API-05 | Phase 2 | Pending |
 | API-06 | Phase 2 | Pending |
@@ -120,8 +120,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IND-05 | Phase 1 | Complete |
 | IND-06 | Phase 2 | Pending |
 | IND-07 | Phase 2 | Pending |
-| IND-08 | Phase 1 | Pending |
-| IND-09 | Phase 1 | Pending |
+| IND-08 | Phase 1 | Complete |
+| IND-09 | Phase 1 | Complete |
 | IND-10 | Phase 2 | Pending |
 | IND-11 | Phase 2 | Pending |
 | IND-12 | Phase 2 | Pending |
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
 | UI-03 | Phase 1 | Pending |
-| UI-04 | Phase 1 | Pending |
+| UI-04 | Phase 1 | Complete |
 | UI-05 | Phase 1 | Complete |
 | UI-06 | Phase 2 | Pending |
 | UI-07 | Phase 1 | Pending |
@@ -149,7 +149,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-09 | Phase 1 | Pending |
 | REAL-01 | Phase 3 | Pending |
 | REAL-02 | Phase 3 | Pending |
-| REAL-03 | Phase 1 | Pending |
+| REAL-03 | Phase 1 | Complete |
 | REAL-04 | Phase 1 | Pending |
 | REAL-05 | Phase 1 | Pending |
 | EXPORT-01 | Phase 2 | Pending |
