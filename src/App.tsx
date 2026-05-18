@@ -7,6 +7,7 @@ import { FilterBar } from './components/layout/FilterBar';
 import { EmploymentPanel } from './components/indicators/EmploymentPanel';
 import { InflationPanel } from './components/indicators/InflationPanel';
 import { CryptoPanel } from './components/indicators/CryptoPanel';
+import { USIndicesPanel } from './components/indicators/USIndicesPanel';
 import { useDashboardStore } from './stores/dashboardStore';
 import { DARK_THEME } from './constants/colors';
 
@@ -60,6 +61,7 @@ function App() {
               <div className="space-y-4">
                 <FedRatePanel />
                 <CryptoPanel />
+                <USIndicesPanel />
               </div>
 
               {/* Right column */}
