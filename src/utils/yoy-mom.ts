@@ -6,7 +6,7 @@ import { HistoricalDataPoint } from '../types/indicator';
  * Returns null for first year (no prior data) or when division by zero would occur.
  */
 export function calculateYoY(data: HistoricalDataPoint[]): (number | null)[] {
-  return data.map((point, index) => {
+  return data.map((point) => {
     // Find same month one year ago
     const priorDate = subYears(point.timestamp, 1);
     const priorPoint = data.find((d) => isSameMonth(d.timestamp, priorDate));

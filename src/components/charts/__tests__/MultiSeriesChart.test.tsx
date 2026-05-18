@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MultiSeriesChart } from '../MultiSeriesChart';
-import { NormalizedIndicator } from '../../types/indicator';
+import { NormalizedIndicator } from '../../../types/indicator';
 
 // Helper to create test indicator
 function createIndicator(
