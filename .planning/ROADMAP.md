@@ -28,7 +28,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can view US stock indices (Dow Jones, Nasdaq, S&P 500) trend charts
   4. User sees a dark terminal-style dashboard with responsive grid layout and clear data visibility
   5. Each data panel shows "last updated" timestamp and loading/error states correctly
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
+
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: Fed Rate slice (17 reqs)
+- [ ] 01-02-PLAN.md — Crypto Slice: BTC/ETH real-time prices (6 reqs)
+- [ ] 01-03-PLAN.md — Employment + Inflation Slice: BLS data with time selector (5 reqs)
+- [ ] 01-04-PLAN.md — US Indices Slice: Alpha Vantage integration (5 reqs)
+- [ ] 01-05-PLAN.md — Dashboard Integration: Layout, Theme, Polish (8 reqs)
 
 ### Phase 2: Cross-Market Analysis
 **Goal**: 用户能进行跨市场对比分析，查看就业和通胀细分数据，导出数据
@@ -60,7 +67,7 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Data Infrastructure | 0/TBD | Not started | - |
+| 1. Core Data Infrastructure | 0/5 | Planned | - |
 | 2. Cross-Market Analysis | 0/TBD | Not started | - |
 | 3. Professional Experience | 0/TBD | Not started | - |
 
@@ -69,3 +76,4 @@ Phases execute in numeric order: 1 → 2 → 3
 *Roadmap created: 2026-05-18*
 *Based on: REQUIREMENTS.md v1 (56 requirements)*
 *Granularity: coarse (3 phases)*
+*Plans created: 2026-05-18*
