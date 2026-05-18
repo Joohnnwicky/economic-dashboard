@@ -1,0 +1,12 @@
+[
+  { "date": "2024-10-21", "rate": 3.10, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 25bp" },
+  { "date": "2024-07-22", "rate": 3.35, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 10bp" },
+  { "date": "2024-02-20", "rate": 3.45, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 5bp" },
+  { "date": "2023-08-21", "rate": 3.45, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate unchanged" },
+  { "date": "2023-06-20", "rate": 3.55, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 10bp" },
+  { "date": "2022-08-22", "rate": 3.65, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 5bp" },
+  { "date": "2022-01-20", "rate": 3.70, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 10bp" },
+  { "date": "2021-12-20", "rate": 3.80, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 5bp" },
+  { "date": "2020-04-20", "rate": 3.85, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate cut by 20bp" },
+  { "date": "2019-08-20", "rate": 4.25, "type": "LPR-1Y", "description": "PBOC LPR 1-year benchmark rate initial launch" }
+]
