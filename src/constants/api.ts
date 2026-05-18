@@ -1,9 +1,13 @@
-export const FRED_BASE_URL = 'https://api.stlouisfed.org/fred';
+// 开发环境使用 Vite 代理，生产环境直接访问
+const isDev = import.meta.env.DEV;
+
+export const FRED_BASE_URL = isDev ? '/api/fred' : 'https://api.stlouisfed.org/fred';
 export const FRED_FED_RATE_SERIES = 'FEDFUNDS';
 export const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
 
 // BLS API configuration - CRITICAL: 25 calls/day FREE tier!
-export const BLS_BASE_URL = 'https://api.bls.gov/publicAPI/v2/timeseries/data/';
+// 开发环境使用代理路径
+export const BLS_BASE_URL = isDev ? '/api/bls/timeseries/data/' : 'https://api.bls.gov/publicAPI/v2/timeseries/data/';
 
 // BLS series IDs
 export const BLS_SERIES = {
