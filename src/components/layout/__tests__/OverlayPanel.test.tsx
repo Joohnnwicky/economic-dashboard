@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OverlayPanel } from '../OverlayPanel';
 import * as fedRateHook from '../../../hooks/useFedRate';
@@ -9,7 +9,6 @@ import * as inflationHook from '../../../hooks/useInflationSubMetrics';
 import * as pceHook from '../../../hooks/usePCEData';
 import * as chineseHook from '../../../hooks/useChineseIndices';
 import * as pbocHook from '../../../hooks/usePBOCRate';
-import * as overlayChart from '../../charts/OverlayComparisonChart';
 
 // Mock all hooks
 vi.mock('../../../hooks/useFedRate', () => ({
@@ -130,19 +129,42 @@ describe('OverlayPanel', () => {
     expect(parseInt(indicatorCount || '0')).toBeGreaterThanOrEqual(7);
   });
 
-  it('shows loading spinner when indicators fetching', () => {
+  it('shows failed message when all data sources fail', () => {
+    // All hooks return no data and not loading
     vi.mocked(fedRateHook.useFedRate).mockReturnValue({
-      isLoading: true,
+      isLoading: false,
+      data: undefined,
+    } as any);
+    vi.mocked(cryptoHook.useCrypto).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as any);
+    vi.mocked(employmentHook.useEmploymentSubMetrics).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as any);
+    vi.mocked(inflationHook.useInflationSubMetrics).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as any);
+    vi.mocked(pceHook.usePCEData).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as any);
+    vi.mocked(chineseHook.useChineseIndices).mockReturnValue({
+      isLoading: false,
+      data: [],
+    } as any);
+    vi.mocked(pbocHook.usePBOCRate).mockReturnValue({
+      isLoading: false,
       data: undefined,
     } as any);
 
     render(<OverlayPanel />, { wrapper: createWrapper() });
 
-    // Should show loading spinner
+    // Should show failed message when all sources failed
     expect(screen.getByText('跨市场对比分析')).toBeInTheDocument();
-    // Loading indicator should be present
-    const spinner = screen.getByText('跨市场对比分析').parentElement?.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
+    expect(screen.getByText('数据加载失败，请检查网络连接或API配置')).toBeInTheDocument();
   });
 
   it('shows panel even when some hooks fail', () => {

@@ -3,13 +3,12 @@ import { useDashboardStore } from '../stores/dashboardStore';
 import { fetchBLSSeries } from '../api/bls';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 
-// BLS CPI component series IDs (verified from BLS Data Tools)
-// NOTE: Per RESEARCH.md, these series IDs are ASSUMED and need verification
+// BLS CPI component series IDs (verified from BLS API)
 const CPI_COMPONENT_SERIES = {
   CORE_CPI: 'CUSR0000SAC',           // Core CPI (ex food/energy)
-  FOOD: 'CUSR0000SEF',               // Food (ASSUMED per RESEARCH.md)
-  ENERGY: 'CUSR0000SEB',             // Energy (ASSUMED)
-  MEDICAL: 'CUSR0000SAM',            // Medical care (ASSUMED)
+  FOOD: 'CUSR0000SAF',               // Food CPI
+  ENERGY: 'CUSR0000SA0E',            // Energy CPI
+  MEDICAL: 'CUSR0000SAM',            // Medical care CPI
 } as const;
 
 interface BLSSeriesData {

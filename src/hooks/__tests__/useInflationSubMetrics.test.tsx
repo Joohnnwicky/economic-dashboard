@@ -34,12 +34,12 @@ describe('useInflationSubMetrics', () => {
         seriesId: 'CUSR0000SAC',
         data: [{ timestamp: new Date('2024-01-01'), value: 300.0 }],
       },
-      CUSR0000SEF: {
-        seriesId: 'CUSR0000SEF',
+      CUSR0000SAF: {
+        seriesId: 'CUSR0000SAF',
         data: [{ timestamp: new Date('2024-01-01'), value: 310.0 }],
       },
-      CUSR0000SEB: {
-        seriesId: 'CUSR0000SEB',
+      CUSR0000SA0E: {
+        seriesId: 'CUSR0000SA0E',
         data: [{ timestamp: new Date('2024-01-01'), value: 280.0 }],
       },
       CUSR0000SAM: {
@@ -101,12 +101,12 @@ describe('useInflationSubMetrics', () => {
         seriesId: 'CUSR0000SAC',
         data: [{ timestamp: new Date('2024-01-01'), value: 300.0 }],
       },
-      CUSR0000SEF: {
-        seriesId: 'CUSR0000SEF',
+      CUSR0000SAF: {
+        seriesId: 'CUSR0000SAF',
         data: [{ timestamp: new Date('2024-01-01'), value: 310.0 }],
       },
-      CUSR0000SEB: {
-        seriesId: 'CUSR0000SEB',
+      CUSR0000SA0E: {
+        seriesId: 'CUSR0000SA0E',
         data: [{ timestamp: new Date('2024-01-01'), value: 280.0 }],
       },
       CUSR0000SAM: {
