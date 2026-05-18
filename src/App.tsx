@@ -3,6 +3,9 @@ import { useFedRate } from './hooks/useFedRate';
 import { LineChart } from './components/charts/LineChart';
 import { GridPanel } from './components/layout/GridPanel';
 import { Header } from './components/layout/Header';
+import { FilterBar } from './components/layout/FilterBar';
+import { EmploymentPanel } from './components/indicators/EmploymentPanel';
+import { InflationPanel } from './components/indicators/InflationPanel';
 import { useDashboardStore } from './stores/dashboardStore';
 import { DARK_THEME } from './constants/colors';
 
@@ -46,8 +49,23 @@ function App() {
       >
         <Header />
         <main className="p-4">
-          <div className="max-w-4xl mx-auto">
-            <FedRatePanel />
+          <div className="max-w-7xl mx-auto">
+            {/* Filter Bar at top */}
+            <FilterBar />
+
+            {/* Grid layout for all panels */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Left column */}
+              <div className="space-y-4">
+                <FedRatePanel />
+              </div>
+
+              {/* Right column */}
+              <div className="space-y-4">
+                <EmploymentPanel />
+                <InflationPanel />
+              </div>
+            </div>
           </div>
         </main>
       </div>
