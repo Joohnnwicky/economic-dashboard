@@ -9,7 +9,7 @@
 ### API基础设施
 
 - [ ] **API-01**: FRED API客户端实现（美联储利率数据获取）
-- [ ] **API-02**: BLS API客户端实现（美国就业数据获取�?- [ ] **API-03**: CoinGecko API客户端实现（加密货币价格获取�?- [ ] **API-04**: Alpha Vantage API客户端实现（美股指数获取�?- [ ] **API-05**: 东方财富/新浪财经数据源集成（A股指数获取）
+- [x] **API-02**: BLS API客户端实现（美国就业数据获取�?- [ ] **API-03**: CoinGecko API客户端实现（加密货币价格获取�?- [ ] **API-04**: Alpha Vantage API客户端实现（美股指数获取�?- [ ] **API-05**: 东方财富/新浪财经数据源集成（A股指数获取）
 - [ ] **API-06**: 中国央行利率数据源集�?- [ ] **API-07**: API限流机制实现（防止配额耗尽�?- [ ] **API-08**: 数据缓存层实现（TanStack Query配置�?
 ### 数据处理
 
@@ -19,8 +19,8 @@
 
 - [ ] **IND-01**: 美联储利率历史走势图表（近一年）
 - [ ] **IND-02**: 美联储决议详情展示（议息会议结果、声明摘要）
-- [ ] **IND-03**: 美国就业数据图表（NFP、失业率�?- [ ] **IND-04**: 就业分项指标展示（劳动参与率、工资增长）
-- [ ] **IND-05**: CPI通胀数据图表
+- [x] **IND-03**: 美国就业数据图表（NFP、失业率�?- [ ] **IND-04**: 就业分项指标展示（劳动参与率、工资增长）
+- [x] **IND-05**: CPI通胀数据图表
 - [ ] **IND-06**: 通胀分项数据展示（核心CPI、食�?能源/医疗�?- [ ] **IND-07**: PCE通胀数据展示
 - [ ] **IND-08**: 比特币实时价格及走势图表
 - [ ] **IND-09**: 以太坊实时价格及走势图表
@@ -32,7 +32,7 @@
 
 ### 图表功能
 
-- [ ] **CHART-01**: ECharts图表组件封装（echarts-for-react集成�?- [ ] **CHART-02**: 历史走势折线图实�?- [ ] **CHART-03**: 时间范围选择器（1D�?W�?M�?M�?M�?Y、ALL�?- [ ] **CHART-04**: 图表放大/缩小交互功能
+- [ ] **CHART-01**: ECharts图表组件封装（echarts-for-react集成�?- [ ] **CHART-02**: 历史走势折线图实�?- [x] **CHART-03**: 时间范围选择器（1D�?W�?M�?M�?M�?Y、ALL�?- [ ] **CHART-04**: 图表放大/缩小交互功能
 - [ ] **CHART-05**: 图表悬停提示工具（显示精确值）
 - [ ] **CHART-06**: 双Y轴图表支持（跨市场对比）
 - [ ] **CHART-07**: 多指标叠加图表实�?- [ ] **CHART-08**: 图表数据缩放组件（dataZoom�?- [ ] **CHART-09**: 事件标记功能（FOMC会议等）
@@ -43,7 +43,7 @@
 - [ ] **UI-02**: 多面板网格布局（响应式2-3列）
 - [ ] **UI-03**: 暗色金融终端主题实现
 - [ ] **UI-04**: 指标卡片组件（关键数值展示）
-- [ ] **UI-05**: 筛选栏组件（时间范围、指标选择�?- [ ] **UI-06**: 数据导出对话�?- [ ] **UI-07**: 加载状态指示器
+- [x] **UI-05**: 筛选栏组件（时间范围、指标选择�?- [ ] **UI-06**: 数据导出对话�?- [ ] **UI-07**: 加载状态指示器
 - [ ] **UI-08**: 错误边界处理（单API失败不影响整体）
 - [ ] **UI-09**: 数据刷新状态指示（"上次更新"时间�?
 ### 实时更新
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | API-01 | Phase 1 | Pending |
-| API-02 | Phase 1 | Pending |
+| API-02 | Phase 1 | Complete |
 | API-03 | Phase 1 | Pending |
 | API-04 | Phase 1 | Pending |
 | API-05 | Phase 2 | Pending |
@@ -115,9 +115,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-06 | Phase 1 | Pending |
 | IND-01 | Phase 1 | Pending |
 | IND-02 | Phase 2 | Pending |
-| IND-03 | Phase 1 | Pending |
+| IND-03 | Phase 1 | Complete |
 | IND-04 | Phase 2 | Pending |
-| IND-05 | Phase 1 | Pending |
+| IND-05 | Phase 1 | Complete |
 | IND-06 | Phase 2 | Pending |
 | IND-07 | Phase 2 | Pending |
 | IND-08 | Phase 1 | Pending |
@@ -131,7 +131,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IND-16 | Phase 2 | Pending |
 | CHART-01 | Phase 1 | Pending |
 | CHART-02 | Phase 1 | Pending |
-| CHART-03 | Phase 1 | Pending |
+| CHART-03 | Phase 1 | Complete |
 | CHART-04 | Phase 3 | Pending |
 | CHART-05 | Phase 1 | Pending |
 | CHART-06 | Phase 2 | Pending |
@@ -142,7 +142,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-02 | Phase 1 | Pending |
 | UI-03 | Phase 1 | Pending |
 | UI-04 | Phase 1 | Pending |
-| UI-05 | Phase 1 | Pending |
+| UI-05 | Phase 1 | Complete |
 | UI-06 | Phase 2 | Pending |
 | UI-07 | Phase 1 | Pending |
 | UI-08 | Phase 1 | Pending |
