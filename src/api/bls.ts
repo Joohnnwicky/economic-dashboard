@@ -10,12 +10,12 @@ import { parseBLSDate, calculateStartDate } from '../utils/utc';
 let blsCallCount = 0;
 const MAX_BLS_CALLS_PER_DAY = 25;
 
-interface BLSSeriesData {
+export interface BLSSeriesData {
   seriesId: string;
   data: Array<{ timestamp: Date; value: number }>;
 }
 
-async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange): Promise<Record<string, BLSSeriesData>> {
+export async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange): Promise<Record<string, BLSSeriesData>> {
   const apiKey = import.meta.env.VITE_BLS_API_KEY;
 
   if (!apiKey) {
