@@ -13,11 +13,24 @@ export const BLS_SERIES = {
   CPI_CORE: 'CUSR0000SA0L1E',        // Core CPI (excludes food/energy)
 } as const;
 
+// Alpha Vantage API configuration - CRITICAL: 25 calls/day FREE tier!
+export const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
+
+// Alpha Vantage symbols for US indices
+// NOTE: Alpha Vantage uses specific symbols, not standard ticker symbols
+export const ALPHA_VANTAGE_SYMBOLS = {
+  DOW_JONES: 'DJI',           // Dow Jones Industrial Average
+  NASDAQ: 'NASDAQ',           // NASDAQ Composite
+  SP500: 'SPX',               // S&P 500
+} as const;
+
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
   // WARNING: BLS free tier = 25 calls/day. With 30-min cache, max 2 calls per hour = 48 calls/day possible
   // MUST cache aggressively or quota will be exhausted in minutes!
   BLS: { maxCallsPerDay: 25, minIntervalMs: 3600000, cacheTtlMs: 1800000 },
+  // WARNING: Alpha Vantage free tier = 25 calls/day. With 60-min cache, max 24 calls per day
+  // Indices update slowly, so 60-min cache is acceptable for real-time display
   AlphaVantage: { maxCallsPerDay: 25, minIntervalMs: 3600000, cacheTtlMs: 3600000 },
   CoinGecko: { maxCallsPerDay: 500, minIntervalMs: 1200, cacheTtlMs: 60000 },
 } as const;

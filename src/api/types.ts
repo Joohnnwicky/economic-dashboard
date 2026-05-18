@@ -35,3 +35,32 @@ export interface BLSResponse {
     }>;
   };
 }
+
+// Alpha Vantage TIME_SERIES_DAILY response
+export interface AlphaVantageDailyResponse {
+  'Time Series (Daily)': {
+    [date: string]: {
+      '1. open': string;
+      '2. high': string;
+      '3. low': string;
+      '4. close': string;    // We use close price
+      '5. volume': string;
+    };
+  };
+}
+
+// Alpha Vantage QUOTE endpoint (current price)
+export interface AlphaVantageQuoteResponse {
+  'Global Quote': {
+    '01. symbol': string;
+    '02. open': string;
+    '03. high': string;
+    '04. low': string;
+    '05. price': string;    // Current price
+    '06. volume': string;
+    '07. latest trading day': string;
+    '08. previous close': string;
+    '09. change': string;
+    '10. change percent': string;
+  };
+}
