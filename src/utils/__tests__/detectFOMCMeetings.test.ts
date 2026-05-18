@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { detectFOMCMeetings, FOMCEvent } from '../detectFOMCMeetings';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { detectFOMCMeetings } from '../detectFOMCMeetings';
 import { HistoricalDataPoint } from '../../types/indicator';
 
 describe('detectFOMCMeetings', () => {

@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ConnectionIndicator } from '../ConnectionIndicator';
-import { DARK_THEME } from '../../../constants/colors';
 
 describe('ConnectionIndicator', () => {
   describe('Color mapping (D-03)', () => {

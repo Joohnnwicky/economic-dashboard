@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
-import { FRED_BASE_URL, FRED_FED_RATE_SERIES, RATE_LIMITS } from '../constants/api';
+import { FRED_BASE_URL, FRED_FED_RATE_SERIES, FRED_CPI_SERIES, RATE_LIMITS } from '../constants/api';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 import { TimeRange } from '../types/api';
 import { FredSeriesResponse } from './types';
@@ -69,5 +69,46 @@ export async function getFedRate(timeRange: TimeRange = '1Y'): Promise<Normalize
     }
 
     return normalizeFredData(response.data, timeRange);
+  }, RATE_LIMITS.FRED);
+}
+
+// Get CPI data from FRED
+export async function getCPI(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
+  const apiKey = import.meta.env.VITE_FRED_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('VITE_FRED_API_KEY not set in .env.local');
+  }
+
+  const endDate = new Date();
+  const startDate = calculateStartDate(timeRange);
+
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_CPI_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+
+  return rateLimiter.call('FRED', async () => {
+    const response = await axios.get<FredSeriesResponse>(url);
+
+    if (!response.data?.observations) {
+      throw new Error('FRED CPI response missing observations');
+    }
+
+    const historical: HistoricalDataPoint[] = response.data.observations
+      .filter((obs) => obs.value !== '.')
+      .map((obs) => ({
+        timestamp: parseUTCDate(obs.date),
+        value: parseFloat(obs.value),
+      }))
+      .reverse();
+
+    const current = historical[historical.length - 1];
+
+    return {
+      id: 'cpi',
+      name: 'CPI消费者物价指数',
+      value: current?.value ?? 0,
+      unit: 'index',
+      timestamp: current?.timestamp ?? new Date(),
+      historical,
+    };
   }, RATE_LIMITS.FRED);
 }

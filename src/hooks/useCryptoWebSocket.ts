@@ -114,7 +114,7 @@ export function useCryptoWebSocket(): WebSocketState {
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
       }
-      heartbeatRef.current = setInterval(() => {
+      heartbeatRef.current = window.setInterval(() => {
         if (btcWsRef.current?.readyState === WebSocket.OPEN) {
           btcWsRef.current.send('ping');
         }

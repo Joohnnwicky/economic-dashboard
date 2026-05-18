@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { FedRateChart } from '../FedRateChart';
-import { NormalizedIndicator } from '../../types/indicator';
-import { FOMCEvent } from '../../utils/detectFOMCMeetings';
+import type { NormalizedIndicator } from '../../../types/indicator';
 
 describe('FedRateChart', () => {
   const mockRateData: NormalizedIndicator = {

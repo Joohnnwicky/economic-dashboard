@@ -1,51 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FedRatePanel } from '../FedRatePanel';
-import * as useFOMCTargetRatesHook from '../../hooks/useFOMCTargetRates';
+import * as useFedRateModule from '../../../hooks/useFedRate';
+import * as useFOMCTargetRatesModule from '../../../hooks/useFOMCTargetRates';
 
 // Mock hooks
-vi.mock('../../hooks/useFedRate', () => ({
-  useFedRate: vi.fn(() => ({
-    data: {
-      id: 'fed-rate',
-      name: '美联储利率',
-      value: 5.25,
-      unit: '%',
-      timestamp: new Date('2024-06-01'),
-      historical: [
-        { timestamp: new Date('2024-01-01'), value: 5.0 },
-        { timestamp: new Date('2024-02-01'), value: 5.25 },
-      ],
-    },
-    isLoading: false,
-    error: null,
-    dataUpdatedAt: Date.now(),
-  })),
+vi.mock('../../../hooks/useFedRate', () => ({
+  useFedRate: vi.fn(),
 }));
 
-vi.mock('../../hooks/useFOMCTargetRates', () => ({
-  useFOMCTargetRates: vi.fn(() => ({
-    data: {
-      id: 'fomc-target-rate-upper',
-      name: '美联储目标利率上限',
-      value: 5.25,
-      unit: '%',
-      timestamp: new Date('2024-06-01'),
-      historical: [
-        { timestamp: new Date('2024-01-01'), value: 5.0 },
-        { timestamp: new Date('2024-02-01'), value: 5.25 },
-      ],
-    },
-    isLoading: false,
-    error: null,
-  })),
+vi.mock('../../../hooks/useFOMCTargetRates', () => ({
+  useFOMCTargetRates: vi.fn(),
 }));
 
-vi.mock('../../stores/dashboardStore', () => ({
+vi.mock('../../../stores/dashboardStore', () => ({
   useDashboardStore: vi.fn(() => ({ timeRange: '1Y' })),
 }));
 
-vi.mock('../layout/GridPanel', () => ({
+vi.mock('../../layout/GridPanel', () => ({
   GridPanel: vi.fn(({ title, children }) => (
     <div data-testid="grid-panel">
       <h2>{title}</h2>
@@ -54,7 +27,7 @@ vi.mock('../layout/GridPanel', () => ({
   )),
 }));
 
-vi.mock('../charts/FedRateChart', () => ({
+vi.mock('../../charts/FedRateChart', () => ({
   FedRateChart: vi.fn(() => <div data-testid="fed-rate-chart">FedRateChart</div>),
 }));
 
@@ -63,40 +36,164 @@ describe('FedRatePanel', () => {
     vi.clearAllMocks();
   });
 
+  const createWrapper = () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    return ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    );
+  };
+
   it('calls useFedRate for rate history', () => {
-    render(<FedRatePanel />);
+    vi.mocked(useFedRateModule.useFedRate).mockReturnValue({
+      data: {
+        id: 'fed-rate',
+        name: '美联储利率',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [
+          { timestamp: new Date('2024-01-01'), value: 5.0 },
+          { timestamp: new Date('2024-02-01'), value: 5.25 },
+        ],
+      },
+      isLoading: false,
+      error: null,
+      dataUpdatedAt: Date.now(),
+    } as any);
+
+    vi.mocked(useFOMCTargetRatesModule.useFOMCTargetRates).mockReturnValue({
+      data: {
+        id: 'fomc-target-rate-upper',
+        name: '美联储目标利率上限',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [
+          { timestamp: new Date('2024-01-01'), value: 5.0 },
+          { timestamp: new Date('2024-02-01'), value: 5.25 },
+        ],
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+
+    render(<FedRatePanel />, { wrapper: createWrapper() });
     expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
   });
 
   it('calls useFOMCTargetRates for DFEDTARU data', () => {
-    render(<FedRatePanel />);
-    expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
+    vi.mocked(useFedRateModule.useFedRate).mockReturnValue({
+      data: {
+        id: 'fed-rate',
+        name: '美联储利率',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [],
+      },
+      isLoading: false,
+      error: null,
+      dataUpdatedAt: Date.now(),
+    } as any);
+
+    vi.mocked(useFOMCTargetRatesModule.useFOMCTargetRates).mockReturnValue({
+      data: {
+        id: 'fomc-target-rate-upper',
+        name: '美联储目标利率上限',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [],
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+
+    render(<FedRatePanel />, { wrapper: createWrapper() });
+    expect(useFOMCTargetRatesModule.useFOMCTargetRates).toHaveBeenCalled();
   });
 
   it('renders FedRateChart with both data sources', () => {
-    render(<FedRatePanel />);
+    vi.mocked(useFedRateModule.useFedRate).mockReturnValue({
+      data: {
+        id: 'fed-rate',
+        name: '美联储利率',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [],
+      },
+      isLoading: false,
+      error: null,
+      dataUpdatedAt: Date.now(),
+    } as any);
+
+    vi.mocked(useFOMCTargetRatesModule.useFOMCTargetRates).mockReturnValue({
+      data: {
+        id: 'fomc-target-rate-upper',
+        name: '美联储目标利率上限',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [],
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+
+    render(<FedRatePanel />, { wrapper: createWrapper() });
     expect(screen.getByTestId('fed-rate-chart')).toBeInTheDocument();
   });
 
   it('Loading state shows while fetching FOMC data', () => {
-    vi.mocked(useFOMCTargetRatesHook.useFOMCTargetRates).mockReturnValueOnce({
+    vi.mocked(useFedRateModule.useFedRate).mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+      dataUpdatedAt: 0,
+    } as any);
+
+    vi.mocked(useFOMCTargetRatesModule.useFOMCTargetRates).mockReturnValue({
       data: null,
       isLoading: true,
       error: null,
     } as any);
 
-    render(<FedRatePanel />);
+    render(<FedRatePanel />, { wrapper: createWrapper() });
     expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
   });
 
   it('Error handling for FOMC fetch failure', () => {
-    vi.mocked(useFOMCTargetRatesHook.useFOMCTargetRates).mockReturnValueOnce({
+    vi.mocked(useFedRateModule.useFedRate).mockReturnValue({
+      data: {
+        id: 'fed-rate',
+        name: '美联储利率',
+        value: 5.25,
+        unit: '%',
+        timestamp: new Date('2024-06-01'),
+        historical: [],
+      },
+      isLoading: false,
+      error: null,
+      dataUpdatedAt: Date.now(),
+    } as any);
+
+    vi.mocked(useFOMCTargetRatesModule.useFOMCTargetRates).mockReturnValue({
       data: null,
       isLoading: false,
       error: new Error('FOMC fetch failed'),
     } as any);
 
-    render(<FedRatePanel />);
+    render(<FedRatePanel />, { wrapper: createWrapper() });
     expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
   });
 });

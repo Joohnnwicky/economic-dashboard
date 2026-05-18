@@ -1,4 +1,4 @@
-import { useInflationData } from '../../hooks/useBlsData';
+import { useCpiData } from '../../hooks/useCpiData';
 import { LineChart } from '../charts/LineChart';
 import { GridPanel } from '../layout/GridPanel';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -6,7 +6,7 @@ import { DARK_THEME } from '../../constants/colors';
 
 export function InflationPanel() {
   const timeRange = useDashboardStore((state) => state.timeRange);
-  const { data, isLoading, error, dataUpdatedAt } = useInflationData();
+  const { data, isLoading, error, dataUpdatedAt } = useCpiData(timeRange);
 
   return (
     <div>

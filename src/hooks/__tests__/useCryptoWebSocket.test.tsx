@@ -133,7 +133,7 @@ describe('useCryptoWebSocket', () => {
 
       // Wait for cache update
       await waitFor(() => {
-        const cacheData = queryClient.getQueryData(['crypto-price']);
+        const cacheData = queryClient.getQueryData<{ bitcoin?: { price: number } }>(['crypto-price']);
         expect(cacheData).toBeDefined();
         expect(cacheData?.bitcoin?.price).toBe(43250);
       });
@@ -163,7 +163,7 @@ describe('useCryptoWebSocket', () => {
 
       // Wait for cache update
       await waitFor(() => {
-        const cacheData = queryClient.getQueryData(['crypto-price']);
+        const cacheData = queryClient.getQueryData<{ ethereum?: { price: number } }>(['crypto-price']);
         expect(cacheData).toBeDefined();
         expect(cacheData?.ethereum?.price).toBe(2250);
       });

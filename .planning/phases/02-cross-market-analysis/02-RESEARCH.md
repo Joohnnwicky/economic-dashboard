@@ -655,7 +655,7 @@ export function MultiSeriesChart({ series, height = 400 }: MultiSeriesChartProps
 
 **Recommendation for planner:** Tasks involving Chinese APIs (API-05) should include validation step testing with live endpoint. Tasks involving export (EXPORT-01/02) should include manual Excel verification for Chinese character display.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **PBOC Historical Rate Data Source**
    - What we know: PBOC (中国人民银行) publishes rate decisions on official website, but no public API identified

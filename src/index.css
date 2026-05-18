@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Terminal aesthetic enhancements */
+.terminal-aesthetic {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+/* Subtle card glow effect */
+.panel-glow {
+  box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.panel-glow:hover {
+  box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.3);
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #161b22;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* Base body styles */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,6 +50,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #0d1117;
+  color: #c9d1d9;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
 }
 
 .dark {

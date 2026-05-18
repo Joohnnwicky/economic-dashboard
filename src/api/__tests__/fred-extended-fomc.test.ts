@@ -11,7 +11,7 @@ vi.mock('axios', () => ({
 // Mock rate limiter
 vi.mock('../rate-limiter', () => ({
   rateLimiter: {
-    call: vi.fn((apiName, fn) => fn()),
+    call: vi.fn((_apiName, fn) => fn()),
   },
 }));
 
