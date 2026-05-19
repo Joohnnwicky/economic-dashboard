@@ -1,9 +1,21 @@
 import { useInflationSubMetrics } from '../../hooks/useInflationSubMetrics';
 import { usePCEData } from '../../hooks/usePCEData';
 import { calculateYoY } from '../../utils/yoy-mom';
-import { formatPercentage } from '../../utils/formatters';
+import { formatPercentage, formatChineseNumber } from '../../utils/formatters';
 import { DARK_THEME } from '../../constants/colors';
 import { MultiSeriesChart } from '../charts/MultiSeriesChart';
+import { LineChart } from '../charts/LineChart';
+
+// 根据单位格式化数值
+function formatValue(value: number, unit: string): string {
+  if (unit === '%') {
+    return formatPercentage(value);
+  }
+  if (unit === 'index') {
+    return value.toFixed(2);
+  }
+  return value.toLocaleString('zh-CN');
+}
 
 export function InflationSubMetricsPanel() {
   const cpiData = useInflationSubMetrics();
@@ -58,7 +70,7 @@ export function InflationSubMetricsPanel() {
                   {indicator.name}
                 </div>
                 <div className="text-lg" style={{ color: DARK_THEME.accent[2] }}>
-                  {formatPercentage(indicator.value)}
+                  {formatValue(indicator.value, indicator.unit)}
                 </div>
                 <div className="text-xs" style={{ color: DARK_THEME.textMuted }}>
                   同比: {latestYoy !== null ? formatPercentage(latestYoy) : '-'}
@@ -82,26 +94,25 @@ export function InflationSubMetricsPanel() {
         </div>
       )}
 
-      {/* PCE Metrics */}
+      {/* PCE Trend Charts */}
       {pceData.data && pceData.data.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
-          {pceData.data.map((indicator) => (
-            <div
-              key={indicator.id}
-              className="p-2 bg-[#0d1117] rounded"
-              style={{ backgroundColor: DARK_THEME.background }}
-            >
-              <div
-                className="text-xs"
-                style={{ color: DARK_THEME.textMuted }}
-              >
-                {indicator.name}
+        <div className="mt-4">
+          <h4 className="text-sm mb-2" style={{ color: DARK_THEME.text }}>
+            PCE物价指数趋势
+          </h4>
+          <div className="grid grid-cols-2 gap-4">
+            {pceData.data.map((indicator) => (
+              <div key={indicator.id}>
+                <div
+                  className="text-xs mb-1"
+                  style={{ color: DARK_THEME.textMuted }}
+                >
+                  {indicator.name}: {formatValue(indicator.value, indicator.unit)}
+                </div>
+                <LineChart data={indicator} height={150} />
               </div>
-              <div className="text-lg" style={{ color: DARK_THEME.accent[3] }}>
-                {formatPercentage(indicator.value)}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

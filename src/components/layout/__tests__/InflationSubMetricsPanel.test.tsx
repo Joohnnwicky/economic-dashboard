@@ -23,11 +23,17 @@ vi.mock('../../../utils/yoy-mom', () => ({
 
 vi.mock('../../../utils/formatters', () => ({
   formatPercentage: vi.fn((value: number) => `${value.toFixed(2)}%`),
+  formatChineseNumber: vi.fn((value: number) => value.toLocaleString('zh-CN')),
 }));
 
 // Mock MultiSeriesChart
 vi.mock('../../charts/MultiSeriesChart', () => ({
   MultiSeriesChart: vi.fn(() => <div data-testid="multi-series-chart">Chart</div>),
+}));
+
+// Mock LineChart
+vi.mock('../../charts/LineChart', () => ({
+  LineChart: vi.fn(() => <div data-testid="line-chart">Line Chart</div>),
 }));
 
 const createWrapper = () => {
@@ -160,8 +166,7 @@ describe('InflationSubMetricsPanel', () => {
     render(<InflationSubMetricsPanel />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('PCE物价指数')).toBeDefined();
-      expect(screen.getByText('核心PCE物价指数')).toBeDefined();
+      expect(screen.getByText('PCE物价指数趋势')).toBeDefined();
     });
   });
 
