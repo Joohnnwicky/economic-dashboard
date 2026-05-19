@@ -24,7 +24,6 @@ export function Dashboard() {
           <div className="space-y-4">
             <FedRatePanel />
             <EmploymentPanel />
-            <EmploymentSubMetricsPanel />
             <InflationPanel />
             <InflationSubMetricsPanel />
           </div>
