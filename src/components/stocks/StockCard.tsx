@@ -55,8 +55,8 @@ export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
         </div>
       )}
 
-      {/* View Chart button */}
-      {onViewChart && data.historical && data.historical.length > 0 && (
+      {/* View Chart button - always show, K-line fetched on demand */}
+      {onViewChart && (
         <button
           onClick={onViewChart}
           className="mt-2 text-xs px-2 py-1 rounded hover:bg-[#21262d]"
