@@ -61,8 +61,8 @@ describe('usePCEData', () => {
     expect(fredExtended.getPCEData).toHaveBeenCalledWith('PCEPILFE', expect.anything());
 
     // Verify cache time
-    const staleTime = 5 * 60 * 1000;
-    expect(staleTime).toBe(300000); // 5 minutes in ms
+    const staleTime = 24 * 60 * 60 * 1000;
+    expect(staleTime).toBe(86400000); // 24 hours in ms
   });
 
   it('should use existing fredClient pattern from Phase 1', async () => {

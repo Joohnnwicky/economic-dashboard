@@ -13,8 +13,8 @@ export function useFOMCTargetRates(timeRange: TimeRange = '1Y') {
       }
       return data;
     },
-    staleTime: 5 * 60 * 1000, // FOMC decisions infrequent
-    gcTime: 30 * 60 * 1000,
+    staleTime: 24 * 60 * 60 * 1000, // 24小时（FRED数据月度更新）
+    gcTime: 7 * 24 * 60 * 60 * 1000, // 7天
     retry: 2,
     refetchOnWindowFocus: false,
   });

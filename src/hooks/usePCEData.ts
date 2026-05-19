@@ -5,8 +5,8 @@ import { NormalizedIndicator } from '../types/indicator';
 
 /**
  * Hook for fetching PCE inflation data (overall and core PCE).
- * Uses 5-min cache (FRED standard rate limit).
  * PCE is Fed's preferred inflation metric (more stable than CPI).
+ * FRED数据月度更新，24小时缓存。
  */
 export function usePCEData() {
   const timeRange = useDashboardStore((state) => state.timeRange);
@@ -16,8 +16,8 @@ export function usePCEData() {
       {
         queryKey: ['fred', 'PCEPI', timeRange],
         queryFn: () => getPCEData('PCEPI', timeRange),
-        staleTime: 5 * 60 * 1000,       // 5 minutes (FRED standard)
-        gcTime: 60 * 60 * 1000,         // Keep in cache 1 hour
+        staleTime: 24 * 60 * 60 * 1000,       // 24小时（FRED数据月度更新）
+        gcTime: 7 * 24 * 60 * 60 * 1000,         // 7天
         retry: 2,
         refetchOnWindowFocus: false,
       },

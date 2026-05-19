@@ -22,27 +22,27 @@ describe('detectFOMCMeetings', () => {
     expect(Array.isArray(result)).toBe(true);
   });
 
-  it('Rate hike (curr > prev) has decision: 加息, color: #f85149', () => {
+  it('Rate hike (curr > prev) has decision: 空字符串, color: #f85149', () => {
     const data: HistoricalDataPoint[] = [
       { timestamp: new Date('2024-01-01'), value: 5.0 },
       { timestamp: new Date('2024-02-01'), value: 5.25 }, // Hike
     ];
     const result = detectFOMCMeetings(data);
     expect(result.length).toBe(1);
-    expect(result[0].decision).toBe('加息');
+    expect(result[0].decision).toBe('');
     expect(result[0].color).toBe('#f85149');
     expect(result[0].rate).toBe(5.25);
   });
 
-  it('Rate cut (curr < prev) has decision: 降息, color: #3fb950', () => {
+  it('Rate cut (curr < prev) has decision: 空字符串, color: #f85149', () => {
     const data: HistoricalDataPoint[] = [
       { timestamp: new Date('2024-01-01'), value: 5.25 },
       { timestamp: new Date('2024-02-01'), value: 5.0 }, // Cut
     ];
     const result = detectFOMCMeetings(data);
     expect(result.length).toBe(1);
-    expect(result[0].decision).toBe('降息');
-    expect(result[0].color).toBe('#3fb950');
+    expect(result[0].decision).toBe('');
+    expect(result[0].color).toBe('#f85149');
     expect(result[0].rate).toBe(5.0);
   });
 
@@ -113,7 +113,7 @@ describe('detectFOMCMeetings', () => {
     const result = detectFOMCMeetings(data);
     // Only the hike from 5.25 -> 5.5 should be detected
     expect(result.length).toBe(1);
-    expect(result[0].decision).toBe('加息');
+    expect(result[0].decision).toBe('');
     expect(result[0].rate).toBe(5.5);
   });
 

@@ -13,8 +13,8 @@ export function useCpiData(timeRange: TimeRange = '1Y') {
       }
       return data;
     },
-    staleTime: 30 * 60 * 1000,  // CPI updates monthly, cache 30 min
-    gcTime: 60 * 60 * 1000,
+    staleTime: 24 * 60 * 60 * 1000,  // CPI月度更新，24小时缓存
+    gcTime: 7 * 24 * 60 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
   });
