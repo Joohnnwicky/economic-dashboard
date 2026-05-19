@@ -3,7 +3,7 @@ import { ALPHA_VANTAGE_SYMBOLS } from './api';
 export const INDICATORS = {
   FED_RATE: {
     id: 'fed-rate',
-    name: '联邦基金利率',
+    name: '联邦基金利率（FFR Federal Funds Rate）',
     unit: '%',
     source: 'FRED',
     seriesId: 'FEDFUNDS',
@@ -39,7 +39,7 @@ export const EMPLOYMENT = {
 export const INFLATION = {
   id: 'inflation',
   indicators: [
-    { id: 'cpi', name: 'CPI消费者物价指数', unit: 'index', seriesId: 'CUSR0000SA0' },
+    { id: 'cpi', name: '消费者物价指数（CPI）', unit: 'index', seriesId: 'CUSR0000SA0' },
   ],
 } as const;
 

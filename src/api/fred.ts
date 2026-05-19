@@ -41,7 +41,7 @@ function normalizeFredData(
 
   return {
     id: 'fed-rate',
-    name: '联邦基金利率',
+    name: '联邦基金利率（FFR Federal Funds Rate）',
     value: current?.value ?? 0,
     unit: '%',
     timestamp: current?.timestamp ?? new Date(),
@@ -104,7 +104,7 @@ export async function getCPI(timeRange: TimeRange = '1Y'): Promise<NormalizedInd
 
     return {
       id: 'cpi',
-      name: 'CPI消费者物价指数',
+      name: '消费者物价指数（CPI）',
       value: current?.value ?? 0,
       unit: 'index',
       timestamp: current?.timestamp ?? new Date(),
