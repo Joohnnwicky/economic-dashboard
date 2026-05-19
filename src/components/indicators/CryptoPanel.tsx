@@ -16,7 +16,7 @@ export function CryptoPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-          加密货币实时行情
+          加密货币行情（Crypto Prices）
         </h3>
       </div>
 

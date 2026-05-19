@@ -12,18 +12,18 @@ export const INDICATORS = {
 
 export const BTC = {
   id: 'btc',
-  name: '比特币',
+  name: '比特币（BTC Bitcoin）',
   unit: 'USD',
-  source: 'CoinGecko',
-  coinGeckoId: 'bitcoin',
+  source: 'Binance',
+  symbol: 'BTCUSDT',
 } as const;
 
 export const ETH = {
   id: 'eth',
-  name: '以太坊',
+  name: '以太坊（ETH Ethereum）',
   unit: 'USD',
-  source: 'CoinGecko',
-  coinGeckoId: 'ethereum',
+  source: 'Binance',
+  symbol: 'ETHUSDT',
 } as const;
 
 // Employment indicators from BLS
