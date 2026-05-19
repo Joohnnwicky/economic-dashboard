@@ -63,7 +63,7 @@ export async function getPCEData(seriesId: string, timeRange: TimeRange = '1Y'):
         timestamp: parseUTCDate(obs.date),
         value: parseFloat(obs.value),
       }))
-      .reverse();
+      // 移除reverse，保持最旧→最新顺序（与FEDFUNDS一致）
 
     const current = historical[historical.length - 1];
 
