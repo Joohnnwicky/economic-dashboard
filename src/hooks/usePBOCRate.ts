@@ -43,19 +43,21 @@ async function fetchPBOCRate(): Promise<NormalizedIndicator> {
  * TanStack Query hook loading PBOC historical rate data from static JSON
  *
  * Cache configuration:
- * - staleTime: Infinity - static data, never stale
- * - gcTime: Infinity - keep cached data indefinitely
+ * - staleTime: 24 hours - static data but allow daily refresh for updates
+ * - gcTime: Infinity - keep cached data indefinitely in memory
+ * - refetchOnMount: true - refetch when component mounts (ensures latest data)
  * - retry: false - static file should load successfully on first attempt
  *
  * Per RESEARCH.md, PBOC rate is historical static data with rare updates.
- * No API polling needed.
+ * Note: staleTime changed from Infinity to 24h to allow data updates.
  */
 export function usePBOCRate() {
   return useQuery({
     queryKey: ['pboc-rate'],
     queryFn: fetchPBOCRate,
-    staleTime: Infinity,  // Static data, never stale
-    gcTime: Infinity,     // Keep cached indefinitely
-    retry: false,         // Static file should load on first attempt
+    staleTime: 24 * 60 * 60 * 1000,  // 24 hours - allow daily refresh
+    gcTime: Infinity,                // Keep cached indefinitely in memory
+    refetchOnMount: true,            // Refetch when component mounts
+    retry: false,                    // Static file should load on first attempt
   });
 }
