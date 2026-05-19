@@ -84,15 +84,27 @@ export function MultiSeriesChart({
       : []),
   ];
 
-  // Build series data aligned to timestamps
+  // Build series data aligned to monthly timestamps
+  // For each month, use the latest available data point in that month
   const buildAlignedData = (indicator: NormalizedIndicator): (number | null)[] => {
     return alignedTimestamps.map((ts) => {
-      const point = indicator.historical.find((h) => {
+      // Find all data points in the same month
+      const monthStart = new Date(ts.getFullYear(), ts.getMonth(), 1);
+      const monthEnd = new Date(ts.getFullYear(), ts.getMonth() + 1, 0, 23, 59, 59);
+
+      const monthPoints = indicator.historical.filter((h) => {
         const hTime = h.timestamp.getTime();
-        const aTime = ts.getTime();
-        return hTime === aTime;
+        return hTime >= monthStart.getTime() && hTime <= monthEnd.getTime();
       });
-      return point?.value ?? null;
+
+      if (monthPoints.length === 0) return null;
+
+      // Use the latest data point in that month (closest to month end)
+      const latest = monthPoints.reduce((latest, current) =>
+        current.timestamp.getTime() > latest.timestamp.getTime() ? current : latest
+      );
+
+      return latest.value;
     });
   };
 
