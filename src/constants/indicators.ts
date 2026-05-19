@@ -16,6 +16,7 @@ export const BTC = {
   unit: 'USD',
   source: 'Binance',
   symbol: 'BTCUSDT',
+  coinGeckoId: 'bitcoin',
 } as const;
 
 export const ETH = {
@@ -24,6 +25,7 @@ export const ETH = {
   unit: 'USD',
   source: 'Binance',
   symbol: 'ETHUSDT',
+  coinGeckoId: 'ethereum',
 } as const;
 
 // Employment indicators from BLS
