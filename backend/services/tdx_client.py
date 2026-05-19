@@ -2,10 +2,20 @@
 通达信客户端服务 - 使用mootdx获取A股数据
 """
 from mootdx.quotes import StdQuotes
+from mootdx.server import bestip
 from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
+
+# 通达信服务器列表
+TDX_SERVERS = [
+    ('119.147.212.81', 7709),
+    ('218.75.126.9', 7709),
+    ('115.238.90.165', 7709),
+    ('124.160.88.21', 7709),
+    ('60.12.136.250', 7709),
+]
 
 
 class TDXClient:
@@ -23,8 +33,19 @@ class TDXClient:
         """获取通达信客户端连接"""
         if self._client is None:
             try:
-                self._client = StdQuotes(market='std')
-                logger.info("通达信客户端连接成功")
+                # 尝试连接服务器
+                for host, port in TDX_SERVERS:
+                    try:
+                        self._client = StdQuotes(market='std', server=(host, port))
+                        logger.info(f"通达信客户端连接成功: {host}:{port}")
+                        break
+                    except Exception as e:
+                        logger.warning(f"连接失败 {host}:{port}: {e}")
+                        continue
+
+                if self._client is None:
+                    raise Exception("无法连接任何通达信服务器")
+
             except Exception as e:
                 logger.error(f"通达信连接失败: {e}")
                 raise
@@ -33,6 +54,7 @@ class TDXClient:
     def close(self):
         """关闭连接"""
         if self._client:
+            self._client.close()
             self._client = None
             logger.info("通达信客户端连接关闭")
 

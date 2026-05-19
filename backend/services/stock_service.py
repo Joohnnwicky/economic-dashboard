@@ -36,48 +36,51 @@ def get_kline_data(
         client = tdx_client.get_client()
         market, symbol = get_market_code(code)
 
-        # mootdx category: 9=日线, 5=周线, 4=月线
-        category_map = {'daily': 9, 'weekly': 5, 'monthly': 4}
-        category = category_map.get(period, 9)
+        # mootdx frequency: 9=日线, 5=周线, 4=月线
+        freq_map = {'daily': 9, 'weekly': 5, 'monthly': 4}
+        frequency = freq_map.get(period, 9)
 
-        # 获取K线数据
-        result = client.get_kline(
-            market=market,
+        # 获取K线数据 (使用 bars 方法)
+        result = client.bars(
             code=symbol,
-            category=category,
+            frequency=frequency,
             start=0,
-            count=limit
+            offset=limit
         )
 
-        if not result or not hasattr(result, 'data'):
-            logger.warning(f"获取K线数据失败: {code}")
+        if result is None or result.empty:
+            logger.warning(f"获取K线数据失败: {code}, result empty")
             return None
 
-        # 转换数据格式
+        # result 是 pandas DataFrame，列名包括: open, close, high, low, volume 等
+        # 索引是日期
         historical = []
-        for row in result.data:
-            # mootdx返回格式: [date, open, close, high, low, volume, amount]
+        for idx, row in result.iterrows():
             try:
-                if isinstance(row[0], str):
-                    ts = datetime.strptime(row[0], '%Y-%m-%d')
+                # idx 可能是字符串日期或 Timestamp
+                if isinstance(idx, str):
+                    ts = datetime.strptime(idx, '%Y-%m-%d')
                 else:
-                    ts = datetime.fromtimestamp(row[0] / 1000)
+                    ts = datetime.fromtimestamp(idx.timestamp())
 
-                historical.append(HistoricalDataPoint(
-                    timestamp=ts,
-                    value=float(row[2])  # 收盘价
-                ))
+                close_price = float(row.get('close', 0))
+                if close_price > 0:
+                    historical.append(HistoricalDataPoint(
+                        timestamp=ts,
+                        value=close_price
+                    ))
             except Exception as e:
                 logger.warning(f"解析K线数据点失败: {e}")
                 continue
 
         if not historical:
+            logger.warning(f"K线数据无有效点: {code}")
             return None
 
         latest = historical[-1]
         first = historical[0]
 
-        # 计算涨跌幅
+        # 计算涨跌幅（相对于第一天的收盘价）
         if first.value > 0:
             change_pct = (latest.value - first.value) / first.value * 100
             change_value = latest.value - first.value
@@ -118,24 +121,21 @@ def get_quote_data(code: str) -> Optional[NormalizedIndicator]:
         client = tdx_client.get_client()
         market, symbol = get_market_code(code)
 
-        # 获取实时行情
-        result = client.get_quote(market=market, code=symbol)
+        # 获取实时行情 (使用 quotes 方法)
+        result = client.quotes(code=symbol)
 
-        if not result or not hasattr(result, 'data'):
+        if result is None or result.empty:
             logger.warning(f"获取实时行情失败: {code}")
             return None
 
-        data = result.data
-        if not data or len(data) == 0:
+        # result 是 DataFrame，取第一行
+        row = result.iloc[0] if len(result) > 0 else None
+        if row is None:
             return None
 
-        # 解析行情数据
-        row = data[0]
-        # mootdx quote格式: [code, name, price, open, close, high, low, volume, amount, ...]
-
-        current_price = float(row[2]) if row[2] else 0
-        prev_close = float(row[4]) if row[4] else current_price  # 前收盘价
-        open_price = float(row[3]) if row[3] else current_price
+        # DataFrame 列名: code, name, price, open, high, low, volume 等
+        current_price = float(row.get('price', 0))
+        prev_close = float(row.get('last_close', current_price))  # 前收盘价
 
         # 计算涨跌幅（相对于前收盘价）
         if prev_close > 0:
@@ -145,9 +145,11 @@ def get_quote_data(code: str) -> Optional[NormalizedIndicator]:
             change_pct = 0
             change_value = 0
 
+        name = str(row.get('name', get_stock_name(code)))
+
         return NormalizedIndicator(
             id=f"stock-{code}",
-            name=row[1] if len(row) > 1 else get_stock_name(code),
+            name=name,
             value=current_price,
             unit="CNY",
             timestamp=datetime.now(),
