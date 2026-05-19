@@ -32,6 +32,23 @@ export function StockSearchDialog({ isOpen, onClose }: StockSearchDialogProps) {
     onClose();
   };
 
+  // 检测是否是6位数字代码（可以直接添加）
+  const isStockCode = /^\d{6}$/.test(keyword);
+  const getMarketFromCode = (code: string): 'sh' | 'sz' => {
+    // 6开头是上海，其他是深圳
+    return code.startsWith('6') ? 'sh' : 'sz';
+  };
+
+  const handleDirectAdd = () => {
+    if (!isStockCode) return;
+    const market = getMarketFromCode(keyword);
+    handleAddStock({
+      code: keyword,
+      name: `股票${keyword}`,  // 名称会在获取行情时自动更新
+      market,
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
@@ -71,6 +88,7 @@ export function StockSearchDialog({ isOpen, onClose }: StockSearchDialogProps) {
           </div>
         )}
 
+        {/* 搜索结果列表 */}
         {results && results.length > 0 && (
           <ul className="mt-4 space-y-1 max-h-60 overflow-y-auto">
             {results.map((stock) => {
@@ -104,9 +122,25 @@ export function StockSearchDialog({ isOpen, onClose }: StockSearchDialogProps) {
           </ul>
         )}
 
+        {/* 直接输入代码添加 */}
         {keyword.length >= 1 && !isLoading && results && results.length === 0 && (
-          <div className="mt-4 text-center" style={{ color: DARK_THEME.textMuted }}>
-            未找到匹配的股票
+          <div className="mt-4">
+            {isStockCode ? (
+              <button
+                onClick={handleDirectAdd}
+                className="w-full p-3 rounded border hover:bg-[#21262d]"
+                style={{
+                  borderColor: DARK_THEME.accent[0],
+                  color: DARK_THEME.accent[0],
+                }}
+              >
+                直接添加代码 {keyword} ({getMarketFromCode(keyword) === 'sh' ? '沪市' : '深市'})
+              </button>
+            ) : (
+              <div className="text-center py-4" style={{ color: DARK_THEME.textMuted }}>
+                未找到匹配的股票，请输入6位股票代码直接添加
+              </div>
+            )}
           </div>
         )}
 
@@ -114,7 +148,7 @@ export function StockSearchDialog({ isOpen, onClose }: StockSearchDialogProps) {
           className="mt-4 text-xs"
           style={{ color: DARK_THEME.textMuted }}
         >
-          支持常用A股股票搜索，输入代码或名称
+          支持200+常用A股搜索，或输入任意6位代码直接添加
         </p>
       </div>
     </div>

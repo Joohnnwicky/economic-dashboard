@@ -79,7 +79,16 @@
       "Skill(scrape)",
       "WebFetch(domain:quote.eastmoney.com)",
       "WebFetch(domain:www.pbc.gov.cn)",
-      "WebFetch(domain:www.bankofchina.com)"
+      "WebFetch(domain:www.bankofchina.com)",
+      "Skill(context-save)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "Bash(git restore *)",
+      "Bash(pip install *)",
+      "Bash(timeout 5 python -c \"from main import app; print\\('FastAPI app loaded OK'\\)\")",
+      "Bash(python -c \"from main import app; print\\('OK'\\)\")",
+      "Bash(python *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stocks/600519/quote\" -Method Get | ConvertTo-Json)",
+      "Bash(chcp 65001)"
     ]
   }
 }
