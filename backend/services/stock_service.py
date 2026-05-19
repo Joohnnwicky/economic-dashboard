@@ -207,21 +207,15 @@ def search_stocks(keyword: str) -> List[StockSearchResult]:
         ('002475', '立讯精密', 'sz'),
         ('603259', '药明康德', 'sh'),
         ('300059', '东方财富', 'sz'),
-        # 指数
-        ('sh000001', '上证指数', 'sh'),
-        ('sh000300', '沪深300', 'sh'),
-        ('sh000016', '上证50', 'sh'),
-        ('sz399001', '深证成指', 'sz'),
-        ('sz399006', '创业板指', 'sz'),
     ]
 
     results = []
-    keyword_lower = keyword.lower()
 
     for code, name, market in stock_list:
-        if keyword_lower in code.lower() or keyword_lower in name.lower():
+        # 使用字符串包含判断（不区分大小写）
+        if keyword in code or keyword in name:
             results.append(StockSearchResult(
-                code=code.replace('sh', '').replace('sz', ''),  # 移除市场前缀
+                code=code,
                 name=name,
                 market=market,
             ))
