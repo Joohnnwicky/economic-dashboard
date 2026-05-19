@@ -61,7 +61,7 @@ export function ChineseIndicesPanel() {
       </div>
 
       <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
-        数据每小时更新一次 (新浪财经API)
+        数据每小时更新一次 (腾讯财经API)
       </p>
     </div>
   );

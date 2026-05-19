@@ -5,51 +5,58 @@ import { NormalizedIndicator } from '../types/indicator';
 // 开发环境使用代理，生产环境直接访问
 const isDev = import.meta.env.DEV;
 
-// 新浪财经API - 更稳定、广泛使用的公开API
-const SINA_FINANCE_URL = isDev
-  ? '/api/sina/hq.sinajs.cn'
-  : 'http://hq.sinajs.cn';
+// 腾讯财经API - 更稳定、不易被封禁
+const TENCENT_FINANCE_URL = isDev
+  ? '/api/tencent/qt.gtimg.cn'
+  : 'http://qt.gtimg.cn';
 
 // Rate limit configuration
-const SINA_RATE_LIMIT = {
+const TENCENT_RATE_LIMIT = {
   maxCallsPerDay: 1000,
   minIntervalMs: 60000,  // 60 seconds minimum interval
   cacheTtlMs: 3600000,   // 60 minutes cache TTL
 };
 
-// 新浪财经返回格式: var hq_str_s_sh000001="上证指数,3400.23,12.45,0.37,34567890,12345678";
-// 格式: 名称,当前价,涨跌额,涨跌幅,成交量(手),成交额(万)
+// 腾讯财经返回格式: v_s_sh000001="1~上证指数~000001~3400.23~-3.86~-0.09~627233137~131508420~~";
+// 格式: 类型~名称~代码~当前价~涨跌额~涨跌幅~成交量~成交额~~
 export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
-  // A股主要指数代码: 上证指数、沪深300、深证成指
+  // A股主要指数代码: 上证指数、沪深300、上证50
   const symbols = 's_sh000001,s_sh000300,s_sh000016';
 
-  return rateLimiter.call('SinaFinance', async () => {
+  return rateLimiter.call('TencentFinance', async () => {
     const response = await axios.get<string>(
-      `${SINA_FINANCE_URL}/list=${symbols}`,
+      `${TENCENT_FINANCE_URL}/q=${symbols}`,
       {
-        responseType: 'text',  // 新浪返回的是文本格式
-        transformResponse: [(data: string) => {
-          // 解析新浪返回的文本格式
-          const lines = data.split('\n').filter(line => line.includes('var hq_str_'));
+        responseType: 'arraybuffer',  // 腾讯返回GBK编码，需要正确解码
+        responseEncoding: 'binary',
+        transformResponse: [(data: ArrayBuffer) => {
+          // GBK解码
+          const decoder = new TextDecoder('gbk');
+          const text = decoder.decode(data);
+
+          // 解析腾讯返回的文本格式
+          const lines = text.split('\n').filter(line => line.includes('v_s_sh'));
           const indices: NormalizedIndicator[] = [];
 
           for (const line of lines) {
-            const match = line.match(/var hq_str_s_sh(\d+)="(.+)"/);
+            const match = line.match(/v_s_sh(\d+)="(.+)"/);
             if (!match || !match[2]) continue;
 
-            const parts = match[2].split(',');
-            if (parts.length < 4) continue;
+            const parts = match[2].split('~');
+            if (parts.length < 6) continue;
 
-            const [name, priceStr, changeStr, changePercentStr] = parts;
-            const price = parseFloat(priceStr);
-            const change = parseFloat(changeStr);
-            const changePercent = parseFloat(changePercentStr);
+            // parts[0]=类型, parts[1]=名称, parts[2]=代码, parts[3]=当前价, parts[4]=涨跌额, parts[5]=涨跌幅
+            const name = parts[1].trim();
+            const code = parts[2].trim();
+            const price = parseFloat(parts[3]);
+            const change = parseFloat(parts[4]);
+            const changePercent = parseFloat(parts[5]);
 
             if (isNaN(price)) continue;
 
             indices.push({
               id: `sh${match[1]}`,
-              name: name.trim(),
+              name: name,
               value: price,
               unit: 'index',
               timestamp: new Date(),
@@ -58,7 +65,7 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
                 percentage: changePercent,
                 period: 'daily' as const,
               },
-              historical: [], // 新浪API只提供当前数据
+              historical: [], // 腾讯API只提供当前数据
             });
           }
 
@@ -68,9 +75,9 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
     );
 
     if (!response.data || response.data.length === 0) {
-      throw new Error('新浪财经API返回数据为空');
+      throw new Error('腾讯财经API返回数据为空');
     }
 
     return response.data;
-  }, SINA_RATE_LIMIT);
+  }, TENCENT_RATE_LIMIT);
 }
