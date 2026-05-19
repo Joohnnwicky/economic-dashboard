@@ -3,30 +3,30 @@
     "id": "dow-jones",
     "symbol": "DIA",
     "name": "道琼斯工业平均指数（DJIA Dow Jones）",
-    "value": 42987.46,
-    "change": 156.87,
-    "changePercent": 0.37,
-    "timestamp": "2025-05-19T04:00:00Z",
-    "note": "美股闭市时间收盘数据 (美国东部时间16:00收盘)"
+    "value": 49686.12,
+    "change": 158.45,
+    "changePercent": 0.32,
+    "timestamp": "2026-05-19T04:00:00Z",
+    "note": "美股收盘数据 (美东时间2026-05-18 16:00收盘)"
   },
   {
     "id": "nasdaq",
     "symbol": "QQQ",
     "name": "纳斯达克综合指数（NASDAQ Nasdaq Composite）",
-    "value": 19167.82,
-    "change": 283.45,
-    "changePercent": 1.51,
-    "timestamp": "2025-05-19T04:00:00Z",
-    "note": "美股闭市时间收盘数据"
+    "value": 26090.73,
+    "change": -133.54,
+    "changePercent": -0.51,
+    "timestamp": "2026-05-19T04:00:00Z",
+    "note": "美股收盘数据 (美东时间2026-05-18 16:00收盘)"
   },
   {
     "id": "sp500",
     "symbol": "SPY",
     "name": "标准普尔500指数（S&P 500）",
-    "value": 5956.23,
-    "change": 42.15,
-    "changePercent": 0.71,
-    "timestamp": "2025-05-19T04:00:00Z",
-    "note": "美股闭市时间收盘数据"
+    "value": 7403.05,
+    "change": -5.20,
+    "changePercent": -0.07,
+    "timestamp": "2026-05-19T04:00:00Z",
+    "note": "美股收盘数据 (美东时间2026-05-18 16:00收盘)"
   }
 ]
