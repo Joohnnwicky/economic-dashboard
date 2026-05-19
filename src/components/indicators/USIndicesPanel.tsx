@@ -1,26 +1,54 @@
-import { useIndices } from '../../hooks/useIndices';
+import { useEffect, useState } from 'react';
 import { IndicatorCard } from '../ui/IndicatorCard';
-import { MiniChart } from '../charts/MiniChart';
 import { DARK_THEME } from '../../constants/colors';
 
 /**
- * US Stock Indices Panel
+ * US Stock Indices Panel - Static Data
  *
- * Displays Dow Jones, Nasdaq, and S&P 500 indices.
- *
- * CRITICAL: Alpha Vantage free tier = 25 calls/day
- * - Data updates hourly (not minute-level) due to API quota
- * - Clear disclaimer informs user of update frequency
+ * 美股在中国白天是闭市状态（美股交易时间：21:30-04:00 北京时间）
+ * 所以使用静态JSON数据展示最近收盘价，每日更新即可
  */
+
+interface StaticUSIndex {
+  id: string;
+  symbol: string;
+  name: string;
+  value: number;
+  change: number;
+  changePercent: number;
+  timestamp: string;
+  note: string;
+}
+
 export function USIndicesPanel() {
-  const {
-    dowJones,
-    nasdaq,
-    sp500,
-    isLoading,
-    isError,
-    errors,
-  } = useIndices();
+  const [indices, setIndices] = useState<StaticUSIndex[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Load static US indices data from JSON file
+    fetch('/data/us-indices-latest.json')
+      .then(res => res.json())
+      .then(data => {
+        setIndices(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('[US Indices] Failed to load static data:', err);
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-4 rounded" style={{ backgroundColor: DARK_THEME.panel, color: DARK_THEME.textMuted }}>
+        正在加载美股指数数据...
+      </div>
+    );
+  }
+
+  if (indices.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
@@ -28,66 +56,28 @@ export function USIndicesPanel() {
         美股大盘指数
       </h3>
 
-      {/* Disclaimer about hourly updates due to API quota */}
+      {/* Disclaimer about static data */}
       <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-        数据每小时更新一次 (API配额限制: 25次/天)
+        美股闭市时间静态数据 · 每日更新
+        <br />
+        (美股交易时间: 北京时间 21:30-04:00)
       </p>
-
-      {isError && (
-        <div className="p-2 bg-red-900/20 rounded" style={{ color: DARK_THEME.accent[2] }}>
-          部分指数数据加载失败
-          {errors.map((e, i) => e && (
-            <span key={i} className="ml-2">
-              {i === 0 ? '道琼斯' : i === 1 ? '纳斯达克' : '标普500'}: {e.message}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {isLoading && !dowJones && !nasdaq && !sp500 && (
-        <div className="p-4 rounded" style={{ backgroundColor: DARK_THEME.panel, color: DARK_THEME.textMuted }}>
-          正在加载美股指数数据...
-        </div>
-      )}
 
       {/* Index cards */}
       <div className="grid grid-cols-3 gap-4">
-        {/* Dow Jones */}
-        <IndicatorCard
-          title={dowJones?.name || '道琼斯'}
-          value={dowJones?.value || 0}
-          unit={dowJones?.unit || 'index'}
-          lastUpdated={dowJones?.timestamp}
-        />
-
-        {/* Nasdaq */}
-        <IndicatorCard
-          title={nasdaq?.name || '纳斯达克'}
-          value={nasdaq?.value || 0}
-          unit={nasdaq?.unit || 'index'}
-          lastUpdated={nasdaq?.timestamp}
-        />
-
-        {/* S&P 500 */}
-        <IndicatorCard
-          title={sp500?.name || '标普500'}
-          value={sp500?.value || 0}
-          unit={sp500?.unit || 'index'}
-          lastUpdated={sp500?.timestamp}
-        />
-      </div>
-
-      {/* Mini charts */}
-      <div className="grid grid-cols-3 gap-4">
-        {dowJones && dowJones.historical.length > 0 && (
-          <MiniChart data={dowJones} height={60} />
-        )}
-        {nasdaq && nasdaq.historical.length > 0 && (
-          <MiniChart data={nasdaq} height={60} />
-        )}
-        {sp500 && sp500.historical.length > 0 && (
-          <MiniChart data={sp500} height={60} />
-        )}
+        {indices.map(index => (
+          <IndicatorCard
+            key={index.id}
+            title={index.name}
+            value={index.value}
+            unit="index"
+            change={{
+              value: index.change,
+              percentage: index.changePercent,
+            }}
+            lastUpdated={new Date(index.timestamp)}
+          />
+        ))}
       </div>
     </div>
   );

@@ -1,67 +1,76 @@
 import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
 import { NormalizedIndicator } from '../types/indicator';
-import { CHINESE_INDEX_CODES, EASTMONEY_INDEX_FIELDS } from '../constants/chinese-indices';
 
 // 开发环境使用代理，生产环境直接访问
 const isDev = import.meta.env.DEV;
-const EASTMONEY_INDEX_URL = isDev
-  ? '/api/eastmoney/qt/ulist.np'
-  : 'https://push2.eastmoney.com/api/qt/ulist.np';
 
-// Rate limit configuration for East Money (unofficial API)
-// Aggressive caching to prevent quota exhaustion and reduce risk of endpoint changes
-const EASTMONEY_RATE_LIMIT = {
-  maxCallsPerDay: 500,
+// 新浪财经API - 更稳定、广泛使用的公开API
+const SINA_FINANCE_URL = isDev
+  ? '/api/sina/hq.sinajs.cn'
+  : 'http://hq.sinajs.cn';
+
+// Rate limit configuration
+const SINA_RATE_LIMIT = {
+  maxCallsPerDay: 1000,
   minIntervalMs: 60000,  // 60 seconds minimum interval
   cacheTtlMs: 3600000,   // 60 minutes cache TTL
 };
 
-interface EastMoneyDataItem {
-  f2: number;   // latest price
-  f3: number;   // change percentage
-  f4: number;   // change amount
-  f12: string;  // code
-  f14: string;  // name
-  f15: number;  // high
-  f16: number;  // low
-  f17: number;  // open
-  f18: number;  // previous close
-}
-
-interface EastMoneyResponse {
-  data?: {
-    diff?: EastMoneyDataItem[];
-  };
-}
-
+// 新浪财经返回格式: var hq_str_s_sh000001="上证指数,3400.23,12.45,0.37,34567890,12345678";
+// 格式: 名称,当前价,涨跌额,涨跌幅,成交量(手),成交额(万)
 export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
-  const secids = Object.values(CHINESE_INDEX_CODES).join(',');
+  // A股主要指数代码: 上证指数、沪深300、深证成指
+  const symbols = 's_sh000001,s_sh000300,s_sh000016';
 
-  return rateLimiter.call('EastMoney', async () => {
-    // East Money requires cb= and ut= parameters for JSON response
-    // cb= (callback) empty for raw JSON, ut= is a tracking parameter
-    const response = await axios.get<EastMoneyResponse>(
-      `${EASTMONEY_INDEX_URL}?fltt=2&invt=2&secids=${secids}&fields=${EASTMONEY_INDEX_FIELDS}&cb=&ut=b2884a393a59ad6400f92e6b8e9`
+  return rateLimiter.call('SinaFinance', async () => {
+    const response = await axios.get<string>(
+      `${SINA_FINANCE_URL}/list=${symbols}`,
+      {
+        responseType: 'text',  // 新浪返回的是文本格式
+        transformResponse: [(data: string) => {
+          // 解析新浪返回的文本格式
+          const lines = data.split('\n').filter(line => line.includes('var hq_str_'));
+          const indices: NormalizedIndicator[] = [];
+
+          for (const line of lines) {
+            const match = line.match(/var hq_str_s_sh(\d+)="(.+)"/);
+            if (!match || !match[2]) continue;
+
+            const parts = match[2].split(',');
+            if (parts.length < 4) continue;
+
+            const [name, priceStr, changeStr, changePercentStr] = parts;
+            const price = parseFloat(priceStr);
+            const change = parseFloat(changeStr);
+            const changePercent = parseFloat(changePercentStr);
+
+            if (isNaN(price)) continue;
+
+            indices.push({
+              id: `sh${match[1]}`,
+              name: name.trim(),
+              value: price,
+              unit: 'index',
+              timestamp: new Date(),
+              change: {
+                value: change,
+                percentage: changePercent,
+                period: 'daily' as const,
+              },
+              historical: [], // 新浪API只提供当前数据
+            });
+          }
+
+          return indices;
+        }],
+      }
     );
 
-    if (!response.data?.data?.diff || response.data.data.diff.length === 0) {
-      throw new Error('East Money response missing data.diff');
+    if (!response.data || response.data.length === 0) {
+      throw new Error('新浪财经API返回数据为空');
     }
 
-    // Normalize East Money data to NormalizedIndicator format
-    return response.data.data.diff.map((item: EastMoneyDataItem) => ({
-      id: String(item.f12),
-      name: String(item.f14),
-      value: Number(item.f2),
-      unit: 'index',
-      timestamp: new Date(),
-      change: {
-        value: Number(item.f4),
-        percentage: Number(item.f3),
-        period: 'daily' as const,
-      },
-      historical: [], // East Money API provides current snapshot only, not historical data
-    }));
-  }, EASTMONEY_RATE_LIMIT);
+    return response.data;
+  }, SINA_RATE_LIMIT);
 }

@@ -50,6 +50,17 @@ export default defineConfig({
           });
         },
       },
+      // 新浪财经 API 代理 (A股数据 - 更稳定)
+      '/api/sina': {
+        target: 'http://hq.sinajs.cn',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/sina/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('Referer', 'https://finance.sina.com.cn/');
+          });
+        },
+      },
     },
   },
   test: {

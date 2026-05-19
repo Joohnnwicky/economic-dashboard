@@ -7,7 +7,6 @@ import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
 import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
-import { EmploymentSubMetricsPanel } from './EmploymentSubMetricsPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
 import { DARK_THEME } from '../../constants/colors';
 
@@ -31,7 +30,7 @@ export function Dashboard() {
           {/* Right Column: Market Data */}
           <div className="space-y-4">
             <CryptoPanel />
-            {/* US Indices disabled: Alpha Vantage quota exhausted (25/day) */}
+            <USIndicesPanel />
             <ChineseIndicesPanel />
             <PBOCRatePanel />
           </div>
