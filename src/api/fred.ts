@@ -29,13 +29,18 @@ function normalizeFredData(
   response: FredSeriesResponse,
   _timeRange: TimeRange
 ): NormalizedIndicator {
+  // FRED返回数据：最旧→最新（从2024-01到2024-12）
+  // 需要反转：最新→最旧，然后图表显示从左到右时间递增
+  // 但当前reverse导致最左边最新，最右边最旧（错误）
+  // 所以移除reverse，保持最旧→最新顺序
   const historical: HistoricalDataPoint[] = response.observations
     .filter((obs) => obs.value !== '.')
     .map((obs) => ({
       timestamp: parseUTCDate(obs.date),
       value: parseFloat(obs.value),
     }))
-    .reverse();
+    // 移除reverse，保持FRED原始顺序（最旧→最新）
+    // 这样横轴从左到右：最旧月份→最新月份
 
   const current = historical[historical.length - 1];
 
@@ -92,13 +97,15 @@ export async function getCPI(timeRange: TimeRange = '1Y'): Promise<NormalizedInd
       throw new Error('FRED CPI response missing observations');
     }
 
+    // FRED返回数据：最旧→最新
+    // 移除reverse，保持原始顺序，横轴从左到右时间递增
     const historical: HistoricalDataPoint[] = response.data.observations
       .filter((obs) => obs.value !== '.')
       .map((obs) => ({
         timestamp: parseUTCDate(obs.date),
         value: parseFloat(obs.value),
       }))
-      .reverse();
+      // 不使用reverse，保持最旧→最新顺序
 
     const current = historical[historical.length - 1];
 

@@ -63,7 +63,8 @@
       "Bash(curl -s \"https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT\")",
       "Bash(curl -s \"https://example.com/api/lpr\")",
       "Bash(curl -s \"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm\")",
-      "Bash(git diff *)"
+      "Bash(git diff *)",
+      "Bash(curl -s \"https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key=7fed09933eb74912dcf97bcea729bb89&observation_start=2024-01-01&observation_end=2024-12-31&file_type=json\")"
     ]
   }
 }
