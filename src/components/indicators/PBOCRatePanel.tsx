@@ -9,7 +9,7 @@ export function PBOCRatePanel() {
 
   return (
     <GridPanel
-      title="中国央行利率"
+      title="贷款市场报价利率（LPR Loan Prime Rate）"
       isLoading={isLoading}
       lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
     >
