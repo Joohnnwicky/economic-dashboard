@@ -24,6 +24,16 @@ export function formatPrice(value: number, unit: string): string {
     return `${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
   }
 
+  // For Gold (USD per ounce)
+  if (unit === 'USD/oz') {
+    return `$${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/oz`;
+  }
+
+  // For Oil (USD per barrel)
+  if (unit === 'USD/barrel') {
+    return `$${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/桶`;
+  }
+
   // Default: number with unit
   return `${value.toLocaleString('zh-CN')} ${unit}`;
 }

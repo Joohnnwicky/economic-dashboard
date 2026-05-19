@@ -5,6 +5,8 @@ import { InflationPanel } from '../indicators/InflationPanel';
 import { USIndicesPanel } from '../indicators/USIndicesPanel';
 import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
 import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
+import { GoldPricePanel } from '../indicators/GoldPricePanel';
+import { OilPricePanel } from '../indicators/OilPricePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
@@ -26,6 +28,8 @@ export function Dashboard() {
             <EmploymentPanel />
             <InflationPanel />
             <InflationSubMetricsPanel />
+            <GoldPricePanel />
+            <OilPricePanel />
           </div>
 
           {/* Right Column: Market Data */}

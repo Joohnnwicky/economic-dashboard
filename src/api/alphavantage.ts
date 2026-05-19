@@ -19,6 +19,7 @@ function getIndexName(symbol: string): string {
     'DJI': '道琼斯指数',
     'NASDAQ': '纳斯达克指数',
     'SPX': '标普500指数',
+    'GLD': '黄金ETF (GLD - SPDR Gold Shares)',
   };
   return names[symbol] || symbol;
 }
@@ -94,4 +95,64 @@ export async function getAllIndicesData(): Promise<NormalizedIndicator[]> {
   const results = await Promise.all(symbols.map(symbol => getIndexData(symbol)));
 
   return results;
+}
+
+/**
+ * Get GLD ETF data (Gold price proxy)
+ * GLD ETF tracks gold spot price, approximately 1/10 of gold price per ounce
+ */
+export async function getGoldETFData(): Promise<NormalizedIndicator> {
+  const apiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('VITE_ALPHA_VANTAGE_API_KEY not set in .env.local');
+  }
+
+  // Track quota
+  alphaVantageCallCount++;
+  console.warn(`[Alpha Vantage] Call #${alphaVantageCallCount} of ${MAX_AV_CALLS_PER_DAY} daily quota (GLD)`);
+
+  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=GLD&apikey=${apiKey}`;
+
+  return rateLimiter.call('AlphaVantage', async () => {
+    const response = await axios.get<AlphaVantageDailyResponse>(url);
+
+    if (!response.data?.['Time Series (Daily)']) {
+      throw new Error('Alpha Vantage GLD response missing Time Series (Daily)');
+    }
+
+    const timeSeries = response.data['Time Series (Daily)'];
+
+    const historical: HistoricalDataPoint[] = Object.entries(timeSeries)
+      .map(([dateStr, values]) => ({
+        timestamp: parseUTCDate(dateStr),
+        value: parseFloat(values['4. close']),
+      }))
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    const limitedHistorical = historical.slice(-365);
+    const current = limitedHistorical[limitedHistorical.length - 1];
+    const previous = limitedHistorical[limitedHistorical.length - 2];
+
+    let change = undefined;
+    if (current && previous && previous.value > 0) {
+      const changeValue = current.value - previous.value;
+      const changePct = (changeValue / previous.value) * 100;
+      change = {
+        value: changeValue,
+        percentage: changePct,
+        period: 'daily' as const,
+      };
+    }
+
+    return {
+      id: 'gold-gld',
+      name: '黄金ETF (GLD - SPDR Gold Shares)',
+      value: current?.value || 0,
+      unit: 'USD',
+      timestamp: current?.timestamp || new Date(),
+      change,
+      historical: limitedHistorical,
+    };
+  }, RATE_LIMITS.AlphaVantage);
 }
