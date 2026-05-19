@@ -31,7 +31,7 @@ export function Dashboard() {
           {/* Right Column: Market Data */}
           <div className="space-y-4">
             <CryptoPanel />
-            <USIndicesPanel />
+            {/* US Indices disabled: Alpha Vantage quota exhausted (25/day) */}
             <ChineseIndicesPanel />
             <PBOCRatePanel />
           </div>

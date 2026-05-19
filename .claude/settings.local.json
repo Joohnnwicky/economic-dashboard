@@ -50,7 +50,8 @@
       "Bash(curl -s \"https://api.bls.gov/publicAPI/v2/timeseries/data/\" -H \"Content-Type: application/json\" -d '{\"seriesid\":[\"CES0000000001\",\"LNS14000000\"],\"startyear\":\"2024\",\"endyear\":\"2025\",\"registrationkey\":\"96d421375ab542e681df3dc06bbbbef6\"}')",
       "Bash(curl -s \"https://api.bls.gov/publicAPI/v2/timeseries/data/\" -H \"Content-Type: application/json\" -d '{\"seriesid\":[\"LNS11000000\",\"CES0500000003\"],\"startyear\":\"2024\",\"endyear\":\"2025\",\"registrationkey\":\"96d421375ab542e681df3dc06bbbbef6\"}')",
       "Bash(curl -s \"https://api.bls.gov/publicAPI/v2/timeseries/data/\" -H \"Content-Type: application/json\" -d '{\"seriesid\":[\"LNS11300000\"],\"startyear\":\"2024\",\"endyear\":\"2025\",\"registrationkey\":\"96d421375ab542e681df3dc06bbbbef6\"}')",
-      "Bash(curl -s \"https://api.bls.gov/publicAPI/v2/timeseries/data/\" -H \"Content-Type: application/json\" -d '{\"seriesid\":[\"LNS11300000\",\"CES0500000003\"],\"startyear\":\"2024\",\"endyear\":\"2025\",\"registrationkey\":\"96d421375ab542e681df3dc06bbbbef6\"}')"
+      "Bash(curl -s \"https://api.bls.gov/publicAPI/v2/timeseries/data/\" -H \"Content-Type: application/json\" -d '{\"seriesid\":[\"LNS11300000\",\"CES0500000003\"],\"startyear\":\"2024\",\"endyear\":\"2025\",\"registrationkey\":\"96d421375ab542e681df3dc06bbbbef6\"}')",
+      "Bash(curl -s \"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=DIA&apikey=2Y0LWU9BXVKNO8G1\")"
     ]
   }
 }
