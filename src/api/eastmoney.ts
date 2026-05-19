@@ -13,7 +13,7 @@ const TENCENT_FINANCE_URL = isDev
 
 // 东方财富K线API
 const EASTMONEY_KLINE_URL = isDev
-  ? '/api/eastmoneykline'
+  ? '/api/eastmoneykline/api/qt/stock/kline/get'
   : 'http://push2his.eastmoney.com/api/qt/stock/kline/get';
 
 // Rate limit configuration

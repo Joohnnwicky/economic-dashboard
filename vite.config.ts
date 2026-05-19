@@ -54,7 +54,7 @@ export default defineConfig({
       '/api/eastmoneykline': {
         target: 'http://push2his.eastmoney.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/eastmoneykline/, '/api/qt/stock/kline/get'),
+        rewrite: (path) => path.replace(/^\/api\/eastmoneykline/, ''),
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
             proxyReq.setHeader('Referer', 'https://eastmoney.com/');
