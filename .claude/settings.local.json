@@ -56,7 +56,8 @@
       "Bash(curl -s \"http://hq.sinajs.cn/list=s_sh000001,s_sh000300,s_sh000016\")",
       "Bash(curl -s \"http://qt.gtimg.cn/q=s_sh000001,s_sh000300,s_sh000016\")",
       "Bash(pkill -f \"vite\")",
-      "Bash(killall node *)"
+      "Bash(killall node *)",
+      "Bash(pkill -f vite)"
     ]
   }
 }

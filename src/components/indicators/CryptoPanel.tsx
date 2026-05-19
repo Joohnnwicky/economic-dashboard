@@ -26,9 +26,14 @@ export function CryptoPanel() {
         </div>
       )}
 
-      <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
-        数据每30秒更新一次 (CoinGecko API)
-      </p>
+      {isLoading && !btcPrice && !ethPrice && (
+        <div className="p-4 rounded" style={{ backgroundColor: DARK_THEME.panel, color: DARK_THEME.textMuted }}>
+          正在加载加密货币数据...
+        </div>
+      )}
+
+      {/* Price Cards */}
+      <div className="grid grid-cols-2 gap-4">
         {/* BTC Card */}
         <IndicatorCard
           title={BTC.name}
@@ -59,6 +64,11 @@ export function CryptoPanel() {
         {btcHistory && <MiniChart data={btcHistory} />}
         {ethHistory && <MiniChart data={ethHistory} />}
       </div>
+
+      {/* Update Frequency Notice */}
+      <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
+        数据每30秒更新一次 (CoinGecko API)
+      </p>
     </div>
   );
 }
