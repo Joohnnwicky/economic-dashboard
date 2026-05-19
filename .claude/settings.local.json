@@ -68,7 +68,14 @@
       "Bash(curl -s \"https://api.stlouisfed.org/fred/series/observations?series_id=DFEDTARU&api_key=7fed09933eb74912dcf97bcea729bb89&observation_start=2024-01-01&observation_end=2024-12-31&file_type=json\")",
       "Skill(gsd-resume-work)",
       "Bash(timeout 3 bash -c 'cat /tmp/claude-output.txt')",
-      "Bash(curl -s http://localhost:5185)"
+      "Bash(curl -s http://localhost:5185)",
+      "Bash(curl -s \"http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt=101&fqt=1&end=20500101&lmt=10\")",
+      "Bash(curl -v \"http://qt.gtimg.cn/q=s_sh000001,s_sh000300,s_sh000016\")",
+      "Bash(Select-Object -First 30)",
+      "PowerShell(curl *)",
+      "Bash(curl *)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":5173\")"
     ]
   }
 }

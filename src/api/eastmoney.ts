@@ -11,10 +11,10 @@ const TENCENT_FINANCE_URL = isDev
   ? '/api/tencent'
   : 'http://qt.gtimg.cn';
 
-// 东方财富K线API
+// 东方财富K线API - 注意：此API可能失效，已添加fallback处理
 const EASTMONEY_KLINE_URL = isDev
-  ? '/api/eastmoneykline/api/qt/stock/kline/get'
-  : 'http://push2his.eastmoney.com/api/qt/stock/kline/get';
+  ? '/api/eastmoneykline'
+  : 'http://push2his.eastmoney.com';
 
 // Rate limit configuration
 const TENCENT_RATE_LIMIT = {
@@ -44,66 +44,73 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
   const symbols = 's_sh000001,s_sh000300,s_sh000016';
 
   return rateLimiter.call('TencentFinance', async () => {
-    const response = await axios.get<string>(
+    console.log('[Tencent] Fetching Chinese indices...');
+    const response = await axios.get<ArrayBuffer>(
       `${TENCENT_FINANCE_URL}/q=${symbols}`,
       {
-        responseType: 'arraybuffer',  // 腾讯返回GBK编码，需要正确解码
-        responseEncoding: 'binary',
-        transformResponse: [(data: ArrayBuffer) => {
-          // GBK解码
-          const decoder = new TextDecoder('gbk');
-          const text = decoder.decode(data);
+        responseType: 'arraybuffer',
+        transformResponse: [(data) => {
+          try {
+            if (!data || !(data instanceof ArrayBuffer)) {
+              console.error('[Tencent] Invalid response');
+              return [];
+            }
 
-          // 解析腾讯返回的文本格式
-          const lines = text.split('\n').filter(line => line.includes('v_s_sh'));
-          const indices: NormalizedIndicator[] = [];
+            const decoder = new TextDecoder('gbk');
+            const text = decoder.decode(data);
+            const lines = text.split('\n').filter(line => line.includes('v_s_sh'));
+            const indices: NormalizedIndicator[] = [];
 
-          for (const line of lines) {
-            const match = line.match(/v_s_sh(\d+)="(.+)"/);
-            if (!match || !match[2]) continue;
+            for (const line of lines) {
+              const match = line.match(/v_s_sh(\d+)="(.+)"/);
+              if (!match || !match[2]) continue;
 
-            const parts = match[2].split('~');
-            if (parts.length < 6) continue;
+              const parts = match[2].split('~');
+              if (parts.length < 6) continue;
 
-            // parts[0]=类型, parts[1]=名称, parts[2]=代码, parts[3]=当前价, parts[4]=涨跌额, parts[5]=涨跌幅
-            const name = parts[1].trim();
-            const code = parts[2].trim();
-            const price = parseFloat(parts[3]);
-            const change = parseFloat(parts[4]);
-            const changePercent = parseFloat(parts[5]);
+              const name = parts[1].trim();
+              const price = parseFloat(parts[3]);
+              const change = parseFloat(parts[4]);
+              const changePercent = parseFloat(parts[5]);
 
-            if (isNaN(price)) continue;
+              if (isNaN(price)) continue;
 
-            indices.push({
-              id: `sh${match[1]}`,
-              name: name,
-              value: price,
-              unit: 'index',
-              timestamp: new Date(),
-              change: {
-                value: change,
-                percentage: changePercent,
-                period: 'daily' as const,
-              },
-              historical: [], // 腾讯API只提供当前数据
-            });
+              indices.push({
+                id: `sh${match[1]}`,
+                name,
+                value: price,
+                unit: 'index',
+                timestamp: new Date(),
+                change: {
+                  value: change,
+                  percentage: changePercent,
+                  period: 'daily' as const,
+                },
+                historical: [],
+              });
+            }
+
+            return indices;
+          } catch (err) {
+            console.error('[Tencent] Transform error:', err);
+            return [];
           }
-
-          return indices;
         }],
       }
     );
 
-    if (!response.data || response.data.length === 0) {
-      throw new Error('腾讯财经API返回数据为空');
+    const parsedData = response.data as NormalizedIndicator[];
+    if (!parsedData || parsedData.length === 0) {
+      throw new Error('腾讯财经API返回数据为空或解析失败');
     }
 
-    return response.data;
+    return parsedData;
   }, TENCENT_RATE_LIMIT);
 }
 
 /**
  * 获取A股指数历史K线数据（近一年）
+ * 注意：东方财富K线API可能失效，返回空数组作为fallback
  * @param indexId - 指数ID（如 'sh000001'）
  * @param days - 天数，默认365天
  */
@@ -114,29 +121,40 @@ export async function getChineseIndexHistory(indexId: string, days: number = 365
     return [];
   }
 
-  return rateLimiter.call('EastMoneyKline', async () => {
-    const params = `secid=${secid}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt=101&fqt=1&end=20500101&lmt=${days}`;
-    const url = `${EASTMONEY_KLINE_URL}?${params}`;
+  try {
+    return await rateLimiter.call('EastMoneyKline', async () => {
+      const params = `secid=${secid}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt=101&fqt=1&end=20500101&lmt=${days}`;
+      const url = `${EASTMONEY_KLINE_URL}/api/qt/stock/kline/get?${params}`;
 
-    const response = await axios.get(url);
+      console.log(`[EastMoney] Fetching history for ${indexId}...`);
 
-    if (!response.data?.data?.klines) {
-      console.warn(`[EastMoney] No klines data for ${indexId}`);
-      return [];
-    }
+      const response = await axios.get(url, {
+        timeout: 10000, // 10秒超时
+      });
 
-    // 东方财富K线格式: "日期,开盘,收盘,最高,最低,成交量,成交额,振幅,涨跌幅,涨跌额,换手率"
-    const klines: string[] = response.data.data.klines;
-    const historical: HistoricalDataPoint[] = klines.map((line: string) => {
-      const parts = line.split(',');
-      // parts[0]=日期(如"2025-05-19"), parts[2]=收盘价
-      return {
-        timestamp: parseUTCDate(parts[0]),
-        value: parseFloat(parts[2]),
-      };
-    });
+      if (!response.data?.data?.klines) {
+        console.warn(`[EastMoney] No klines data for ${indexId}, API may be down`);
+        return [];
+      }
 
-    // 东方财富返回的是最新→最旧，需要反转
-    return historical.reverse();
-  }, EASTMONEY_KLINE_RATE_LIMIT);
+      // 东方财富K线格式: "日期,开盘,收盘,最高,最低,成交量,成交额,振幅,涨跌幅,涨跌额,换手率"
+      const klines: string[] = response.data.data.klines;
+      const historical: HistoricalDataPoint[] = klines.map((line: string) => {
+        const parts = line.split(',');
+        // parts[0]=日期(如"2025-05-19"), parts[2]=收盘价
+        return {
+          timestamp: parseUTCDate(parts[0]),
+          value: parseFloat(parts[2]),
+        };
+      });
+
+      // 东方财富返回的是最新→最旧，需要反转
+      console.log(`[EastMoney] Successfully parsed ${historical.length} points for ${indexId}`);
+      return historical.reverse();
+    }, EASTMONEY_KLINE_RATE_LIMIT);
+  } catch (error) {
+    console.warn(`[EastMoney] History API failed for ${indexId}:`, error instanceof Error ? error.message : 'Unknown error');
+    // Fallback: 返回空数组，不影响当前数据显示
+    return [];
+  }
 }

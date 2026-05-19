@@ -41,10 +41,14 @@ export function useChineseIndicesWithHistory() {
     historical: historyQueries[i].data || [],
   })) || [];
 
+  const isLoading = indicesQuery.isLoading || historyQueries.some(q => q.isLoading);
+  const hasHistoryError = historyQueries.some(q => q.isError);
+  const error = indicesQuery.error || (hasHistoryError ? new Error('部分历史数据加载失败') : null);
+
   return {
     data: combinedData,
-    isLoading: indicesQuery.isLoading || historyQueries.some(q => q.isLoading),
-    error: indicesQuery.error || historyQueries.find(q => q.error)?.error,
+    isLoading,
+    error,
     dataUpdatedAt: indicesQuery.dataUpdatedAt,
   };
 }
