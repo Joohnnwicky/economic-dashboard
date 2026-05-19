@@ -21,29 +21,18 @@ export function detectFOMCMeetings(historical: HistoricalDataPoint[]): FOMCEvent
       continue;
     }
 
-    // Only mark actual rate changes (prev !== curr)
+    // Mark all FOMC meeting points (rate changes)
     if (prev !== curr) {
-      // Determine decision type per D-12
-      const decision: '加息' | '降息' | '维持' =
-        curr > prev ? '加息' : curr < prev ? '降息' : '维持';
-
-      // Color coding per D-12
-      const color = decision === '加息'
-        ? DARK_THEME.accent[2]  // Red (#f85149)
-        : decision === '降息'
-          ? DARK_THEME.accent[1]  // Green (#3fb950)
-          : DARK_THEME.textMuted; // Gray (#8b949e) - for holds (unlikely when prev !== curr)
-
       events.push({
         timestamp: historical[i].timestamp,
         rate: curr,
-        decision,
-        color,
+        decision: '', // 去掉加息/降息字样，只显示利率
+        color: '#f85149', // 统一用红色标记FOMC会议点
       });
     }
   }
 
-  // Filter to past 1 year per D-14
+  // Filter to past 1 year
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 

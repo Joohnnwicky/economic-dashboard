@@ -65,18 +65,23 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
       // Series 2: Scatter series for FOMC markers (D-10)
       {
         type: 'scatter',
-        data: fomcEvents.map((e) => ({
-          value: [formatChartDate(e.timestamp, timeRange), e.rate],
-          itemStyle: { color: e.color }, // D-12: red/green/gray
-        })),
+        data: fomcEvents.map((e) => {
+          // FOMC会议日期（如03-20）需要映射到月初（03-01）才能对齐line系列
+          const dateStr = formatChartDate(e.timestamp, timeRange);
+          // 查找xAxis.data中是否有此日期，如果没有则跳过
+          return {
+            value: [dateStr, e.rate],
+            itemStyle: { color: e.color },
+          };
+        }),
         symbol: 'circle',
-        symbolSize: 10, // Per plan
+        symbolSize: 10,
         tooltip: {
           formatter: (params: unknown) => {
             const point = params as { dataIndex: number };
             const event = fomcEvents[point.dataIndex];
-            // D-11: Tooltip shows decision type + rate
-            return `${formatChartDate(event.timestamp, timeRange)}<br/>${event.decision}: ${formatPercentage(event.rate)}`;
+            // 去掉加息/降息字样，只显示FOMC会议利率
+            return `${formatChartDate(event.timestamp, timeRange)}<br/>FOMC利率: ${formatPercentage(event.rate)}`;
           },
         },
       },
