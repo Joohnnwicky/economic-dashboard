@@ -2,7 +2,7 @@
   {
     "id": "dow-jones",
     "symbol": "DIA",
-    "name": "道琼斯指数",
+    "name": "道琼斯工业平均指数（DJIA Dow Jones）",
     "value": 42987.46,
     "change": 156.87,
     "changePercent": 0.37,
@@ -12,7 +12,7 @@
   {
     "id": "nasdaq",
     "symbol": "QQQ",
-    "name": "纳斯达克指数",
+    "name": "纳斯达克综合指数（NASDAQ Nasdaq Composite）",
     "value": 19167.82,
     "change": 283.45,
     "changePercent": 1.51,
@@ -22,7 +22,7 @@
   {
     "id": "sp500",
     "symbol": "SPY",
-    "name": "标普500指数",
+    "name": "标准普尔500指数（S&P 500）",
     "value": 5956.23,
     "change": 42.15,
     "changePercent": 0.71,

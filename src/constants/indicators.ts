@@ -43,29 +43,28 @@ export const INFLATION = {
   ],
 } as const;
 
-// US stock indices from Alpha Vantage
-// CRITICAL: Alpha Vantage free tier = 25 calls/day
-// Updates are hourly due to API quota limitation
+// US stock indices (静态数据展示)
+// CRITICAL: 美股在中国白天闭市，使用静态JSON数据
 export const US_INDICES = {
   dowJones: {
     id: 'dow-jones',
-    name: '道琼斯指数',
+    name: '道琼斯工业平均指数（DJIA Dow Jones）',
     unit: 'index',
-    source: 'Alpha Vantage',
-    symbol: ALPHA_VANTAGE_SYMBOLS.DOW_JONES,
+    source: 'Static JSON',
+    symbol: 'DIA',
   },
   nasdaq: {
     id: 'nasdaq',
-    name: '纳斯达克指数',
+    name: '纳斯达克综合指数（NASDAQ Nasdaq Composite）',
     unit: 'index',
-    source: 'Alpha Vantage',
-    symbol: ALPHA_VANTAGE_SYMBOLS.NASDAQ,
+    source: 'Static JSON',
+    symbol: 'QQQ',
   },
   sp500: {
     id: 'sp500',
-    name: '标普500指数',
+    name: '标准普尔500指数（S&P 500）',
     unit: 'index',
-    source: 'Alpha Vantage',
-    symbol: ALPHA_VANTAGE_SYMBOLS.SP500,
+    source: 'Static JSON',
+    symbol: 'SPY',
   },
 } as const;

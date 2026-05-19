@@ -53,7 +53,7 @@ export function USIndicesPanel() {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-        美股大盘指数
+        美国股市指数（U.S. Stock Indices）
       </h3>
 
       {/* Disclaimer about static data */}
