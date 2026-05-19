@@ -1,60 +1,59 @@
 import { useQuery } from '@tanstack/react-query';
-import { getCryptoPrice, getCryptoHistory, CryptoPriceData } from '../api/coingecko';
+import { getCryptoPrices, getCryptoHistoryFromBinance } from '../api/binance';
 import { BTC, ETH } from '../constants/indicators';
 import { NormalizedIndicator } from '../types/indicator';
 
 /**
- * Hook for fetching current BTC and ETH prices
+ * Hook for fetching current BTC and ETH prices from Binance
  *
- * 5分钟更新一次（避免CoinGecko 429 rate limit）
- * CoinGecko免费API限制: 10-50 calls/minute
+ * Binance API rate limit: 1200 requests/minute (much higher than CoinGecko)
+ * 1分钟轮询完全安全
  */
 export function useCryptoPrice() {
   const query = useQuery({
     queryKey: ['crypto-price'],
     queryFn: async () => {
-      return getCryptoPrice([BTC.coinGeckoId, ETH.coinGeckoId]);
+      return getCryptoPrices();
     },
-    staleTime: 5 * 60 * 1000,        // 5分钟 - 避免rate limit
-    gcTime: 10 * 60 * 1000,          // Keep in cache 10 min
-    refetchInterval: 5 * 60 * 1000,  // 每5分钟自动刷新
-    retry: 1,                         // 减少重试避免浪费quota
+    staleTime: 60 * 1000,        // 1分钟
+    gcTime: 5 * 60 * 1000,       // Keep in cache 5 min
+    refetchInterval: 60 * 1000,  // 每1分钟自动刷新
+    retry: 2,
     refetchOnWindowFocus: false,
   });
 
   return {
     ...query,
-    btcPrice: query.data?.[BTC.coinGeckoId],
-    ethPrice: query.data?.[ETH.coinGeckoId],
+    btcPrice: query.data?.bitcoin,
+    ethPrice: query.data?.ethereum,
     isPending: query.isFetching,
   };
 }
 
 /**
- * Hook for 24h price history (mini chart data)
- * @param coinId - CoinGecko coin ID (e.g., 'bitcoin')
- * @param days - Number of days of history (default 1 for 24h)
+ * Hook for 24h price history from Binance (mini chart data)
+ * @param symbol - Binance symbol (e.g., 'BTCUSDT')
  */
-export function useCryptoHistory(coinId: string, days: number = 1) {
+export function useCryptoHistory(symbol: string, interval: string = '1h', limit: number = 24) {
   return useQuery({
-    queryKey: ['crypto-history', coinId, days],
+    queryKey: ['crypto-history', symbol, interval, limit],
     queryFn: async () => {
-      return getCryptoHistory(coinId, days);
+      return getCryptoHistoryFromBinance(symbol, interval, limit);
     },
-    staleTime: 5 * 60 * 1000,        // 5分钟
-    gcTime: 10 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,  // 每5分钟自动刷新
-    retry: 1,
+    staleTime: 60 * 1000,        // 1分钟
+    gcTime: 5 * 60 * 1000,
+    refetchInterval: 60 * 1000,  // 每1分钟自动刷新
+    retry: 2,
     refetchOnWindowFocus: false,
   });
 }
 
 /**
- * Hook for both BTC and ETH history (parallel fetch)
+ * Hook for both BTC and ETH history (parallel fetch from Binance)
  */
 export function useCryptoHistories() {
-  const btcQuery = useCryptoHistory(BTC.coinGeckoId, 1);
-  const ethQuery = useCryptoHistory(ETH.coinGeckoId, 1);
+  const btcQuery = useCryptoHistory('BTCUSDT', '1h', 24);
+  const ethQuery = useCryptoHistory('ETHUSDT', '1h', 24);
 
   return {
     btcHistory: btcQuery.data,
