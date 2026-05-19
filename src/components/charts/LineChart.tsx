@@ -27,12 +27,13 @@ function formatValue(value: number, unit: string): string {
 
 export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartProps) {
   // 根据unit确定grid left宽度（大数字需要更多空间）
-  const gridLeft = data.unit === 'K' ? '15%' : '10%';
+  // index单位数值通常较大（如130.34），需要更多空间
+  const gridLeft = data.unit === 'K' ? '15%' : data.unit === 'index' ? '12%' : '10%';
 
   const option = {
     backgroundColor: DARK_THEME.background,
     textStyle: { color: DARK_THEME.text },
-    grid: { left: gridLeft, right: '5%', top: '10%', bottom: '20%' },
+    grid: { left: gridLeft, right: '5%', top: '10%', bottom: '25%' },
     xAxis: {
       type: 'category',
       data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
