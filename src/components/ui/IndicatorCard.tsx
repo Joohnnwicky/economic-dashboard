@@ -35,7 +35,7 @@ export function IndicatorCard({ title, value, unit, change, lastUpdated }: Indic
       {change && (
         <div className="flex items-center gap-2 mt-2">
           <span style={{ color: changeColor }}>
-            {isPositive ? '+' : ''}{formatPercentage(change.percentage)}
+            {isPositive ? '+' : ''}{change.percentage.toFixed(2)}%
           </span>
           <span className="text-sm" style={{ color: DARK_THEME.textMuted }}>
             (24h)
