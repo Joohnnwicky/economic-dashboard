@@ -1,7 +1,7 @@
 import ReactECharts from 'echarts-for-react';
 import { NormalizedIndicator } from '../../types/indicator';
 import { DARK_THEME } from '../../constants/colors';
-import { formatChartDate, formatPercentage } from '../../utils/formatters';
+import { formatChartDate, formatPercentage, formatChineseNumber, formatLargeNumber } from '../../utils/formatters';
 import { TimeRange } from '../../types/api';
 
 interface LineChartProps {
@@ -10,11 +10,29 @@ interface LineChartProps {
   height?: number;
 }
 
+// 根据单位选择格式化函数
+function formatValue(value: number, unit: string): string {
+  switch (unit) {
+    case '%':
+      return formatPercentage(value);
+    case 'K':
+      // K单位表示"千"，需要转换为万或亿显示
+      return formatChineseNumber(value * 1000);
+    case 'index':
+      return value.toFixed(2);
+    default:
+      return formatLargeNumber(value);
+  }
+}
+
 export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartProps) {
+  // 根据unit确定grid left宽度（大数字需要更多空间）
+  const gridLeft = data.unit === 'K' ? '15%' : '10%';
+
   const option = {
     backgroundColor: DARK_THEME.background,
     textStyle: { color: DARK_THEME.text },
-    grid: { left: '10%', right: '5%', top: '10%', bottom: '20%' },
+    grid: { left: gridLeft, right: '5%', top: '10%', bottom: '20%' },
     xAxis: {
       type: 'category',
       data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
@@ -23,19 +41,16 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
     },
     yAxis: {
       type: 'value',
-      name: data.unit,
+      name: data.unit === 'K' ? '就业人数' : data.unit,
       nameTextStyle: { color: DARK_THEME.textMuted },
       min: (value: { min: number; max: number }) => {
-        // 动态调整纵轴范围，不从0开始
         const dataMin = value.min;
         const dataMax = value.max;
         const range = dataMax - dataMin;
-        // 向下扩展10%，向上扩展10%
         if (dataMin > 0 && range < dataMin * 0.5) {
-          // 如果数据范围较小（如利率3%-5%），动态调整
           return Math.floor((dataMin - range * 0.1) * 10) / 10;
         }
-        return 0; // 其他情况从0开始
+        return 0;
       },
       max: (value: { min: number; max: number }) => {
         const dataMin = value.min;
@@ -49,7 +64,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: {
         color: DARK_THEME.textMuted,
-        formatter: (value: number) => formatPercentage(value),
+        formatter: (value: number) => formatValue(value, data.unit),
       },
       splitLine: { lineStyle: { color: DARK_THEME.gridLine, opacity: 0.3 } },
     },
@@ -70,7 +85,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
       textStyle: { color: DARK_THEME.text },
       formatter: (params: unknown) => {
         const point = (params as Array<{ name: string; value: number }>)[0];
-        return `${point.name}<br/>${data.name}: ${formatPercentage(point.value)}`;
+        return `${point.name}: ${formatValue(point.value, data.unit)}`;
       },
     },
     dataZoom: [
