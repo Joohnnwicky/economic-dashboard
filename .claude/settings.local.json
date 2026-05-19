@@ -60,7 +60,8 @@
       "Bash(pkill -f vite)",
       "Bash(curl -s \"https://api.coingecko.com/api/v3/ping\")",
       "Bash(curl -s \"https://api.binance.com/api/v3/ticker/price?symbols=[\\\\\"BTCUSDT\\\\\",\\\\\"ETHUSDT\\\\\"]\")",
-      "Bash(curl -s \"https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT\")"
+      "Bash(curl -s \"https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT\")",
+      "Bash(curl -s \"https://example.com/api/lpr\")"
     ]
   }
 }

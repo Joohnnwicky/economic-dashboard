@@ -13,7 +13,7 @@ export function FedRatePanel() {
 
   return (
     <GridPanel
-      title="美联储利率"
+      title="联邦基金利率"
       isLoading={isLoading}
       lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
     >

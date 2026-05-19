@@ -41,7 +41,7 @@ function normalizeFredData(
 
   return {
     id: 'fed-rate',
-    name: '美联储利率',
+    name: '联邦基金利率',
     value: current?.value ?? 0,
     unit: '%',
     timestamp: current?.timestamp ?? new Date(),

@@ -3,7 +3,7 @@ import { ALPHA_VANTAGE_SYMBOLS } from './api';
 export const INDICATORS = {
   FED_RATE: {
     id: 'fed-rate',
-    name: '美联储利率',
+    name: '联邦基金利率',
     unit: '%',
     source: 'FRED',
     seriesId: 'FEDFUNDS',
