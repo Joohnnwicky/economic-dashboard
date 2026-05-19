@@ -1,31 +1,33 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-19T12:55:17Z",
+  "timestamp": "2026-05-19T23:39:35.696Z",
   "phase": null,
-  "phase_name": "A股个股自定义追踪功能",
-  "task": 7,
-  "total_tasks": 7,
+  "phase_name": "金价油价功能添加",
+  "phase_dir": null,
+  "plan": null,
+  "task": 9,
+  "total_tasks": 9,
   "status": "completed",
   "completed_tasks": [
-    {"id": 1, "name": "修复加密货币跨市场对比显示(coinGeckoId)", "status": "done", "commit": "cb7bd12"},
-    {"id": 2, "name": "修复useCrypto使用币安API获取历史数据", "status": "done", "commit": "cb7bd12"},
-    {"id": 3, "name": "创建Python后端(FastAPI+mootdx)", "status": "done", "commit": "b2ba66e"},
-    {"id": 4, "name": "实现通达信数据获取服务", "status": "done", "commit": "cd65983"},
-    {"id": 5, "name": "创建前端API模块和Hooks", "status": "done", "commit": "b2ba66e"},
-    {"id": 6, "name": "创建自选股UI组件(搜索/面板/卡片/图表)", "status": "done", "commit": "b2ba66e"},
-    {"id": 7, "name": "预设军工板块20只股票为默认自选股", "status": "done", "commit": "e735edc"}
+    {"id": 1, "name": "添加FRED商品Series IDs到constants/api.ts", "status": "done", "commit": "0505326"},
+    {"id": 2, "name": "创建fred-commodities.ts API客户端", "status": "done", "commit": "0505326"},
+    {"id": 3, "name": "创建useGoldPrice.ts Hook", "status": "done", "commit": "0505326"},
+    {"id": 4, "name": "创建useOilPrice.ts Hook", "status": "done", "commit": "0505326"},
+    {"id": 5, "name": "创建GoldPricePanel.tsx组件", "status": "done", "commit": "0505326"},
+    {"id": 6, "name": "创建OilPricePanel.tsx组件", "status": "done", "commit": "0505326"},
+    {"id": 7, "name": "扩展formatters.ts商品单位格式化", "status": "done", "commit": "0505326"},
+    {"id": 8, "name": "更新Dashboard.tsx集成新面板", "status": "done", "commit": "0505326"},
+    {"id": 9, "name": "修复StockCard查看趋势按钮显示", "status": "done", "commit": "548496d"}
   ],
   "remaining_tasks": [],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "使用FastAPI + mootdx构建Python后端", "rationale": "mootdx是通达信API的Python封装，支持K线和实时行情", "phase": null},
-    {"decision": "使用Zustand + localStorage持久化自选股", "rationale": "首次使用persist middleware", "phase": null},
-    {"decision": "扩展股票搜索列表至200+只", "rationale": "用户反馈搜索不到股票", "phase": null},
-    {"decision": "支持直接输入代码添加", "rationale": "解决搜索列表不全问题", "phase": null},
-    {"decision": "预设军工板块20只股票为默认自选股", "rationale": "用户提供的股票列表", "phase": null}
+    {"decision": "使用Alpha Vantage GLD ETF代替FRED黄金数据", "rationale": "FRED LBMA黄金Series不存在，GLD ETF跟踪金价走势", "phase": null},
+    {"decision": "使用FRED DCOILBRENTEU/DCOILWTICO获取油价", "rationale": "FRED有完整的Brent和WTI原油数据", "phase": null},
+    {"decision": "暂不实现中国国内金价油价", "rationale": "mootdx期货接口已失效，无其他免费API", "phase": null}
   ],
   "uncommitted_files": [],
-  "next_action": "功能已完成，刷新浏览器测试自选股面板",
-  "context_notes": "A股个股自定义追踪功能完整实现，包括Python后端、前端组件、API集成。后端运行在localhost:8000。"
+  "next_action": "功能已完成，可继续其他工作或同步ROADMAP",
+  "context_notes": "金价油价模块已完整实现并验证。GLD ETF约$418，Brent约$106/桶，WTI约$101/桶。数据面板正常显示。A股自选股功能也已完成修复。"
 }
