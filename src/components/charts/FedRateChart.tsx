@@ -31,6 +31,20 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
       type: 'value',
       name: data.unit,
       nameTextStyle: { color: DARK_THEME.textMuted },
+      min: (value: { min: number; max: number }) => {
+        // 动态调整纵轴范围，不从0开始，更好地显示趋势
+        const dataMin = value.min;
+        const dataMax = value.max;
+        const range = dataMax - dataMin;
+        // 向下扩展10%范围，向上扩展10%范围
+        return Math.floor((dataMin - range * 0.1) * 10) / 10;
+      },
+      max: (value: { min: number; max: number }) => {
+        const dataMin = value.min;
+        const dataMax = value.max;
+        const range = dataMax - dataMin;
+        return Math.ceil((dataMax + range * 0.1) * 10) / 10;
+      },
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: {
         color: DARK_THEME.textMuted,

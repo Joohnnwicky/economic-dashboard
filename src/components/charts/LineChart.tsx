@@ -25,6 +25,27 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
       type: 'value',
       name: data.unit,
       nameTextStyle: { color: DARK_THEME.textMuted },
+      min: (value: { min: number; max: number }) => {
+        // 动态调整纵轴范围，不从0开始
+        const dataMin = value.min;
+        const dataMax = value.max;
+        const range = dataMax - dataMin;
+        // 向下扩展10%，向上扩展10%
+        if (dataMin > 0 && range < dataMin * 0.5) {
+          // 如果数据范围较小（如利率3%-5%），动态调整
+          return Math.floor((dataMin - range * 0.1) * 10) / 10;
+        }
+        return 0; // 其他情况从0开始
+      },
+      max: (value: { min: number; max: number }) => {
+        const dataMin = value.min;
+        const dataMax = value.max;
+        const range = dataMax - dataMin;
+        if (dataMin > 0 && range < dataMin * 0.5) {
+          return Math.ceil((dataMax + range * 0.1) * 10) / 10;
+        }
+        return 'dataMax';
+      },
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: {
         color: DARK_THEME.textMuted,
