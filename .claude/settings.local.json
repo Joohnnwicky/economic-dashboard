@@ -62,7 +62,8 @@
       "Bash(curl -s \"https://api.binance.com/api/v3/ticker/price?symbols=[\\\\\"BTCUSDT\\\\\",\\\\\"ETHUSDT\\\\\"]\")",
       "Bash(curl -s \"https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT\")",
       "Bash(curl -s \"https://example.com/api/lpr\")",
-      "Bash(curl -s \"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm\")"
+      "Bash(curl -s \"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm\")",
+      "Bash(git diff *)"
     ]
   }
 }
