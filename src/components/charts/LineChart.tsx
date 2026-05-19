@@ -30,7 +30,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
   // K单位: 千人转万/亿（如1584949 -> 1.58亿）
   // index单位: 指数值（如130.34），需要显示完整的3位数
   // %单位: 百分比（如4.33%），2位数即可
-  const gridLeft = data.unit === 'K' ? '20%' : data.unit === 'index' ? '22%' : '10%';
+  const gridLeft = data.unit === 'K' ? '18%' : data.unit === 'index' ? '16%' : '8%';
 
   const option = {
     backgroundColor: DARK_THEME.background,
@@ -68,6 +68,8 @@ export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartPro
       axisLabel: {
         color: DARK_THEME.textMuted,
         formatter: (value: number) => formatValue(value, data.unit),
+        margin: 8,
+        align: 'left',
       },
       splitLine: { lineStyle: { color: DARK_THEME.gridLine, opacity: 0.3 } },
     },
