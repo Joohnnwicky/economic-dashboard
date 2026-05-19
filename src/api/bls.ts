@@ -81,7 +81,7 @@ export async function getEmploymentData(timeRange: TimeRange): Promise<Normalize
 
     return {
       id: seriesId === BLS_SERIES.NFP ? 'nfp' : 'unemployment-rate',
-      name: seriesId === BLS_SERIES.NFP ? '非农就业人数' : '失业率',
+      name: seriesId === BLS_SERIES.NFP ? '非农就业人数（NFP Nonfarm Payrolls）' : '失业率（UR Unemployment Rate）',
       value: current?.value || 0,
       unit: seriesId === BLS_SERIES.NFP ? 'K' : '%',
       timestamp: current?.timestamp || new Date(),

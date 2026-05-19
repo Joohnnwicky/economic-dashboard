@@ -30,8 +30,8 @@ export const ETH = {
 export const EMPLOYMENT = {
   id: 'employment',
   indicators: [
-    { id: 'nfp', name: '非农就业人数', unit: 'K', seriesId: 'CES0000000001' },
-    { id: 'unemployment-rate', name: '失业率', unit: '%', seriesId: 'LNS14000000' },
+    { id: 'nfp', name: '非农就业人数（NFP Nonfarm Payrolls）', unit: 'K', seriesId: 'CES0000000001' },
+    { id: 'unemployment-rate', name: '失业率（UR Unemployment Rate）', unit: '%', seriesId: 'LNS14000000' },
   ],
 } as const;
 

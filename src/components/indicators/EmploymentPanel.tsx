@@ -11,7 +11,7 @@ export function EmploymentPanel() {
   return (
     <div>
       <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-        美国劳动力市场
+        美国劳动力市场（U.S. Labor Market）
       </h3>
 
       <div className="grid grid-cols-1 gap-4">
