@@ -75,7 +75,9 @@
       "PowerShell(curl *)",
       "Bash(curl *)",
       "Bash(netstat -ano)",
-      "Bash(findstr \":5173\")"
+      "Bash(findstr \":5173\")",
+      "Skill(scrape)",
+      "WebFetch(domain:quote.eastmoney.com)"
     ]
   }
 }

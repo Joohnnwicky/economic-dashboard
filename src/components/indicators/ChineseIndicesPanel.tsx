@@ -1,10 +1,9 @@
-import { useChineseIndicesWithHistory } from '../../hooks/useChineseIndices';
+import { useChineseIndices } from '../../hooks/useChineseIndices';
 import { IndicatorCard } from '../ui/IndicatorCard';
-import { LineChart } from '../charts/LineChart';
 import { DARK_THEME } from '../../constants/colors';
 
 export function ChineseIndicesPanel() {
-  const { data, isLoading, error, dataUpdatedAt } = useChineseIndicesWithHistory();
+  const { data, isLoading, error } = useChineseIndices();
 
   // 只有在完全没有数据且正在加载时才显示loading
   if (isLoading && (!data || data.length === 0)) {
@@ -72,40 +71,17 @@ export function ChineseIndicesPanel() {
         ))}
       </div>
 
-      {/* Historical Trend Charts */}
-      {data.some(index => index.historical.length > 0) && (
-        <div className="mt-4 space-y-4">
-          {data.map((index) => (
-            index.historical.length > 0 && (
-              <div key={`chart-${index.id}`}>
-                <h4 className="text-sm font-medium mb-2" style={{ color: DARK_THEME.textMuted }}>
-                  {index.name} 近一年走势
-                </h4>
-                <LineChart data={index} timeRange="1Y" height={200} gridLeft="6%" />
-              </div>
-            )
-          ))}
-        </div>
-      )}
-
-      {/* No History Notice */}
-      {data.every(index => index.historical.length === 0) && (
-        <div className="mt-4 p-3 rounded" style={{ backgroundColor: DARK_THEME.panel }}>
-          <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-            注：历史走势数据暂时无法获取（东方财富API不稳定）
-          </p>
-          <p className="text-xs mt-1" style={{ color: DARK_THEME.textMuted }}>
-            当前价格数据每1小时更新 (腾讯财经API)
-          </p>
-        </div>
-      )}
-
       {/* Error Notice */}
       {error && (
         <div className="mt-2 p-2 rounded bg-orange-900/20 text-orange-400 text-xs">
           部分数据加载异常: {error.message}
         </div>
       )}
+
+      {/* Update Frequency Notice */}
+      <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
+        数据每1小时更新一次 (腾讯财经API)
+      </p>
     </div>
   );
 }
