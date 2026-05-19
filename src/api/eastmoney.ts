@@ -8,7 +8,7 @@ const isDev = import.meta.env.DEV;
 
 // 腾讯财经API - 更稳定、不易被封禁
 const TENCENT_FINANCE_URL = isDev
-  ? '/api/tencent/qt.gtimg.cn'
+  ? '/api/tencent'
   : 'http://qt.gtimg.cn';
 
 // 东方财富K线API
