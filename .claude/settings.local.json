@@ -54,7 +54,9 @@
       "Bash(curl -s \"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=DIA&apikey=2Y0LWU9BXVKNO8G1\")",
       "Bash(curl -s \"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=1.000001,1.000300,1.000016&fields=f2,f3,f4,f12,f14\")",
       "Bash(curl -s \"http://hq.sinajs.cn/list=s_sh000001,s_sh000300,s_sh000016\")",
-      "Bash(curl -s \"http://qt.gtimg.cn/q=s_sh000001,s_sh000300,s_sh000016\")"
+      "Bash(curl -s \"http://qt.gtimg.cn/q=s_sh000001,s_sh000300,s_sh000016\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(killall node *)"
     ]
   }
 }

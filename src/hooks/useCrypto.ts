@@ -6,9 +6,7 @@ import { NormalizedIndicator } from '../types/indicator';
 /**
  * Hook for fetching current BTC and ETH prices
  *
- * Note: WebSocket updates this cache via setQueryData (D-02)
- * Prices are updated in real-time by useCryptoWebSocket hook
- * This hook reads from the same ['crypto-price'] cache
+ * 30秒轮询更新，简单稳定，无需WebSocket实时推送
  */
 export function useCryptoPrice() {
   const query = useQuery({
@@ -16,9 +14,9 @@ export function useCryptoPrice() {
     queryFn: async () => {
       return getCryptoPrice([BTC.coinGeckoId, ETH.coinGeckoId]);
     },
-    staleTime: 60 * 1000,        // 1 minute - crypto needs freshness
+    staleTime: 30 * 1000,        // 30秒 - 半分钟更新
     gcTime: 5 * 60 * 1000,       // Keep in cache 5 min
-    // refetchInterval removed - WebSocket provides real-time updates
+    refetchInterval: 30 * 1000,  // 每30秒自动刷新
     retry: 2,
     refetchOnWindowFocus: false,
   });
@@ -42,9 +40,9 @@ export function useCryptoHistory(coinId: string, days: number = 1) {
     queryFn: async () => {
       return getCryptoHistory(coinId, days);
     },
-    staleTime: 60 * 1000,        // 1 minute
+    staleTime: 30 * 1000,        // 30秒
     gcTime: 5 * 60 * 1000,
-    refetchInterval: 60 * 1000,  // Auto refetch every 60s
+    refetchInterval: 30 * 1000,  // 每30秒自动刷新
     retry: 2,
     refetchOnWindowFocus: false,
   });
@@ -113,9 +111,9 @@ export function useCrypto() {
 
       return indicators;
     },
-    staleTime: 60 * 1000,
+    staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
-    refetchInterval: 60 * 1000,
+    refetchInterval: 30 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
   });
