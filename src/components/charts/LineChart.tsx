@@ -8,6 +8,7 @@ interface LineChartProps {
   data: NormalizedIndicator;
   timeRange?: TimeRange;
   height?: number;
+  gridLeft?: string; // 可选：自定义grid left宽度，覆盖默认值
 }
 
 // 根据单位选择格式化函数
@@ -25,17 +26,17 @@ function formatValue(value: number, unit: string): string {
   }
 }
 
-export function LineChart({ data, timeRange = '1Y', height = 400 }: LineChartProps) {
-  // 根据unit确定grid left宽度（大数字需要更多空间）
+export function LineChart({ data, timeRange = '1Y', height = 400, gridLeft }: LineChartProps) {
+  // 如果传入gridLeft则使用，否则根据unit确定默认值
   // K单位: 千人转万/亿（如1584949 -> 1.58亿）
   // index单位: 指数值（如130.34），需要显示完整的3位数
   // %单位: 百分比（如4.33%），2位数即可
-  const gridLeft = data.unit === 'K' ? '18%' : data.unit === 'index' ? '16%' : '8%';
+  const finalGridLeft = gridLeft ?? (data.unit === 'K' ? '18%' : data.unit === 'index' ? '16%' : '8%');
 
   const option = {
     backgroundColor: DARK_THEME.background,
     textStyle: { color: DARK_THEME.text },
-    grid: { left: gridLeft, right: '5%', top: '10%', bottom: '30%' },
+    grid: { left: finalGridLeft, right: '5%', top: '10%', bottom: '30%' },
     xAxis: {
       type: 'category',
       data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
