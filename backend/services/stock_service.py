@@ -3,7 +3,7 @@
 """
 from datetime import datetime
 from typing import List, Optional
-from mootdx.consts import MARKET_SH, MARKET_SZ
+import pandas as pd
 from models.indicator import (
     NormalizedIndicator,
     HistoricalDataPoint,
@@ -34,7 +34,6 @@ def get_kline_data(
     """
     try:
         client = tdx_client.get_client()
-        market, symbol = get_market_code(code)
 
         # mootdx frequency: 9=日线, 5=周线, 4=月线
         freq_map = {'daily': 9, 'weekly': 5, 'monthly': 4}
@@ -42,31 +41,32 @@ def get_kline_data(
 
         # 获取K线数据 (使用 bars 方法)
         result = client.bars(
-            code=symbol,
+            symbol=code,
             frequency=frequency,
             start=0,
             offset=limit
         )
 
-        if result is None or result.empty:
+        if result is None or (hasattr(result, 'empty') and result.empty):
             logger.warning(f"获取K线数据失败: {code}, result empty")
             return None
 
-        # result 是 pandas DataFrame，列名包括: open, close, high, low, volume 等
-        # 索引是日期
+        # result 是 pandas DataFrame
         historical = []
         for idx, row in result.iterrows():
             try:
-                # idx 可能是字符串日期或 Timestamp
-                if isinstance(idx, str):
-                    ts = datetime.strptime(idx, '%Y-%m-%d')
+                # 获取日期
+                if isinstance(idx, (pd.Timestamp, datetime)):
+                    ts = idx
+                elif 'datetime' in row:
+                    ts = row['datetime']
                 else:
-                    ts = datetime.fromtimestamp(idx.timestamp())
+                    continue
 
                 close_price = float(row.get('close', 0))
                 if close_price > 0:
                     historical.append(HistoricalDataPoint(
-                        timestamp=ts,
+                        timestamp=ts if isinstance(ts, datetime) else ts.to_pydatetime(),
                         value=close_price
                     ))
             except Exception as e:
@@ -119,12 +119,11 @@ def get_quote_data(code: str) -> Optional[NormalizedIndicator]:
     """
     try:
         client = tdx_client.get_client()
-        market, symbol = get_market_code(code)
 
         # 获取实时行情 (使用 quotes 方法)
-        result = client.quotes(code=symbol)
+        result = client.quotes(symbol=[code])
 
-        if result is None or result.empty:
+        if result is None or (hasattr(result, 'empty') and result.empty):
             logger.warning(f"获取实时行情失败: {code}")
             return None
 

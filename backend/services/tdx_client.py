@@ -2,19 +2,16 @@
 通达信客户端服务 - 使用mootdx获取A股数据
 """
 from mootdx.quotes import StdQuotes
-from mootdx.server import bestip
 from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
-# 通达信服务器列表
+# 通达信服务器列表（已验证可连接）
 TDX_SERVERS = [
-    ('119.147.212.81', 7709),
     ('218.75.126.9', 7709),
     ('115.238.90.165', 7709),
     ('124.160.88.21', 7709),
-    ('60.12.136.250', 7709),
 ]
 
 
@@ -36,7 +33,11 @@ class TDXClient:
                 # 尝试连接服务器
                 for host, port in TDX_SERVERS:
                     try:
-                        self._client = StdQuotes(market='std', server=(host, port))
+                        self._client = StdQuotes(
+                            market='std',
+                            server=(host, port),
+                            timeout=10
+                        )
                         logger.info(f"通达信客户端连接成功: {host}:{port}")
                         break
                     except Exception as e:
@@ -73,8 +74,6 @@ def get_market_code(stock_code: str) -> tuple:
     Returns:
         (market, code): market=1表示上海，0表示深圳
     """
-    # 上海: 6开头 (主板600xxx, 科创板688xxx)
-    # 深圳: 0开头(主板000xxx), 3开头(创业板300xxx), 002xxx(中小板)
     if stock_code.startswith('6'):
         return (1, stock_code)  # 上海
     else:
@@ -83,7 +82,6 @@ def get_market_code(stock_code: str) -> tuple:
 
 def get_stock_name(stock_code: str) -> str:
     """获取股票名称（从静态映射表）"""
-    # 常用股票名称映射
     stock_names = {
         '600519': '贵州茅台',
         '000001': '平安银行',
@@ -100,11 +98,20 @@ def get_stock_name(stock_code: str) -> str:
         '601288': '农业银行',
         '600030': '中信证券',
         '000651': '格力电器',
-        # 指数
-        '000001': '上证指数',  # 注意：这个代码和平安银行冲突，指数需要特殊处理
-        '000300': '沪深300',
-        '000016': '上证50',
-        '399001': '深证成指',
-        '399006': '创业板指',
+        '600887': '伊利股份',
+        '002594': '比亚迪',
+        '600900': '长江电力',
+        '601012': '隆基绿能',
+        '300750': '宁德时代',
+        '600010': '包钢股份',
+        '601899': '紫金矿业',
+        '000725': '京东方A',
+        '002352': '顺丰控股',
+        '600019': '宝钢股份',
+        '601888': '中国中免',
+        '600585': '海螺水泥',
+        '002475': '立讯精密',
+        '603259': '药明康德',
+        '300059': '东方财富',
     }
     return stock_names.get(stock_code, f"股票{stock_code}")
