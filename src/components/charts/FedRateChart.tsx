@@ -16,6 +16,26 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
   // Detect FOMC events from DFEDTARU data (D-13)
   const fomcEvents: FOMCEvent[] = detectFOMCMeetings(fomcData.historical);
 
+  // Build xAxis data (dates)
+  const xAxisData = data.historical.map((d) => formatChartDate(d.timestamp, timeRange));
+
+  // Map FOMC events to xAxis indices for precise alignment
+  // FOMC会议日期映射到最近的xAxis月份
+  const scatterData: Array<{ value: [number, number]; itemStyle: { color: string }; event: FOMCEvent }> = [];
+  fomcEvents.forEach((event) => {
+    // 找到FOMC会议日期对应的xAxis索引
+    const eventDateStr = formatChartDate(event.timestamp, timeRange);
+    const xIndex = xAxisData.indexOf(eventDateStr);
+    if (xIndex !== -1) {
+      // 使用索引定位scatter点，确保精确对齐line上的点
+      scatterData.push({
+        value: [xIndex, event.rate],
+        itemStyle: { color: event.color },
+        event,
+      });
+    }
+  });
+
   // Build ECharts option with two series: line + scatter
   const option = {
     backgroundColor: DARK_THEME.background,
@@ -23,7 +43,7 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
     grid: { left: '10%', right: '5%', top: '10%', bottom: '20%' },
     xAxis: {
       type: 'category',
-      data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
+      data: xAxisData,
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: { color: DARK_THEME.textMuted },
     },
@@ -32,11 +52,9 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
       name: data.unit,
       nameTextStyle: { color: DARK_THEME.textMuted },
       min: (value: { min: number; max: number }) => {
-        // 动态调整纵轴范围，不从0开始，更好地显示趋势
         const dataMin = value.min;
         const dataMax = value.max;
         const range = dataMax - dataMin;
-        // 向下扩展10%范围，向上扩展10%范围
         return Math.floor((dataMin - range * 0.1) * 10) / 10;
       },
       max: (value: { min: number; max: number }) => {
@@ -62,49 +80,38 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
         lineStyle: { color: DARK_THEME.accent[0], width: 2 },
         connectNulls: false,
       },
-      // Series 2: Scatter series for FOMC markers (D-10)
+      // Series 2: Scatter series for FOMC markers (使用xAxis索引精确对齐)
       {
         type: 'scatter',
-        data: fomcEvents.map((e) => {
-          // FOMC会议日期（如03-20）需要映射到月初（03-01）才能对齐line系列
-          const dateStr = formatChartDate(e.timestamp, timeRange);
-          // 查找xAxis.data中是否有此日期，如果没有则跳过
-          return {
-            value: [dateStr, e.rate],
-            itemStyle: { color: e.color },
-          };
-        }),
+        data: scatterData.map((item) => ({
+          value: item.value,
+          itemStyle: item.itemStyle,
+        })),
         symbol: 'circle',
         symbolSize: 10,
-        tooltip: {
-          formatter: (params: unknown) => {
-            const point = params as { dataIndex: number };
-            const event = fomcEvents[point.dataIndex];
-            // 去掉加息/降息字样，只显示FOMC会议利率
-            return `${formatChartDate(event.timestamp, timeRange)}<br/>FOMC利率: ${formatPercentage(event.rate)}`;
-          },
-        },
       },
     ],
     tooltip: {
-      trigger: 'axis', // Default for line series
+      trigger: 'axis',
       backgroundColor: DARK_THEME.panel,
       borderColor: DARK_THEME.gridLine,
       textStyle: { color: DARK_THEME.text },
       formatter: (params: unknown) => {
-        const points = params as Array<{ seriesName?: string; name: string; value: number; seriesType: string; dataIndex?: number }>;
+        const points = params as Array<{ seriesType: string; dataIndex: number; name: string; value: number | [number, number] }>;
 
-        // Check if scatter series point (FOMC marker)
-        const scatterPoint = points.find((p) => p.seriesType === 'scatter');
-        if (scatterPoint && scatterPoint.dataIndex !== undefined) {
-          const event = fomcEvents[scatterPoint.dataIndex];
-          return `${formatChartDate(event.timestamp, timeRange)}<br/>${event.decision}: ${formatPercentage(event.rate)}`;
-        }
-
-        // Default line tooltip
+        // 简化tooltip: 只显示 "时间: 利率"
         const linePoint = points.find((p) => p.seriesType === 'line');
         if (linePoint) {
-          return `${linePoint.name}<br/>${data.name}: ${formatPercentage(linePoint.value)}`;
+          return `${linePoint.name}: ${formatPercentage(linePoint.value as number)}`;
+        }
+
+        const scatterPoint = points.find((p) => p.seriesType === 'scatter');
+        if (scatterPoint) {
+          const item = scatterData[scatterPoint.dataIndex];
+          if (item) {
+            const dateStr = xAxisData[item.value[0]];
+            return `${dateStr}: ${formatPercentage(item.value[1])}`;
+          }
         }
 
         return '';
