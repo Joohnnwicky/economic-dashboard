@@ -18,12 +18,12 @@ async function fetchPBOCRate(): Promise<NormalizedIndicator> {
   const response = await fetch('/src/data/pboc-rates.json');
   const data: PBOCRateEntry[] = await response.json();
 
-  // Sort by date descending, latest first
-  const sorted = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Sort by date ascending (oldest first) for chronological display
+  const sorted = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const latest = sorted[0];
+  const latest = sorted[sorted.length - 1];
 
-  // Convert to historical data points
+  // Convert to historical data points (oldest first, newest last)
   const historical: HistoricalDataPoint[] = sorted.map((entry) => ({
     timestamp: new Date(entry.date),
     value: entry.rate,
