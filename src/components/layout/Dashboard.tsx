@@ -8,6 +8,7 @@ import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
+import { CustomStocksPanel } from '../stocks/CustomStocksPanel';
 import { DARK_THEME } from '../../constants/colors';
 
 export function Dashboard() {
@@ -32,6 +33,7 @@ export function Dashboard() {
             <CryptoPanel />
             <USIndicesPanel />
             <ChineseIndicesPanel />
+            <CustomStocksPanel />
             <PBOCRatePanel />
           </div>
         </div>

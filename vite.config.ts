@@ -68,6 +68,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/tencent/, ''),
       },
+      // Python后端代理 (自选股数据)
+      '/api/backend': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/backend/, ''),
+      },
     },
   },
   test: {
