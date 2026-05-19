@@ -81,7 +81,7 @@ export async function getCryptoHistoryFromBinance(
 
     const current = historical[historical.length - 1];
     const coinId = symbol === 'BTCUSDT' ? 'bitcoin' : 'ethereum';
-    const name = symbol === 'BTCUSDT' ? 'Bitcoin (BTC)' : 'Ethereum (ETH)';
+    const name = symbol === 'BTCUSDT' ? '比特币（BTC Bitcoin）' : '以太坊（ETH Ethereum）';
 
     return {
       id: coinId,

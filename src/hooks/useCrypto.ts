@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCryptoPrices, getCryptoHistoryFromBinance } from '../api/binance';
-import { BTC, ETH } from '../constants/indicators';
 import { NormalizedIndicator } from '../types/indicator';
 
 /**
@@ -68,44 +67,52 @@ export function useCryptoHistories() {
 /**
  * Hook for crypto data in NormalizedIndicator format.
  * Returns BTC and ETH as NormalizedIndicator array for export dialog and overlay panel.
+ * Uses Binance API for 365 days of daily history (interval='1d', limit=365).
  */
 export function useCrypto() {
   const query = useQuery({
     queryKey: ['crypto-normalized'],
     queryFn: async () => {
-      const btcData = await getCryptoHistory(BTC.coinGeckoId, 365);
-      const ethData = await getCryptoHistory(ETH.coinGeckoId, 365);
-      const prices = await getCryptoPrice([BTC.coinGeckoId, ETH.coinGeckoId]);
+      // Fetch 365 days of daily history from Binance (interval='1d', limit=365)
+      const btcData = await getCryptoHistoryFromBinance('BTCUSDT', '1d', 365);
+      const ethData = await getCryptoHistoryFromBinance('ETHUSDT', '1d', 365);
+      const prices = await getCryptoPrices();
 
       const indicators: NormalizedIndicator[] = [];
 
       // BTC
-      const btcPrice = prices[BTC.coinGeckoId];
+      const btcPrice = prices.bitcoin;
       if (btcData && btcPrice) {
         indicators.push({
-          ...btcData,
+          id: 'bitcoin',
+          name: '比特币（BTC Bitcoin）',
           value: btcPrice.price,
+          unit: 'USD',
           timestamp: btcPrice.timestamp,
           change: {
             value: btcPrice.price * (btcPrice.change24h / 100),
             percentage: btcPrice.change24h,
             period: 'daily',
           },
+          historical: btcData.historical,
         });
       }
 
       // ETH
-      const ethPrice = prices[ETH.coinGeckoId];
+      const ethPrice = prices.ethereum;
       if (ethData && ethPrice) {
         indicators.push({
-          ...ethData,
+          id: 'ethereum',
+          name: '以太坊（ETH Ethereum）',
           value: ethPrice.price,
+          unit: 'USD',
           timestamp: ethPrice.timestamp,
           change: {
             value: ethPrice.price * (ethPrice.change24h / 100),
             percentage: ethPrice.change24h,
             period: 'daily',
           },
+          historical: ethData.historical,
         });
       }
 
