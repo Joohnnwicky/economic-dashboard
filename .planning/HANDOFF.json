@@ -1,29 +1,31 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-19T08:24:41.205Z",
+  "timestamp": "2026-05-19T12:55:17Z",
   "phase": null,
-  "phase_name": "post-project-polish",
-  "task": 9,
-  "total_tasks": 9,
+  "phase_name": "A股个股自定义追踪功能",
+  "task": 7,
+  "total_tasks": 7,
   "status": "completed",
   "completed_tasks": [
-    {"id": 1, "name": "FOMC红点对齐修复", "status": "done", "commit": "f8de272"},
-    {"id": 2, "name": "FRED刷新频率调整(24小时)", "status": "done", "commit": "cac69b2"},
-    {"id": 3, "name": "NFP图表格式化修复(K单位显示)", "status": "done", "commit": "14b8ac2"},
-    {"id": 4, "name": "PCE趋势图添加+格式化修复", "status": "done", "commit": "4a2871e"},
-    {"id": 5, "name": "LineChart gridLeft独立配置", "status": "done", "commit": "8722037"},
-    {"id": 6, "name": "Crypto 24h涨幅修复", "status": "done", "commit": "b85dab5"},
-    {"id": 7, "name": "美股指数数据更新", "status": "done", "commit": "ab5cb37"},
-    {"id": 8, "name": "MiniChart坐标轴+tooltip", "status": "done", "commit": "0f15d2a"},
-    {"id": 9, "name": "A股指数显示修复+LPR数据更新", "status": "done", "commit": "b4e9d4b"}
+    {"id": 1, "name": "修复加密货币跨市场对比显示(coinGeckoId)", "status": "done", "commit": "cb7bd12"},
+    {"id": 2, "name": "修复useCrypto使用币安API获取历史数据", "status": "done", "commit": "cb7bd12"},
+    {"id": 3, "name": "创建Python后端(FastAPI+mootdx)", "status": "done", "commit": "b2ba66e"},
+    {"id": 4, "name": "实现通达信数据获取服务", "status": "done", "commit": "cd65983"},
+    {"id": 5, "name": "创建前端API模块和Hooks", "status": "done", "commit": "b2ba66e"},
+    {"id": 6, "name": "创建自选股UI组件(搜索/面板/卡片/图表)", "status": "done", "commit": "b2ba66e"},
+    {"id": 7, "name": "预设军工板块20只股票为默认自选股", "status": "done", "commit": "e735edc"}
   ],
   "remaining_tasks": [],
   "blockers": [],
+  "human_actions_pending": [],
   "decisions": [
-    {"decision": "腾讯财经API用于A股当前数据(GBK编码)", "rationale": "东方财富K线API失效", "phase": "polish"},
-    {"decision": "LPR数据填充每月报价确保连续性", "rationale": "避免图表断开", "phase": "polish"},
-    {"decision": "跨市场对比改为月度时间对齐", "rationale": "解决LPR/FFR时间戳不匹配", "phase": "polish"}
+    {"decision": "使用FastAPI + mootdx构建Python后端", "rationale": "mootdx是通达信API的Python封装，支持K线和实时行情", "phase": null},
+    {"decision": "使用Zustand + localStorage持久化自选股", "rationale": "首次使用persist middleware", "phase": null},
+    {"decision": "扩展股票搜索列表至200+只", "rationale": "用户反馈搜索不到股票", "phase": null},
+    {"decision": "支持直接输入代码添加", "rationale": "解决搜索列表不全问题", "phase": null},
+    {"decision": "预设军工板块20只股票为默认自选股", "rationale": "用户提供的股票列表", "phase": null}
   ],
   "uncommitted_files": [],
-  "next_action": "所有polish任务已完成，项目正常运行"
+  "next_action": "功能已完成，刷新浏览器测试自选股面板",
+  "context_notes": "A股个股自定义追踪功能完整实现，包括Python后端、前端组件、API集成。后端运行在localhost:8000。"
 }
