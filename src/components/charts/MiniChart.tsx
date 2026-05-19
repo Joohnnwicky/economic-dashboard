@@ -15,7 +15,7 @@ export function MiniChart({ data, height = 120 }: MiniChartProps) {
   const option = {
     backgroundColor: 'transparent',
     grid: {
-      left: '8%',
+      left: '12%',
       right: '5%',
       top: '10%',
       bottom: '25%',

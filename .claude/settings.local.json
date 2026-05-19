@@ -65,7 +65,10 @@
       "Bash(curl -s \"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm\")",
       "Bash(git diff *)",
       "Bash(curl -s \"https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key=7fed09933eb74912dcf97bcea729bb89&observation_start=2024-01-01&observation_end=2024-12-31&file_type=json\")",
-      "Bash(curl -s \"https://api.stlouisfed.org/fred/series/observations?series_id=DFEDTARU&api_key=7fed09933eb74912dcf97bcea729bb89&observation_start=2024-01-01&observation_end=2024-12-31&file_type=json\")"
+      "Bash(curl -s \"https://api.stlouisfed.org/fred/series/observations?series_id=DFEDTARU&api_key=7fed09933eb74912dcf97bcea729bb89&observation_start=2024-01-01&observation_end=2024-12-31&file_type=json\")",
+      "Skill(gsd-resume-work)",
+      "Bash(timeout 3 bash -c 'cat /tmp/claude-output.txt')",
+      "Bash(curl -s http://localhost:5185)"
     ]
   }
 }

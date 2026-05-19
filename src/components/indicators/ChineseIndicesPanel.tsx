@@ -1,9 +1,10 @@
-import { useChineseIndices } from '../../hooks/useChineseIndices';
+import { useChineseIndicesWithHistory } from '../../hooks/useChineseIndices';
+import { LineChart } from '../charts/LineChart';
 import { GridPanel } from '../layout/GridPanel';
 import { DARK_THEME } from '../../constants/colors';
 
 export function ChineseIndicesPanel() {
-  const { data, isLoading, error, dataUpdatedAt } = useChineseIndices();
+  const { data, isLoading, error, dataUpdatedAt } = useChineseIndicesWithHistory();
 
   if (!data || data.length === 0) {
     return null;
@@ -15,7 +16,7 @@ export function ChineseIndicesPanel() {
         中国股市指数（Chinese Stock Indices）
       </h3>
 
-      <div className="space-y-2">
+      <div className="space-y-4">
         {data.map((index) => (
           <GridPanel
             key={index.id}
@@ -28,32 +29,12 @@ export function ChineseIndicesPanel() {
                 加载失败: {error.message}
               </div>
             )}
-            {!error && (
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-2xl font-bold" style={{ color: DARK_THEME.text }}>
-                    {index.value.toFixed(2)}
-                  </span>
-                  <span className="text-sm ml-2" style={{ color: DARK_THEME.textMuted }}>
-                    {index.unit}
-                  </span>
-                </div>
-                {index.change && (
-                  <div
-                    className="text-sm"
-                    style={{
-                      color: index.change.percentage >= 0
-                        ? DARK_THEME.accent[1]
-                        : DARK_THEME.accent[2],
-                    }}
-                  >
-                    {index.change.percentage >= 0 ? '+' : ''}
-                    {index.change.percentage.toFixed(2)}%
-                    <span className="ml-1">
-                      ({index.change.value >= 0 ? '+' : ''}{index.change.value.toFixed(2)})
-                    </span>
-                  </div>
-                )}
+            {index.historical.length > 0 && (
+              <LineChart data={index} timeRange="1Y" height={300} gridLeft="6%" />
+            )}
+            {index.historical.length === 0 && !isLoading && (
+              <div className="text-sm" style={{ color: DARK_THEME.textMuted }}>
+                暂无历史数据
               </div>
             )}
           </GridPanel>
@@ -61,7 +42,7 @@ export function ChineseIndicesPanel() {
       </div>
 
       <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
-        数据每小时更新一次 (腾讯财经API)
+        数据每小时更新一次 (东方财富API)
       </p>
     </div>
   );

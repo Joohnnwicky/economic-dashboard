@@ -27,7 +27,12 @@ export function EmploymentPanel() {
                 加载失败: {error.message}
               </div>
             )}
-            <LineChart data={indicator} timeRange={timeRange} height={250} />
+            <LineChart
+              data={indicator}
+              timeRange={timeRange}
+              height={300}
+              gridLeft="6%"
+            />
           </GridPanel>
         ))}
       </div>

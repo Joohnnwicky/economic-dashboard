@@ -109,7 +109,7 @@ export function InflationSubMetricsPanel() {
                 >
                   {indicator.name}: {formatValue(indicator.value, indicator.unit)}
                 </div>
-                <LineChart data={indicator} height={200} gridLeft="20%" />
+                <LineChart data={indicator} height={300} gridLeft="8%" />
               </div>
             ))}
           </div>

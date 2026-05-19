@@ -1,25 +1,50 @@
-import { useQuery } from '@tanstack/react-query';
-import { getChineseIndices } from '../api/eastmoney';
+import { useQuery, useQueries } from '@tanstack/react-query';
+import { getChineseIndices, getChineseIndexHistory } from '../api/eastmoney';
+import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 
 /**
  * TanStack Query hook for Chinese A-share indices data
- *
- * Cache configuration:
- * - staleTime: 60 minutes (3600000ms) - data remains fresh for 60 min
- * - gcTime: 2 hours (7200000ms) - garbage collection after 2 hours
- * - retry: 2 - retry failed requests twice
- * - refetchOnWindowFocus: false - do not refetch when window regains focus
- *
- * Per RESEARCH.md, East Money is unofficial API. 60-minute cache prevents
- * quota exhaustion and reduces risk of endpoint changes breaking during session.
  */
 export function useChineseIndices() {
   return useQuery({
     queryKey: ['chinese-indices'],
     queryFn: getChineseIndices,
-    staleTime: 60 * 60 * 1000,  // 60 minutes (matches cacheTtlMs from rate limiter)
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours garbage collection
+    staleTime: 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
   });
+}
+
+/**
+ * Hook for Chinese A-share index historical data (近一年)
+ */
+export function useChineseIndicesWithHistory() {
+  const indicesQuery = useChineseIndices();
+
+  // 获取每个指数的历史数据
+  const historyQueries = useQueries({
+    queries: (indicesQuery.data || []).map((index) => ({
+      queryKey: ['chinese-index-history', index.id],
+      queryFn: () => getChineseIndexHistory(index.id, 365),
+      staleTime: 60 * 60 * 1000,
+      gcTime: 2 * 60 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      enabled: indicesQuery.data !== undefined,
+    })),
+  });
+
+  // 合并当前数据和历史数据
+  const combinedData: NormalizedIndicator[] = indicesQuery.data?.map((index, i) => ({
+    ...index,
+    historical: historyQueries[i].data || [],
+  })) || [];
+
+  return {
+    data: combinedData,
+    isLoading: indicesQuery.isLoading || historyQueries.some(q => q.isLoading),
+    error: indicesQuery.error || historyQueries.find(q => q.error)?.error,
+    dataUpdatedAt: indicesQuery.dataUpdatedAt,
+  };
 }

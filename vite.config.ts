@@ -50,6 +50,18 @@ export default defineConfig({
           });
         },
       },
+      // 东方财富历史K线API代理
+      '/api/eastmoneykline': {
+        target: 'http://push2his.eastmoney.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/eastmoneykline/, '/api/qt/stock/kline/get'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('Referer', 'https://eastmoney.com/');
+            proxyReq.setHeader('User-Agent', 'Mozilla/5.0');
+          });
+        },
+      },
       // 腾讯财经 API 代理 (A股数据 - 最稳定)
       '/api/tencent': {
         target: 'http://qt.gtimg.cn',

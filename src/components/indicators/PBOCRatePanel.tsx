@@ -19,7 +19,7 @@ export function PBOCRatePanel() {
         </div>
       )}
       {data && (
-        <LineChart data={data} timeRange={timeRange} height={250} />
+        <LineChart data={data} timeRange={timeRange} height={250} gridLeft="3%" />
       )}
     </GridPanel>
   );
