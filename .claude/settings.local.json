@@ -77,7 +77,9 @@
       "Bash(netstat -ano)",
       "Bash(findstr \":5173\")",
       "Skill(scrape)",
-      "WebFetch(domain:quote.eastmoney.com)"
+      "WebFetch(domain:quote.eastmoney.com)",
+      "WebFetch(domain:www.pbc.gov.cn)",
+      "WebFetch(domain:www.bankofchina.com)"
     ]
   }
 }

@@ -14,8 +14,8 @@ interface PBOCRateEntry {
  * No API polling needed. staleTime: Infinity prevents unnecessary fetches.
  */
 async function fetchPBOCRate(): Promise<NormalizedIndicator> {
-  // Fetch static JSON file
-  const response = await fetch('/src/data/pboc-rates.json');
+  // Fetch static JSON file from public directory
+  const response = await fetch('/data/pboc-rates.json');
   const data: PBOCRateEntry[] = await response.json();
 
   // Sort by date ascending (oldest first) for chronological display
