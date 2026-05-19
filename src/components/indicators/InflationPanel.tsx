@@ -11,11 +11,11 @@ export function InflationPanel() {
   return (
     <div>
       <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-        消费者物价指数（CPI）
+        美国消费者物价指数（CPI Consumer Price Index）
       </h3>
 
       <GridPanel
-        title={data?.name || '消费者物价指数（CPI）'}
+        title={data?.name || '美国消费者物价指数（CPI Consumer Price Index）'}
         isLoading={isLoading}
         lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
       >

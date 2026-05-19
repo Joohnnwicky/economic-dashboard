@@ -31,7 +31,7 @@ async function fetchPBOCRate(): Promise<NormalizedIndicator> {
 
   return {
     id: 'pboc-rate',
-    name: '贷款市场报价利率（LPR Loan Prime Rate）',
+    name: '中国贷款市场报价利率（LPR Loan Prime Rate）',
     value: latest.rate,
     unit: '%',
     timestamp: new Date(latest.date),

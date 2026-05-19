@@ -13,7 +13,7 @@ export function FedRatePanel() {
 
   return (
     <GridPanel
-      title="联邦基金利率（FFR Federal Funds Rate）"
+      title="美国联邦基金利率（FFR Federal Funds Rate）"
       isLoading={isLoading}
       lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
     >
