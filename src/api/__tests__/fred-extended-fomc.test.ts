@@ -78,9 +78,9 @@ describe('getFOMCTargetRates', () => {
 
     const result = await getFOMCTargetRates('1Y');
 
-    // After reverse(), newest comes first
-    expect(result.historical[0].value).toBe(5.50); // newest (2024-02-01)
-    expect(result.historical[1].value).toBe(5.25); // oldest (2024-01-01)
+    // Without reverse(), oldest comes first (consistent with FEDFUNDS)
+    expect(result.historical[0].value).toBe(5.25); // oldest (2024-01-01)
+    expect(result.historical[1].value).toBe(5.50); // newest (2024-02-01)
     expect(result.historical[0].timestamp).toBeDefined();
     expect(result.historical[0].timestamp instanceof Date).toBe(true);
   });
