@@ -12,7 +12,7 @@ export function ChineseIndicesPanel() {
   return (
     <div>
       <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-        A股指数
+        中国股市指数（Chinese Stock Indices）
       </h3>
 
       <div className="space-y-2">
