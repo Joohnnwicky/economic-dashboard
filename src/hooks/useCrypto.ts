@@ -6,7 +6,8 @@ import { NormalizedIndicator } from '../types/indicator';
 /**
  * Hook for fetching current BTC and ETH prices
  *
- * 30秒轮询更新，简单稳定，无需WebSocket实时推送
+ * 5分钟更新一次（避免CoinGecko 429 rate limit）
+ * CoinGecko免费API限制: 10-50 calls/minute
  */
 export function useCryptoPrice() {
   const query = useQuery({
@@ -14,10 +15,10 @@ export function useCryptoPrice() {
     queryFn: async () => {
       return getCryptoPrice([BTC.coinGeckoId, ETH.coinGeckoId]);
     },
-    staleTime: 30 * 1000,        // 30秒 - 半分钟更新
-    gcTime: 5 * 60 * 1000,       // Keep in cache 5 min
-    refetchInterval: 30 * 1000,  // 每30秒自动刷新
-    retry: 2,
+    staleTime: 5 * 60 * 1000,        // 5分钟 - 避免rate limit
+    gcTime: 10 * 60 * 1000,          // Keep in cache 10 min
+    refetchInterval: 5 * 60 * 1000,  // 每5分钟自动刷新
+    retry: 1,                         // 减少重试避免浪费quota
     refetchOnWindowFocus: false,
   });
 
@@ -40,10 +41,10 @@ export function useCryptoHistory(coinId: string, days: number = 1) {
     queryFn: async () => {
       return getCryptoHistory(coinId, days);
     },
-    staleTime: 30 * 1000,        // 30秒
-    gcTime: 5 * 60 * 1000,
-    refetchInterval: 30 * 1000,  // 每30秒自动刷新
-    retry: 2,
+    staleTime: 5 * 60 * 1000,        // 5分钟
+    gcTime: 10 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,  // 每5分钟自动刷新
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 }
@@ -111,10 +112,10 @@ export function useCrypto() {
 
       return indicators;
     },
-    staleTime: 30 * 1000,
-    gcTime: 5 * 60 * 1000,
-    refetchInterval: 30 * 1000,
-    retry: 2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 

@@ -57,7 +57,8 @@
       "Bash(curl -s \"http://qt.gtimg.cn/q=s_sh000001,s_sh000300,s_sh000016\")",
       "Bash(pkill -f \"vite\")",
       "Bash(killall node *)",
-      "Bash(pkill -f vite)"
+      "Bash(pkill -f vite)",
+      "Bash(curl -s \"https://api.coingecko.com/api/v3/ping\")"
     ]
   }
 }

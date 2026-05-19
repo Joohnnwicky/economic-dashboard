@@ -67,7 +67,7 @@ export function CryptoPanel() {
 
       {/* Update Frequency Notice */}
       <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
-        数据每30秒更新一次 (CoinGecko API)
+        数据每5分钟更新一次 (CoinGecko API)
       </p>
     </div>
   );
