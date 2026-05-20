@@ -117,9 +117,14 @@ export async function getGoldETFData(): Promise<NormalizedIndicator> {
   return rateLimiter.call('AlphaVantage', async () => {
     const response = await axios.get<AlphaVantageDailyResponse>(url);
 
+    // Check for API limit message
+    if (response.data?.['Information'] || response.data?.['Note']) {
+      throw new Error('Alpha Vantage 日配额已用完 (25次/天)，请明天再试');
+    }
+
     if (!response.data?.['Time Series (Daily)']) {
       throw new Error('Alpha Vantage GLD response missing Time Series (Daily)');
-    }
+  }
 
     const timeSeries = response.data['Time Series (Daily)'];
 

@@ -16,7 +16,7 @@ export function useGoldPrice() {
     staleTime: 24 * 60 * 60 * 1000,  // 24 hours - daily updates
     gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days cache
     refetchInterval: 24 * 60 * 60 * 1000,  // Daily refresh
-    retry: 2,
+    retry: 0,  // Don't retry on quota limit - show error immediately
     refetchOnWindowFocus: false,
   });
 
