@@ -1,48 +1,34 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-20T03:44:16.877Z",
+  "timestamp": "2026-05-20T06:49:47Z",
   "phase": null,
-  "phase_name": "新指标面板开发",
+  "phase_name": "新经济指标面板开发",
   "phase_dir": null,
   "plan": null,
-  "task": 3,
-  "total_tasks": 4,
-  "status": "paused",
+  "task": 4,
+  "total_tasks": 6,
+  "status": "completed",
   "completed_tasks": [
-    {"id": 1, "name": "修复油价图表横轴08:00问题", "status": "done", "commit": "local"},
-    {"id": 2, "name": "实现美元指数面板 (FRED DTWEXBGS)", "status": "done", "commit": "local"},
-    {"id": 3, "name": "实现主流汇率面板 (Frankfurter API)", "status": "done", "commit": "local"},
-    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "in_progress", "progress": "API代理已配置，数据结构已修复，但返回多为已关闭市场"}
+    {"id": 1, "name": "修复油价图表横轴08:00显示问题", "status": "done", "commit": "5c3bf5a"},
+    {"id": 2, "name": "实现美元指数面板 (FRED DTWEXBGS)", "status": "done", "commit": "5c3bf5a"},
+    {"id": 3, "name": "实现主流汇率面板 (Frankfurter API)", "status": "done", "commit": "5c3bf5a"},
+    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "done", "commit": "973c447, 0d85251, 9681798"}
   ],
   "remaining_tasks": [
-    {"id": 5, "name": "优化Polymarket获取真正活跃的热门市场", "status": "not_started"},
-    {"id": 6, "name": "实现中国M1/M2剪刀差图（静态JSON方案）", "status": "not_started"},
-    {"id": 7, "name": "五角大楼披萨指数（可选）", "status": "not_started"}
+    {"id": 5, "name": "实现中国M1/M2剪刀差图（静态JSON方案）", "status": "not_started"},
+    {"id": 6, "name": "五角大楼披萨指数（可选）", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
     {"decision": "使用FRED DTWEXBGS获取美元指数", "rationale": "免费、稳定、每日更新", "phase": null},
     {"decision": "使用Frankfurter API获取汇率", "rationale": "ECB数据、免费、无需API Key", "phase": null},
-    {"decision": "使用Polymarket CLOB API", "rationale": "公开API、无需认证", "phase": null},
-    {"decision": "M1/M2使用静态JSON手动更新", "rationale": "FRED已停止更新，其他数据源需付费", "phase": null},
-    {"decision": "修复MiniChart日期格式化逻辑", "rationale": "每日数据不应显示HH:mm时间格式", "phase": null}
+    {"decision": "使用Polymarket Gamma API而非CLOB API", "rationale": "Gamma API返回活跃市场，可按volume24hr排序", "phase": null},
+    {"decision": "Polymarket过滤体育和美国政治", "rationale": "用户对体育和政治不感兴趣，显示财经/娱乐市场", "phase": null},
+    {"decision": "涨跌颜色:涨=红,跌=绿", "rationale": "中国惯例统一颜色", "phase": null},
+    {"decision": "MiniChart关键词检测判断每日数据", "rationale": "每日数据不应显示HH:mm时间格式", "phase": null}
   ],
-  "uncommitted_files": [
-    "src/api/exchange-rates.ts",
-    "src/api/forex.ts",
-    "src/api/polymarket.ts",
-    "src/components/indicators/DollarIndexPanel.tsx",
-    "src/components/indicators/ExchangeRatesPanel.tsx",
-    "src/components/indicators/PolymarketPanel.tsx",
-    "src/hooks/useDollarIndex.ts",
-    "src/hooks/useExchangeRates.ts",
-    "src/hooks/usePolymarketTrending.ts",
-    "src/components/charts/MiniChart.tsx",
-    "src/components/layout/Dashboard.tsx",
-    "src/constants/api.ts",
-    "vite.config.ts"
-  ],
-  "next_action": "刷新http://localhost:5196验证新面板显示，然后优化Polymarket获取活跃市场",
-  "context_notes": "美元指数面板正常工作(119.283)。汇率面板Frankfurter代理已配置。Polymarket API返回数据但多为已关闭市场，需找获取活跃市场的方法。MiniChart已修复每日数据的日期显示问题(添加关键词检测:dollar,usd,index,rate等)。"
+  "uncommitted_files": [],
+  "next_action": "实现M1/M2剪刀差图（静态JSON方案）或标记项目完成",
+  "context_notes": "新指标面板开发完成。美元指数(119.283)、汇率(Frankfurter)、Polymarket(Gamma API过滤体育和政治)均正常工作。涨跌颜色已统一为中国惯例(涨红跌绿)。A股K线tooltip显示完整日期。"
 }
