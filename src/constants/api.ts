@@ -9,6 +9,10 @@ export const FRED_CPI_SERIES = 'CPIAUCSL';  // CPI All Urban Consumers
 export const FRED_GOLD_SERIES = 'GOLDAMGBD228NLBM';   // LBMA Gold Price AM Fix ($/oz)
 export const FRED_BRENT_SERIES = 'DCOILBRENTEU';      // Brent Crude Oil ($/barrel)
 export const FRED_WTI_SERIES = 'DCOILWTICO';          // WTI Crude Oil ($/barrel)
+
+// FRED Currency/Exchange Rate Series IDs
+export const FRED_DXY_SERIES = 'DTWEXBGS';            // Trade Weighted Dollar Index (Broad)
+export const FRED_USDCNY_SERIES = 'DEXCHUS';          // China/U.S. Foreign Exchange Rate
 export const COINGECKO_BASE_URL = isDev ? '/api/coingecko' : 'https://api.coingecko.com/api/v3';
 
 // BLS API configuration - CRITICAL: 25 calls/day FREE tier!

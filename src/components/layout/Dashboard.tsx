@@ -7,6 +7,9 @@ import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
 import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
 import { GoldPricePanel } from '../indicators/GoldPricePanel';
 import { OilPricePanel } from '../indicators/OilPricePanel';
+import { DollarIndexPanel } from '../indicators/DollarIndexPanel';
+import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
+import { PolymarketPanel } from '../indicators/PolymarketPanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
@@ -28,6 +31,7 @@ export function Dashboard() {
             <EmploymentPanel />
             <InflationPanel />
             <InflationSubMetricsPanel />
+            <DollarIndexPanel />
             <GoldPricePanel />
             <OilPricePanel />
           </div>
@@ -35,10 +39,12 @@ export function Dashboard() {
           {/* Right Column: Market Data */}
           <div className="space-y-4">
             <CryptoPanel />
+            <ExchangeRatesPanel />
             <USIndicesPanel />
             <ChineseIndicesPanel />
             <CustomStocksPanel />
             <PBOCRatePanel />
+            <PolymarketPanel />
           </div>
         </div>
 

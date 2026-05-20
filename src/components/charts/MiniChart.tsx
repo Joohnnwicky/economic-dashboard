@@ -1,16 +1,36 @@
 import ReactECharts from 'echarts-for-react';
 import { NormalizedIndicator } from '../../types/indicator';
 import { DARK_THEME } from '../../constants/colors';
-import { formatChartDate } from '../../utils/formatters';
+import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 
 interface MiniChartProps {
   data: NormalizedIndicator;
   height?: number;
 }
 
+// Determine appropriate date format based on data frequency
+function formatMiniChartDate(date: Date, dataId: string, forTooltip: boolean = false): string {
+  // Daily data (commodities, indices, forex, etc.) - show dates not times
+  const dailyDataIds = ['gold-gld', 'oil-brent', 'oil-wti', 'dia', 'qqq', 'spy', 'dollar-index', 'usdcny'];
+  const dailyKeywords = ['gold', 'oil', 'dollar', 'usd', 'index', 'rate', 'cny', 'eur', 'gbp', 'jpy'];
+
+  if (dailyDataIds.includes(dataId) || dailyKeywords.some(k => dataId.includes(k))) {
+    // For tooltip, show full date; for axis, show compact date
+    return forTooltip ? format(date, 'yyyy-MM-dd', { locale: zhCN }) : format(date, 'MM/dd', { locale: zhCN });
+  }
+  // Intraday data (crypto) - show time
+  return format(date, 'HH:mm');
+}
+
 export function MiniChart({ data, height = 120 }: MiniChartProps) {
   const isPositive = data.change !== undefined && data.change.percentage >= 0;
   const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Green or Red
+
+  // Mini charts are small - limit labels to avoid overlap
+  // Show at most 6-8 labels depending on data length
+  const dataLength = data.historical.length;
+  const labelInterval = dataLength > 200 ? 60 : dataLength > 100 ? 30 : dataLength > 50 ? 15 : 10;
 
   const option = {
     backgroundColor: 'transparent',
@@ -23,12 +43,12 @@ export function MiniChart({ data, height = 120 }: MiniChartProps) {
     xAxis: {
       type: 'category',
       show: true,
-      data: data.historical.map(d => formatChartDate(d.timestamp, '1D')),
+      data: data.historical.map(d => formatMiniChartDate(d.timestamp, data.id)),
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: {
         color: DARK_THEME.textMuted,
         fontSize: 10,
-        interval: 5, // 每5个点显示一个标签
+        interval: labelInterval,
       },
     },
     yAxis: {
@@ -68,8 +88,12 @@ export function MiniChart({ data, height = 120 }: MiniChartProps) {
       borderColor: DARK_THEME.gridLine,
       textStyle: { color: DARK_THEME.text, fontSize: 12 },
       formatter: (params: unknown) => {
-        const point = (params as Array<{ name: string; value: number }>)[0];
-        return `${point.name}<br/>${data.name}: $${point.value.toLocaleString()}`;
+        const points = params as Array<{ dataIndex: number; value: number }>;
+        if (!points || points.length === 0) return '';
+        const point = points[0];
+        const dateIndex = point.dataIndex;
+        const fullDate = formatMiniChartDate(data.historical[dateIndex].timestamp, data.id, true);
+        return `${fullDate}<br/>${data.name}: $${point.value.toLocaleString()}`;
       },
     },
   };
