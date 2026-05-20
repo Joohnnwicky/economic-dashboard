@@ -8,7 +8,7 @@ export function PolymarketPanel() {
     return (
       <div>
         <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          Polymarket热门赌注
+          Polymarket
         </h3>
         <div className="flex items-center justify-center h-20">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
@@ -21,7 +21,7 @@ export function PolymarketPanel() {
     return (
       <div>
         <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          Polymarket热门赌注
+          Polymarket
         </h3>
         <div className="p-4 bg-red-900/20 rounded text-red-400">
           加载失败: {(error as Error).message}
@@ -34,7 +34,7 @@ export function PolymarketPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-          Polymarket热门赌注
+          Polymarket
           {isFetching && (
             <span className="ml-2 text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
               更新中...

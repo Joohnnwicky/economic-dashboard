@@ -69,7 +69,22 @@ export async function getTrendingMarkets(limit: number = 10): Promise<GammaMarke
     '2028', '2024', 'Dem', 'GOP',
   ];
 
-  // Filter: truly active + non-sports + non-politics + has question
+  // China Politics keywords to filter out (合规风险)
+  const chinaPoliticsKeywords = [
+    'China', 'Chinese', 'China\'s', 'Beijing', 'Shanghai', 'Xi', 'Xi Jinping',
+    'CCP', 'CPC', 'Communist Party', '中国', '习近平', '中共', '共产党',
+    'Taiwan', '台湾', 'Hong Kong', '香港', 'Macau', '澳门',
+    'Xinjiang', '新疆', 'Tibet', '西藏', 'Dalai', '达赖',
+    'Uyghur', '维吾尔', 'Human Rights', '人权', 'censorship', '审查',
+    'TikTok', 'Douyin', '抖音', 'Huawei', '华为', 'Binance', '币安',
+    'Alibaba', '阿里巴巴', 'Tencent', '腾讯', 'WeChat', '微信',
+    'sanction', '制裁', 'tariff', '关税', 'trade war', '贸易战',
+    'South China Sea', '南海', 'dispute', '争端', 'claim', '主权',
+    'reunification', '统一', 'invasion', '入侵', 'military', '军事',
+    'regime', '政权', 'authoritarian', '专制', 'democracy', '民主',
+  ];
+
+  // Filter: truly active + non-sports + non-politics + non-china-politics + has question
   const markets = response.data
     .filter(m => {
       if (m.closed !== false || m.acceptingOrders !== true || !m.question) return false;
@@ -82,7 +97,10 @@ export async function getTrendingMarkets(limit: number = 10): Promise<GammaMarke
       const isPolitics = politicsKeywords.some(kw =>
         questionLower.includes(kw.toLowerCase()) || eventTitleLower.includes(kw.toLowerCase())
       );
-      return !isSports && !isPolitics;
+      const isChinaPolitics = chinaPoliticsKeywords.some(kw =>
+        questionLower.includes(kw.toLowerCase()) || eventTitleLower.includes(kw.toLowerCase())
+      );
+      return !isSports && !isPolitics && !isChinaPolitics;
     })
     .sort((a, b) => (b.volume24hr || 0) - (a.volume24hr || 0))
     .slice(0, limit);
