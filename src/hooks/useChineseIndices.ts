@@ -8,8 +8,9 @@ export function useChineseIndices() {
   return useQuery({
     queryKey: ['chinese-indices'],
     queryFn: getChineseIndices,
-    staleTime: 60 * 60 * 1000,
-    gcTime: 2 * 60 * 60 * 1000,
+    staleTime: 60 * 60 * 1000,           // 1 hour - data considered fresh
+    gcTime: 2 * 60 * 60 * 1000,          // Keep in cache 2 hours
+    refetchInterval: 60 * 60 * 1000,     // Auto-refresh every 1 hour
     retry: 2,
     refetchOnWindowFocus: false,
   });
