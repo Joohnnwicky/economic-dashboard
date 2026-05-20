@@ -3,18 +3,9 @@ import { rateLimiter } from './rate-limiter';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 import { parseUTCDate } from '../utils/utc';
 
-// 开发环境使用代理，生产环境直接访问
-const isDev = import.meta.env.DEV;
-
-// 腾讯财经API - 更稳定、不易被封禁
-const TENCENT_FINANCE_URL = isDev
-  ? '/api/tencent'
-  : 'http://qt.gtimg.cn';
-
-// 东方财富K线API - 注意：此API可能失效，已添加fallback处理
-const EASTMONEY_KLINE_URL = isDev
-  ? '/api/eastmoneykline'
-  : 'http://push2his.eastmoney.com';
+// 使用nginx代理路径
+const TENCENT_FINANCE_URL = '/api/tencent';
+const EASTMONEY_KLINE_URL = '/api/eastmoneykline';
 
 // Rate limit configuration
 const TENCENT_RATE_LIMIT = {

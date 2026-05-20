@@ -1,7 +1,8 @@
-// 开发环境使用 Vite 代理，生产环境直接访问
+// 生产环境也使用nginx代理路径（NAS部署时代理转发请求）
+// 开发环境使用Vite代理，生产环境使用nginx代理
 const isDev = import.meta.env.DEV;
 
-export const FRED_BASE_URL = isDev ? '/api/fred' : 'https://api.stlouisfed.org/fred';
+export const FRED_BASE_URL = '/api/fred';
 export const FRED_FED_RATE_SERIES = 'FEDFUNDS';
 export const FRED_CPI_SERIES = 'CPIAUCSL';  // CPI All Urban Consumers
 
@@ -13,11 +14,11 @@ export const FRED_WTI_SERIES = 'DCOILWTICO';          // WTI Crude Oil ($/barrel
 // FRED Currency/Exchange Rate Series IDs
 export const FRED_DXY_SERIES = 'DTWEXBGS';            // Trade Weighted Dollar Index (Broad)
 export const FRED_USDCNY_SERIES = 'DEXCHUS';          // China/U.S. Foreign Exchange Rate
-export const COINGECKO_BASE_URL = isDev ? '/api/coingecko' : 'https://api.coingecko.com/api/v3';
+export const COINGECKO_BASE_URL = '/api/coingecko';
 
 // BLS API configuration - CRITICAL: 25 calls/day FREE tier!
-// 开发环境使用代理路径
-export const BLS_BASE_URL = isDev ? '/api/bls/timeseries/data/' : 'https://api.bls.gov/publicAPI/v2/timeseries/data/';
+// 使用nginx代理路径
+export const BLS_BASE_URL = '/api/bls/timeseries/data/';
 
 // BLS series IDs
 export const BLS_SERIES = {
@@ -28,8 +29,8 @@ export const BLS_SERIES = {
 } as const;
 
 // Alpha Vantage API configuration - CRITICAL: 25 calls/day FREE tier!
-// 开发环境使用代理路径
-export const ALPHA_VANTAGE_BASE_URL = isDev ? '/api/alphavantage' : 'https://www.alphavantage.co/query';
+// 使用nginx代理路径
+export const ALPHA_VANTAGE_BASE_URL = '/api/alphavantage';
 
 // Alpha Vantage symbols for US indices
 // NOTE: Alpha Vantage TIME_SERIES_DAILY API doesn't support index symbols directly.

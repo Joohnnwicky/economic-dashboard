@@ -6,8 +6,8 @@ import { TimeRange } from '../types/api';
 import { format, subYears, subMonths, subDays, subWeeks } from 'date-fns';
 import { downsampleData } from '../utils/downsampling';
 
-const isDev = import.meta.env.DEV;
-const FRANKFURTER_BASE_URL = isDev ? '/api/frankfurter' : 'https://api.frankfurter.app';
+// 使用nginx代理路径
+const FRANKFURTER_BASE_URL = '/api/frankfurter';
 
 interface FrankfurterRatesResponse {
   amount: number;

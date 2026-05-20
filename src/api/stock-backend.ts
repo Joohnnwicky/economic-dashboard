@@ -2,12 +2,8 @@ import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
 import { NormalizedIndicator } from '../types/indicator';
 
-const isDev = import.meta.env.DEV;
-
-// Backend URL configuration
-const STOCK_BACKEND_URL = isDev
-  ? '/api/backend'  // Will be proxied by Vite
-  : import.meta.env.VITE_STOCK_BACKEND_URL || 'http://localhost:8000';
+// Backend URL - 使用nginx代理路径
+const STOCK_BACKEND_URL = '/api/backend';
 
 const STOCK_BACKEND_RATE_LIMIT = {
   maxCallsPerDay: 10000,
