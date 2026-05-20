@@ -29,6 +29,16 @@
 | **大宗商品** | 伦敦金价 (LBMA) | Alpha Vantage (GLD ETF) | 每日 |
 | **预测市场** | Polymarket热门赌注 | Polymarket Gamma API | 分钟级 |
 
+### A股自选股功能
+
+| 特性 | 说明 |
+|------|------|
+| **默认列表** | 军工板块20支龙头股（中兵红箭、高德红外、中船科技等） |
+| **自定义添加** | 支持搜索沪深A股，手动添加自选股 |
+| **实时行情** | 通过Python后端（通达信数据接口）获取分钟级行情 |
+| **K线图表** | 点击股票查看日K/周K走势图 |
+| **本地持久化** | 自选股列表保存在浏览器localStorage，刷新不丢失 |
+
 ### 界面功能
 
 - **专业金融终端风格** - 暗色主题，高信息密度布局
@@ -84,9 +94,17 @@ cp .env.example .env.local
 
 # 启动开发服务器
 npm run dev
+
+# （可选）启动Python后端获取A股实时行情
+cd backend
+pip install -r requirements.txt
+python main.py
+# 后端运行在 http://localhost:8000
+
+# 访问前端 http://localhost:5173
 ```
 
-访问 http://localhost:5173
+> **注意**: A股自选股功能需要Python后端支持。如果不启动后端，自选股面板将显示"暂无数据"。
 
 ### 3. 生产构建
 
@@ -168,6 +186,11 @@ economic-dashboard/
 │   │   │   ├── CryptoPanel.tsx
 │   │   │   ├── ChineseIndicesPanel.tsx
 │   │   │   └── ...
+│   │   ├── stocks/             # A股自选股组件
+│   │   │   ├── CustomStocksPanel.tsx  # 自选股面板
+│   │   │   ├── StockCard.tsx          # 股票卡片
+│   │   │   ├── StockKlineChart.tsx    # K线图
+│   │   │   └── StockSearchDialog.tsx  # 搜索对话框
 │   │   ├── layout/             # 布局组件
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── OverlayPanel.tsx
@@ -291,9 +314,12 @@ HTTP_PROXY=http://your-proxy:port
 
 ### Q: A股数据不更新
 
-**原因**: 东方财富API不稳定
+**原因**: 东方财富API不稳定，或Python后端未启动
 
-**解决**: 项目内置腾讯财经作为备用数据源
+**解决**: 
+- 项目内置腾讯财经作为备用数据源
+- A股自选股需要启动Python后端 (`cd backend && python main.py`)
+- 检查后端是否运行在 http://localhost:8000
 
 ## 开发指南
 
