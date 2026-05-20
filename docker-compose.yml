@@ -1,11 +1,20 @@
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      args:
+        - VITE_FRED_API_KEY=${VITE_FRED_API_KEY}
+        - VITE_BLS_API_KEY=${VITE_BLS_API_KEY}
+        - VITE_ALPHA_VANTAGE_API_KEY=${VITE_ALPHA_VANTAGE_API_KEY}
     ports:
       - "9000:80"
     depends_on:
       - backend
     restart: unless-stopped
+    # Proxy for API calls (adjust HTTP_PROXY in .env.docker if needed)
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
 
   backend:
     build:
