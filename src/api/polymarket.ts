@@ -60,16 +60,29 @@ export async function getTrendingMarkets(limit: number = 10): Promise<GammaMarke
     'win the 2026', 'beat the', 'vs.', 'matchup', 'game', 'season',
   ];
 
-  // Filter: truly active + non-sports + has question
+  // US Politics keywords to filter out
+  const politicsKeywords = [
+    'Democratic', 'Republican', 'president', 'presidential', 'nomination',
+    'election', 'Senate', 'House', 'Congress', 'governor', 'mayor',
+    'Trump', 'Biden', 'Obama', 'Clinton', 'Hillary', 'Whitmer', 'Cheney',
+    'Mamdani', 'Murphy', 'primary', 'poll', 'vote', 'campaign',
+    '2028', '2024', 'Dem', 'GOP',
+  ];
+
+  // Filter: truly active + non-sports + non-politics + has question
   const markets = response.data
     .filter(m => {
       if (m.closed !== false || m.acceptingOrders !== true || !m.question) return false;
-      // Exclude sports markets
+      // Exclude sports and politics markets
       const questionLower = m.question.toLowerCase();
       const eventTitleLower = (m.events?.[0]?.title || '').toLowerCase();
-      return !sportsKeywords.some(kw =>
+      const isSports = sportsKeywords.some(kw =>
         questionLower.includes(kw.toLowerCase()) || eventTitleLower.includes(kw.toLowerCase())
       );
+      const isPolitics = politicsKeywords.some(kw =>
+        questionLower.includes(kw.toLowerCase()) || eventTitleLower.includes(kw.toLowerCase())
+      );
+      return !isSports && !isPolitics;
     })
     .sort((a, b) => (b.volume24hr || 0) - (a.volume24hr || 0))
     .slice(0, limit);
