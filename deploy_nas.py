@@ -21,7 +21,15 @@ LOCAL_DIR = r"J:\经济指标看板"
 
 # Files to exclude
 EXCLUDE_DIRS = {'node_modules', '.git', 'dist', '.planning', 'coverage', 'test', '.idea', '.vscode'}
-EXCLUDE_FILES = {'*.log', '*.test.ts', '*.spec.ts', '.env*', '.DS_Store'}
+EXCLUDE_FILES = {'*.log', '*.test.ts', '*.spec.ts', '.env.local', '.DS_Store'}
+
+# .env.docker content (will be created on NAS after upload)
+ENV_DOCKER_CONTENT = """VITE_FRED_API_KEY=7fed09933eb74912dcf97bcea729bb89
+VITE_BLS_API_KEY=96d421375ab542e681df3dc06bbbbef6
+VITE_ALPHA_VANTAGE_API_KEY=2Y0LWU9BXVKNO8G1
+HTTP_PROXY=http://192.168.100.1:7893
+HTTPS_PROXY=http://192.168.100.1:7893
+"""
 
 def create_ssh_client():
     """Create SSH client connection"""
@@ -127,7 +135,15 @@ def deploy():
         upload_and_extract(client, tar_buffer, REMOTE_DIR)
 
         # Build Docker containers
-        print("\n[5] Building Docker containers...")
+        print("\n[5] Creating .env.docker on NAS...")
+        # Write .env.docker file via SFTP
+        sftp = client.open_sftp()
+        with sftp.open(f"{REMOTE_DIR}/.env.docker", 'w') as f:
+            f.write(ENV_DOCKER_CONTENT)
+        sftp.close()
+        print("  .env.docker created!")
+
+        print("\n[6] Building Docker containers...")
         output, error = run_sudo_command(client, f"cd {REMOTE_DIR} && docker compose build --no-cache")
         if output:
             print(output)
@@ -135,12 +151,12 @@ def deploy():
             print(f"  Build error: {error}")
 
         # Start containers
-        print("\n[6] Starting containers...")
+        print("\n[7] Starting containers...")
         output, error = run_sudo_command(client, f"cd {REMOTE_DIR} && docker compose up -d")
         print(output if output else "  Containers started!")
 
         # Check status
-        print("\n[7] Container status...")
+        print("\n[8] Container status...")
         output, error = run_sudo_command(client, f"cd {REMOTE_DIR} && docker compose ps")
         print(output)
 
