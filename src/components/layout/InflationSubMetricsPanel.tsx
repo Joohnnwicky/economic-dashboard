@@ -69,7 +69,7 @@ export function InflationSubMetricsPanel() {
                 >
                   {indicator.name}
                 </div>
-                <div className="text-lg" style={{ color: DARK_THEME.accent[2] }}>
+                <div className="text-lg" style={{ color: DARK_THEME.accent[0] }}>
                   {formatValue(indicator.value, indicator.unit)}
                 </div>
                 <div className="text-xs" style={{ color: DARK_THEME.textMuted }}>

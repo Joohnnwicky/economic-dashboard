@@ -88,7 +88,22 @@
       "Bash(python -c \"from main import app; print\\('OK'\\)\")",
       "Bash(python *)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/stocks/600519/quote\" -Method Get | ConvertTo-Json)",
-      "Bash(chcp 65001)"
+      "Bash(chcp 65001)",
+      "Bash(findstr \":8000\")",
+      "Skill(browse)",
+      "WebFetch(domain:fred.stlouisfed.org)",
+      "Bash(pip show *)",
+      "WebFetch(domain:www.mootdx.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:frankfurter.app)",
+      "WebFetch(domain:www.exchangerate-api.com)",
+      "WebFetch(domain:frankfurter.dev)",
+      "WebFetch(domain:docs.polymarket.com)",
+      "WebFetch(domain:sc.macromicro.me)",
+      "WebFetch(domain:tradingeconomics.com)",
+      "PowerShell($response = Invoke-RestMethod -Uri \"https://clob.polymarket.com/markets?active=true&limit=10\"; $response.data | Select-Object -First 3 | ForEach-Object { Write-Output \"Question: $\\($_.question\\)\"; Write-Output \"Active: $\\($_.active\\), Closed: $\\($_.closed\\)\"; Write-Output \"---\" })",
+      "PowerShell($response = Invoke-RestMethod -Uri \"https://clob.polymarket.com/markets?limit=50\"; $activeMarkets = $response.data | Where-Object { $_.closed -eq $false -and $_.accepting_orders -eq $true } | Select-Object -First 5; Write-Output \"Active markets with accepting_orders=true:\"; $activeMarkets | ForEach-Object { Write-Output \"Question: $\\($_.question\\)\"; Write-Output \"Accepting: $\\($_.accepting_orders\\), Closed: $\\($_.closed\\)\"; Write-Output \"---\" })"
     ]
   }
 }

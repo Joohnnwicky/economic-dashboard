@@ -15,7 +15,7 @@ interface IndicatorCardProps {
 
 export function IndicatorCard({ title, value, unit, change, lastUpdated }: IndicatorCardProps) {
   const isPositive = change !== undefined && change.percentage >= 0;
-  const changeColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Green/Red
+  const changeColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Red(涨) or Green(跌)
 
   return (
     <div

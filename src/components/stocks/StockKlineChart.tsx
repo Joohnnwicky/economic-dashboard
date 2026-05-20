@@ -2,6 +2,8 @@ import ReactECharts from 'echarts-for-react';
 import { useStockKline } from '../../hooks/useStockKline';
 import { DARK_THEME } from '../../constants/colors';
 import { formatChartDate } from '../../utils/formatters';
+import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 
 interface StockKlineChartProps {
   code: string;
@@ -81,7 +83,15 @@ export function StockKlineChart({ code, name, onClose }: StockKlineChartProps) {
       textStyle: { color: DARK_THEME.text },
       formatter: (params: any) => {
         const point = params[0];
-        return `${point.name}<br/>${data.name}: ${point.value?.toFixed(2)}`;
+        const dataIndex = point.dataIndex;
+        const timestamp = chartData[dataIndex]?.[0];
+        let dateStr = point.name;
+        if (timestamp) {
+          // Show full date yyyy-MM-dd
+          const d = new Date(timestamp);
+          dateStr = format(d, 'yyyy-MM-dd', { locale: zhCN });
+        }
+        return `${dateStr}<br/>${data.name}: ${point.value?.toFixed(2)}`;
       },
     },
     dataZoom: [

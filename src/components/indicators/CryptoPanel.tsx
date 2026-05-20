@@ -21,7 +21,7 @@ export function CryptoPanel() {
       </div>
 
       {error && (
-        <div className="p-2 rounded" style={{ backgroundColor: 'rgba(248, 81, 73, 0.2)', color: DARK_THEME.accent[2] }}>
+        <div className="p-2 rounded" style={{ backgroundColor: 'rgba(248, 81, 73, 0.2)', color: DARK_THEME.error }}>
           加载失败: {error.message}
         </div>
       )}

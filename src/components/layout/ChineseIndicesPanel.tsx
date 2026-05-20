@@ -53,7 +53,7 @@ export function ChineseIndicesPanel() {
           className="p-2 rounded"
           style={{
             backgroundColor: 'rgba(248, 81, 73, 0.2)',
-            color: DARK_THEME.accent[2], // Red
+            color: DARK_THEME.error,
           }}
         >
           A股数据暂时不可用

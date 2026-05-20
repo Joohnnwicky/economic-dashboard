@@ -51,9 +51,26 @@ export async function getTrendingMarkets(limit: number = 10): Promise<GammaMarke
     return [];
   }
 
-  // Filter to truly active markets and sort by 24hr volume
+  // Sports keywords to filter out
+  const sportsKeywords = [
+    'NBA', 'FIFA', 'World Cup', 'NFL', 'MLB', 'NHL', 'NCAAB', 'NCAAF',
+    'soccer', 'football', 'basketball', 'tennis', 'golf', 'boxing', 'UFC', 'MMA',
+    'Olympics', 'World Series', 'Super Bowl', 'Premier League', 'La Liga',
+    'Cavaliers', 'Knicks', 'Lakers', 'Celtics', 'Warriors', 'Heat', 'Mavericks',
+    'win the 2026', 'beat the', 'vs.', 'matchup', 'game', 'season',
+  ];
+
+  // Filter: truly active + non-sports + has question
   const markets = response.data
-    .filter(m => m.closed === false && m.acceptingOrders === true && m.question)
+    .filter(m => {
+      if (m.closed !== false || m.acceptingOrders !== true || !m.question) return false;
+      // Exclude sports markets
+      const questionLower = m.question.toLowerCase();
+      const eventTitleLower = (m.events?.[0]?.title || '').toLowerCase();
+      return !sportsKeywords.some(kw =>
+        questionLower.includes(kw.toLowerCase()) || eventTitleLower.includes(kw.toLowerCase())
+      );
+    })
     .sort((a, b) => (b.volume24hr || 0) - (a.volume24hr || 0))
     .slice(0, limit);
 

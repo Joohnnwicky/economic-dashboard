@@ -25,7 +25,7 @@ function formatMiniChartDate(date: Date, dataId: string, forTooltip: boolean = f
 
 export function MiniChart({ data, height = 120 }: MiniChartProps) {
   const isPositive = data.change !== undefined && data.change.percentage >= 0;
-  const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Green or Red
+  const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Red(涨) or Green(跌)
 
   // Mini charts are small - limit labels to avoid overlap
   // Show at most 6-8 labels depending on data length

@@ -12,14 +12,18 @@ export const DARK_THEME = {
   gridLine: '#30363d',
   border: '#21262d',
 
-  // Accent Colors (high contrast, color-blind safe)
+  // Accent Colors (high contrast, Chinese convention: 涨=红, 跌=绿)
   accent: [
     '#58a6ff',  // Blue - primary chart color
-    '#3fb950',  // Green - positive change
-    '#f85149',  // Red - negative change
+    '#f85149',  // Red - positive change (涨)
+    '#3fb950',  // Green - negative change (跌)
     '#d29922',  // Yellow - warnings
     '#a371f7',  // Purple - alternative
   ],
+
+  // Chinese stock convention colors
+  positive: '#f85149',  // Red for 涨
+  negative: '#3fb950',  // Green for 跌
 
   // Status Colors
   success: '#3fb950',
