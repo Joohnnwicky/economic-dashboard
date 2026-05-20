@@ -1,34 +1,39 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-20T06:49:47Z",
+  "timestamp": "2026-05-20T17:30:00Z",
   "phase": null,
-  "phase_name": "新经济指标面板开发",
+  "phase_name": "NAS部署与新指标开发",
   "phase_dir": null,
   "plan": null,
-  "task": 4,
+  "task": 5,
   "total_tasks": 6,
   "status": "completed",
   "completed_tasks": [
     {"id": 1, "name": "修复油价图表横轴08:00显示问题", "status": "done", "commit": "5c3bf5a"},
     {"id": 2, "name": "实现美元指数面板 (FRED DTWEXBGS)", "status": "done", "commit": "5c3bf5a"},
     {"id": 3, "name": "实现主流汇率面板 (Frankfurter API)", "status": "done", "commit": "5c3bf5a"},
-    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "done", "commit": "973c447, 0d85251, 9681798"}
+    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "done", "commit": "973c447, 0d85251, 9681798, 6b5c5bf"},
+    {"id": 5, "name": "A股指数自动刷新修复", "status": "done", "commit": "bd74a96"},
+    {"id": 6, "name": "NAS Docker部署", "status": "done", "partial": "TradingAgents-CN构建失败"}
   ],
   "remaining_tasks": [
-    {"id": 5, "name": "实现中国M1/M2剪刀差图（静态JSON方案）", "status": "not_started"},
-    {"id": 6, "name": "五角大楼披萨指数（可选）", "status": "not_started"}
+    {"id": 7, "name": "TradingAgents-CN NAS部署", "status": "blocked", "reason": "Docker Hub镜像已删除,本地构建超时"},
+    {"id": 8, "name": "外网域名配置", "status": "pending", "reason": "用户正在注册顶级域名"}
   ],
-  "blockers": [],
-  "human_actions_pending": [],
+  "blockers": [
+    {"description": "TradingAgents-CN Docker Hub镜像 hsliup/tradingagents-*:v1.0.1 已被作者删除", "type": "external", "workaround": "从GitHub克隆源代码本地构建,但NAS CPU性能有限构建超时"}
+  ],
+  "human_actions_pending": [
+    {"action": "等待顶级域名注册完成", "context": "用户正在注册域名,完成后配置外网访问", "blocking": false},
+    {"action": "TradingAgents-CN部署可选方案", "context": "手动SSH构建或放弃该项目", "blocking": false}
+  ],
   "decisions": [
-    {"decision": "使用FRED DTWEXBGS获取美元指数", "rationale": "免费、稳定、每日更新", "phase": null},
-    {"decision": "使用Frankfurter API获取汇率", "rationale": "ECB数据、免费、无需API Key", "phase": null},
-    {"decision": "使用Polymarket Gamma API而非CLOB API", "rationale": "Gamma API返回活跃市场，可按volume24hr排序", "phase": null},
-    {"decision": "Polymarket过滤体育和美国政治", "rationale": "用户对体育和政治不感兴趣，显示财经/娱乐市场", "phase": null},
-    {"decision": "涨跌颜色:涨=红,跌=绿", "rationale": "中国惯例统一颜色", "phase": null},
-    {"decision": "MiniChart关键词检测判断每日数据", "rationale": "每日数据不应显示HH:mm时间格式", "phase": null}
+    {"decision": "Polymarket面板改名并过滤中国政治关键词", "rationale": "合规风险,托管到公网需避免敏感内容", "phase": null},
+    {"decision": "A股指数添加每小时自动刷新", "rationale": "面板显示每小时更新但实际没有refetchInterval", "phase": null},
+    {"decision": "NAS部署使用Docker Compose", "rationale": "前后端分离,nginx代理外部API", "phase": null},
+    {"decision": "TradingAgents后端端口改为8001", "rationale": "避免与Economic Dashboard后端8000端口冲突", "phase": null}
   ],
-  "uncommitted_files": [],
-  "next_action": "实现M1/M2剪刀差图（静态JSON方案）或标记项目完成",
-  "context_notes": "新指标面板开发完成。美元指数(119.283)、汇率(Frankfurter)、Polymarket(Gamma API过滤体育和政治)均正常工作。涨跌颜色已统一为中国惯例(涨红跌绿)。A股K线tooltip显示完整日期。"
+  "uncommitted_files": ["deploy_nas.py", "Dockerfile (modified)"],
+  "next_action": "等待用户域名注册完成后配置外网访问",
+  "context_notes": "Economic Dashboard已成功部署到NAS (http://192.168.31.153:9000)。TradingAgents-CN构建失败因Docker Hub镜像被删除。A股指数自动刷新已修复。Polymarket已过滤中国政治关键词合规化。"
 }
