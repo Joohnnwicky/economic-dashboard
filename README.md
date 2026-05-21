@@ -6,7 +6,9 @@
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![ECharts](https://img.shields.io/badge/ECharts-5.5-AA344D?logo=apache)](https://echarts.apache.org/)
 
-一个本地运行的全球经济指标实时监控看板，整合展示美联储利率、美国就业数据、通胀数据、加密货币行情、A股/美股指数、中国央行利率等核心经济指标。专业金融终端风格暗色界面，支持历史走势分析、跨市场对比和数据导出。<img width="1440" height="5749" alt="162818_55_28" src="https://github.com/user-attachments/assets/473d7ba2-e1c3-48a9-9cee-b172869fa46d" />
+一个本地运行的全球经济指标实时监控看板，整合展示美联储利率、美国就业数据、通胀数据、加密货币行情、A股/美股指数、中国央行利率等核心经济指标。专业金融终端风格暗色界面，支持历史走势分析、跨市场对比和数据导出。
+<img width="1440" height="6517" alt="b36c4355-f456-4469-bfc3-9625bf840d68" src="https://github.com/user-attachments/assets/08359483-dd20-4f88-8901-7b285646524a" />
+
 
 
 ## 功能特性
