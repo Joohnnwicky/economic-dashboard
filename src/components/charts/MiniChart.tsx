@@ -17,34 +17,61 @@ function formatMiniChartDate(date: Date, dataId: string, forTooltip: boolean = f
     return forTooltip ? format(date, 'yyyy-MM-dd', { locale: zhCN }) : format(date, 'MM/dd', { locale: zhCN });
   }
 
-  // Daily data (commodities, indices, forex, treasury, china macro, etc.) - show dates not times
-  const dailyDataIds = ['gold-gld', 'oil-brent', 'oil-wti', 'dia', 'qqq', 'spy', 'dollar-index', 'usdcny', 'bitcoin', 'ethereum'];
-  const dailyKeywords = ['gold', 'oil', 'dollar', 'usd', 'index', 'rate', 'cny', 'eur', 'gbp', 'jpy', 'treasury', 'china', 'gdp', 'cpi', 'ip', 'daily'];
+  // 加密货币（非daily）显示时间
+  const cryptoIds = ['bitcoin', 'ethereum', 'btc', 'eth'];
+  if (cryptoIds.some(k => dataId.includes(k))) {
+    return format(date, 'HH:mm');
+  }
 
-  if (dailyDataIds.includes(dataId) || dailyKeywords.some(k => dataId.includes(k))) {
-    // For tooltip, show full date; for axis, show compact date
+  // 其他daily数据关键词（treasury, gold, oil等）
+  const dailyKeywords = ['treasury', 'gold', 'oil', 'dollar', 'china', 'gdp', 'cpi', 'ip'];
+  if (dailyKeywords.some(k => dataId.includes(k))) {
     return forTooltip ? format(date, 'yyyy-MM-dd', { locale: zhCN }) : format(date, 'MM/dd', { locale: zhCN });
   }
-  // Intraday data (crypto hourly) - show time
+
+  // 默认显示时间
   return format(date, 'HH:mm');
 }
 
 export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProps) {
   const isPositive = data.change !== undefined && data.change.percentage >= 0;
-  const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2]; // Red(涨) or Green(跌)
+  const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2];
 
-  // Mini charts are small - limit labels to avoid overlap
   const dataLength = data.historical.length;
   const labelInterval = dataLength > 200 ? 60 : dataLength > 100 ? 30 : dataLength > 50 ? 15 : Math.floor(dataLength / 6);
 
-  // 计算数据范围，让纵轴不从0开始，趋势更明显
+  // 计算数据范围
   const values = data.historical.map(d => d.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const range = maxValue - minValue;
-  // 设置纵轴范围：最小值往下留5%空间，最大值往上留5%空间
   const yAxisMin = Math.max(0, minValue - range * 0.05);
   const yAxisMax = maxValue + range * 0.05;
+
+  // 判断单位类型
+  const isPercent = data.unit === '%';  // 美债收益率、CPI等
+  const isPrice = data.unit === 'USD' || data.unit === '美元' || !data.unit;  // 加密货币、价格等
+
+  // 根据数值范围智能格式化纵轴
+  const formatYAxisValue = (value: number): string => {
+    if (isPercent) {
+      // 百分比：直接显示数值
+      return value.toFixed(1);
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K`;
+    }
+    if (value >= 100) {
+      return value.toFixed(0);
+    }
+    if (value >= 10) {
+      return value.toFixed(1);
+    }
+    return value.toFixed(2);
+  };
+
+  // tooltip单位
+  const tooltipUnit = isPercent ? '%' : '$';
 
   const option = {
     backgroundColor: 'transparent',
@@ -74,13 +101,7 @@ export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProp
       axisLabel: {
         color: DARK_THEME.textMuted,
         fontSize: 10,
-        formatter: (value: number) => {
-          // 简化显示：大数字用K/M
-          if (value >= 1000) {
-            return `${(value / 1000).toFixed(0)}K`;
-          }
-          return value.toFixed(0);
-        },
+        formatter: formatYAxisValue,
       },
       splitLine: { show: false },
     },
@@ -109,7 +130,8 @@ export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProp
         const point = points[0];
         const dateIndex = point.dataIndex;
         const fullDate = formatMiniChartDate(data.historical[dateIndex].timestamp, data.id, true, isDaily);
-        return `${fullDate}<br/>${data.name}: $${point.value.toLocaleString()}`;
+        const formattedValue = isPercent ? `${point.value.toFixed(2)}%` : `${tooltipUnit}${point.value.toLocaleString()}`;
+        return `${fullDate}<br/>${data.name}: ${formattedValue}`;
       },
     },
   };
