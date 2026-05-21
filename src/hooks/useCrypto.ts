@@ -65,6 +65,45 @@ export function useCryptoHistories() {
 }
 
 /**
+ * Hook for multi-day price changes (7d and 30d)
+ * Fetches historical data from Binance and calculates percentage changes
+ */
+export function useCryptoMultiDayChanges() {
+  const btc7dQuery = useCryptoHistory('BTCUSDT', '1d', 8);  // 8天数据，取首尾计算7天涨跌
+  const btc30dQuery = useCryptoHistory('BTCUSDT', '1d', 31); // 31天数据，取首尾计算30天涨跌
+  const eth7dQuery = useCryptoHistory('ETHUSDT', '1d', 8);
+  const eth30dQuery = useCryptoHistory('ETHUSDT', '1d', 31);
+
+  // Calculate 7d change
+  const calc7dChange = (data: { historical: { value: number; timestamp: Date }[] } | undefined) => {
+    if (!data?.historical || data.historical.length < 2) return undefined;
+    const latest = data.historical[data.historical.length - 1].value;
+    const weekAgo = data.historical[data.historical.length - 8]?.value || data.historical[0].value;
+    if (weekAgo <= 0) return undefined;
+    const pct = ((latest - weekAgo) / weekAgo) * 100;
+    return pct;
+  };
+
+  // Calculate 30d change
+  const calc30dChange = (data: { historical: { value: number; timestamp: Date }[] } | undefined) => {
+    if (!data?.historical || data.historical.length < 2) return undefined;
+    const latest = data.historical[data.historical.length - 1].value;
+    const monthAgo = data.historical[data.historical.length - 31]?.value || data.historical[0].value;
+    if (monthAgo <= 0) return undefined;
+    const pct = ((latest - monthAgo) / monthAgo) * 100;
+    return pct;
+  };
+
+  return {
+    btc7dChange: calc7dChange(btc7dQuery.data),
+    btc30dChange: calc30dChange(btc30dQuery.data),
+    eth7dChange: calc7dChange(eth7dQuery.data),
+    eth30dChange: calc30dChange(eth30dQuery.data),
+    isLoading: btc7dQuery.isLoading || btc30dQuery.isLoading || eth7dQuery.isLoading || eth30dQuery.isLoading,
+  };
+}
+
+/**
  * Hook for crypto data in NormalizedIndicator format.
  * Returns BTC and ETH as NormalizedIndicator array for export dialog and overlay panel.
  * Uses Binance API for 365 days of daily history (interval='1d', limit=365).

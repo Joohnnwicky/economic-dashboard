@@ -14,6 +14,22 @@ export const FRED_WTI_SERIES = 'DCOILWTICO';          // WTI Crude Oil ($/barrel
 // FRED Currency/Exchange Rate Series IDs
 export const FRED_DXY_SERIES = 'DTWEXBGS';            // Trade Weighted Dollar Index (Broad)
 export const FRED_USDCNY_SERIES = 'DEXCHUS';          // China/U.S. Foreign Exchange Rate
+
+// FRED US Treasury Yield Series IDs (美债收益率)
+export const FRED_TREASURY_SERIES = {
+  DGS10: 'DGS10',   // 10-Year Treasury Constant Maturity Rate
+  DGS2: 'DGS2',     // 2-Year Treasury Constant Maturity Rate
+  DGS30: 'DGS30',   // 30-Year Treasury Constant Maturity Rate
+  DGS3MO: 'DGS3MO', // 3-Month Treasury Constant Maturity Rate
+} as const;
+
+// FRED China Economic Indicators Series IDs (中国经济指标)
+export const FRED_CHINA_SERIES = {
+  GDP: 'CHNGDPNQDSMEI',       // China Gross Domestic Product (Quarterly)
+  CPI: 'CHNCPIALLMINMEI',     // China Consumer Price Index
+  IP: 'CHNIPNINDXMEI',        // China Industrial Production Index
+} as const;
+
 export const COINGECKO_BASE_URL = '/api/coingecko';
 
 // BLS API configuration - CRITICAL: 25 calls/day FREE tier!

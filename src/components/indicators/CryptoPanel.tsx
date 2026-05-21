@@ -1,15 +1,28 @@
-import { useCryptoPrice, useCryptoHistories } from '../../hooks/useCrypto';
+import { useCryptoPrice, useCryptoHistories, useCryptoMultiDayChanges } from '../../hooks/useCrypto';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
 import { BTC, ETH } from '../../constants/indicators';
 import { DARK_THEME } from '../../constants/colors';
 
+// Helper component for displaying multi-day change
+function ChangeBadge({ label, value }: { label: string; value: number | undefined }) {
+  if (value === undefined) return null;
+  const isPositive = value >= 0;
+  const color = isPositive ? DARK_THEME.positive : DARK_THEME.negative;
+  return (
+    <span className="ml-2 px-2 py-0.5 rounded text-xs" style={{ backgroundColor: `${color}20`, color }}>
+      {label}: {isPositive ? '+' : ''}{value.toFixed(2)}%
+    </span>
+  );
+}
+
 export function CryptoPanel() {
   // 30秒轮询更新，不再使用WebSocket实时更新
   const { btcPrice, ethPrice, isLoading: priceLoading, error } = useCryptoPrice();
   const { btcHistory, ethHistory, isLoading: historyLoading } = useCryptoHistories();
+  const { btc7dChange, btc30dChange, eth7dChange, eth30dChange, isLoading: multiDayLoading } = useCryptoMultiDayChanges();
 
-  const isLoading = priceLoading || historyLoading;
+  const isLoading = priceLoading || historyLoading || multiDayLoading;
 
   return (
     <div className="space-y-4">
@@ -35,28 +48,42 @@ export function CryptoPanel() {
       {/* Price Cards */}
       <div className="grid grid-cols-2 gap-4">
         {/* BTC Card */}
-        <IndicatorCard
-          title={BTC.name}
-          value={btcPrice?.price || 0}
-          unit={BTC.unit}
-          change={btcPrice ? {
-            value: btcPrice.price * (btcPrice.change24h / 100),
-            percentage: btcPrice.change24h,
-          } : undefined}
-          lastUpdated={btcPrice?.timestamp}
-        />
+        <div>
+          <IndicatorCard
+            title={BTC.name}
+            value={btcPrice?.price || 0}
+            unit={BTC.unit}
+            change={btcPrice ? {
+              value: btcPrice.price * (btcPrice.change24h / 100),
+              percentage: btcPrice.change24h,
+            } : undefined}
+            lastUpdated={btcPrice?.timestamp}
+          />
+          {/* Multi-day changes */}
+          <div className="mt-2 flex flex-wrap items-center">
+            <ChangeBadge label="7d" value={btc7dChange} />
+            <ChangeBadge label="30d" value={btc30dChange} />
+          </div>
+        </div>
 
         {/* ETH Card */}
-        <IndicatorCard
-          title={ETH.name}
-          value={ethPrice?.price || 0}
-          unit={ETH.unit}
-          change={ethPrice ? {
-            value: ethPrice.price * (ethPrice.change24h / 100),
-            percentage: ethPrice.change24h,
-          } : undefined}
-          lastUpdated={ethPrice?.timestamp}
-        />
+        <div>
+          <IndicatorCard
+            title={ETH.name}
+            value={ethPrice?.price || 0}
+            unit={ETH.unit}
+            change={ethPrice ? {
+              value: ethPrice.price * (ethPrice.change24h / 100),
+              percentage: ethPrice.change24h,
+            } : undefined}
+            lastUpdated={ethPrice?.timestamp}
+          />
+          {/* Multi-day changes */}
+          <div className="mt-2 flex flex-wrap items-center">
+            <ChangeBadge label="7d" value={eth7dChange} />
+            <ChangeBadge label="30d" value={eth30dChange} />
+          </div>
+        </div>
       </div>
 
       {/* Mini Charts */}

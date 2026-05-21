@@ -10,6 +10,8 @@ import { OilPricePanel } from '../indicators/OilPricePanel';
 import { DollarIndexPanel } from '../indicators/DollarIndexPanel';
 import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
 import { PolymarketPanel } from '../indicators/PolymarketPanel';
+import { TreasuryPanel } from '../indicators/TreasuryPanel';
+import { ChinaMacroPanel } from '../indicators/ChinaMacroPanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
@@ -28,6 +30,7 @@ export function Dashboard() {
           {/* Left Column: Economic Indicators */}
           <div className="space-y-4">
             <FedRatePanel />
+            <TreasuryPanel />
             <EmploymentPanel />
             <InflationPanel />
             <InflationSubMetricsPanel />
@@ -42,6 +45,7 @@ export function Dashboard() {
             <ExchangeRatesPanel />
             <USIndicesPanel />
             <ChineseIndicesPanel />
+            <ChinaMacroPanel />
             <CustomStocksPanel />
             <PBOCRatePanel />
             <PolymarketPanel />
