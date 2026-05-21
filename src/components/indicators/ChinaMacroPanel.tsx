@@ -1,8 +1,20 @@
 import { useChinaMacro } from '../../hooks/useChinaMacro';
-import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
 import { DARK_THEME } from '../../constants/colors';
 import { chinaMacroToNormalizedIndicator } from '../../api/china-macro';
+
+// Format large GDP values to readable format
+function formatMacroValue(value: number, seriesId: string): string {
+  if (seriesId === 'CHNGDPNQDSMEI') {
+    // GDP in trillions of dollars
+    if (value >= 1e12) {
+      return `${(value / 1e12).toFixed(2)}万亿`;
+    } else if (value >= 1e9) {
+      return `${(value / 1e9).toFixed(2)}十亿`;
+    }
+  }
+  return value.toFixed(2);
+}
 
 export function ChinaMacroPanel() {
   const { gdp, cpi, ip, isLoading, error } = useChinaMacro('1Y');
@@ -53,10 +65,10 @@ export function ChinaMacroPanel() {
             </div>
             <div className="text-right">
               <span className="text-lg font-semibold" style={{ color: DARK_THEME.text }}>
-                {gdp.value.toFixed(2)}
+                {formatMacroValue(gdp.value, gdp.seriesId)}
               </span>
               <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
-                {gdp.unit}
+                美元
               </span>
               {gdp.yoyChange !== undefined && (
                 <span
@@ -79,27 +91,16 @@ export function ChinaMacroPanel() {
             <div className="flex-1">
               <span className="font-medium" style={{ color: DARK_THEME.text }}>{cpi.name}</span>
               <span className="ml-2 text-sm" style={{ color: DARK_THEME.textMuted }}>
-                (月度)
+                (月度同比)
               </span>
             </div>
             <div className="text-right">
               <span className="text-lg font-semibold" style={{ color: DARK_THEME.text }}>
-                {cpi.value.toFixed(2)}
+                {cpi.value.toFixed(1)}
               </span>
               <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
-                {cpi.unit}
+                %
               </span>
-              {cpi.yoyChange !== undefined && (
-                <span
-                  className="ml-2 px-2 py-0.5 rounded text-xs"
-                  style={{
-                    backgroundColor: cpi.yoyChange >= 0 ? `${DARK_THEME.positive}20` : `${DARK_THEME.negative}20`,
-                    color: cpi.yoyChange >= 0 ? DARK_THEME.positive : DARK_THEME.negative,
-                  }}
-                >
-                  YoY: {cpi.yoyChange >= 0 ? '+' : ''}{cpi.yoyChange.toFixed(2)}%
-                </span>
-              )}
             </div>
           </div>
         )}
@@ -110,27 +111,16 @@ export function ChinaMacroPanel() {
             <div className="flex-1">
               <span className="font-medium" style={{ color: DARK_THEME.text }}>{ip.name}</span>
               <span className="ml-2 text-sm" style={{ color: DARK_THEME.textMuted }}>
-                (月度)
+                (月度指数)
               </span>
             </div>
             <div className="text-right">
               <span className="text-lg font-semibold" style={{ color: DARK_THEME.text }}>
-                {ip.value.toFixed(2)}
+                {ip.value.toFixed(1)}
               </span>
               <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
-                {ip.unit}
+                指数
               </span>
-              {ip.yoyChange !== undefined && (
-                <span
-                  className="ml-2 px-2 py-0.5 rounded text-xs"
-                  style={{
-                    backgroundColor: ip.yoyChange >= 0 ? `${DARK_THEME.positive}20` : `${DARK_THEME.negative}20`,
-                    color: ip.yoyChange >= 0 ? DARK_THEME.positive : DARK_THEME.negative,
-                  }}
-                >
-                  YoY: {ip.yoyChange >= 0 ? '+' : ''}{ip.yoyChange.toFixed(2)}%
-                </span>
-              )}
             </div>
           </div>
         )}

@@ -42,10 +42,20 @@ const CHINA_MACRO_NAMES: Record<string, string> = {
 };
 
 const CHINA_MACRO_UNITS: Record<string, string> = {
-  CHNGDPNQDSMEI: '指数',
+  CHNGDPNQDSMEI: '美元',  // GDP in current US dollars
   CHNCPIALLMINMEI: '指数',
   CHNIPNINDXMEI: '指数',
 };
+
+// Format large GDP numbers to trillions/billions
+function formatGDPValue(value: number): string {
+  if (value >= 1e12) {
+    return `${(value / 1e12).toFixed(2)}万亿`;
+  } else if (value >= 1e9) {
+    return `${(value / 1e9).toFixed(2)}十亿`;
+  }
+  return value.toFixed(2);
+}
 
 /**
  * Fetch a single China economic indicator from FRED

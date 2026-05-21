@@ -11,9 +11,9 @@ interface MiniChartProps {
 
 // Determine appropriate date format based on data frequency
 function formatMiniChartDate(date: Date, dataId: string, forTooltip: boolean = false): string {
-  // Daily data (commodities, indices, forex, etc.) - show dates not times
+  // Daily data (commodities, indices, forex, treasury, china macro, etc.) - show dates not times
   const dailyDataIds = ['gold-gld', 'oil-brent', 'oil-wti', 'dia', 'qqq', 'spy', 'dollar-index', 'usdcny'];
-  const dailyKeywords = ['gold', 'oil', 'dollar', 'usd', 'index', 'rate', 'cny', 'eur', 'gbp', 'jpy'];
+  const dailyKeywords = ['gold', 'oil', 'dollar', 'usd', 'index', 'rate', 'cny', 'eur', 'gbp', 'jpy', 'treasury', 'china', 'gdp', 'cpi', 'ip'];
 
   if (dailyDataIds.includes(dataId) || dailyKeywords.some(k => dataId.includes(k))) {
     // For tooltip, show full date; for axis, show compact date
