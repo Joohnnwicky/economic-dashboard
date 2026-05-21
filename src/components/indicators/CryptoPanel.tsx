@@ -1,4 +1,4 @@
-import { useCryptoPrice, useCryptoHistories, useCryptoMultiDayChanges } from '../../hooks/useCrypto';
+import { useCryptoPrice, useCryptoHistories, useCryptoMultiDayChanges, useCryptoDailyHistories } from '../../hooks/useCrypto';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
 import { BTC, ETH } from '../../constants/indicators';
@@ -21,8 +21,9 @@ export function CryptoPanel() {
   const { btcPrice, ethPrice, isLoading: priceLoading, error } = useCryptoPrice();
   const { btcHistory, ethHistory, isLoading: historyLoading } = useCryptoHistories();
   const { btc7dChange, btc30dChange, eth7dChange, eth30dChange, isLoading: multiDayLoading } = useCryptoMultiDayChanges();
+  const { btcDailyHistory, ethDailyHistory, isLoading: dailyLoading } = useCryptoDailyHistories();
 
-  const isLoading = priceLoading || historyLoading || multiDayLoading;
+  const isLoading = priceLoading || historyLoading || multiDayLoading || dailyLoading;
 
   return (
     <div className="space-y-4">
@@ -86,10 +87,21 @@ export function CryptoPanel() {
         </div>
       </div>
 
-      {/* Mini Charts */}
+      {/* Mini Charts - Hourly */}
       <div className="grid grid-cols-2 gap-4 mt-4">
         {btcHistory && <MiniChart data={btcHistory} />}
         {ethHistory && <MiniChart data={ethHistory} />}
+      </div>
+
+      {/* Daily Trend Charts - 30 days */}
+      <div className="mt-4">
+        <h4 className="text-sm font-medium mb-2" style={{ color: DARK_THEME.textMuted }}>
+          日趋势图 (30天)
+        </h4>
+        <div className="grid grid-cols-2 gap-4">
+          {btcDailyHistory && <MiniChart data={btcDailyHistory} height={100} />}
+          {ethDailyHistory && <MiniChart data={ethDailyHistory} height={100} />}
+        </div>
       </div>
 
       {/* Update Frequency Notice */}

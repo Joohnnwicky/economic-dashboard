@@ -104,6 +104,21 @@ export function useCryptoMultiDayChanges() {
 }
 
 /**
+ * Hook for daily price history (for daily trend charts)
+ * Fetches 30 days of daily data from Binance
+ */
+export function useCryptoDailyHistories() {
+  const btcQuery = useCryptoHistory('BTCUSDT', '1d', 30);
+  const ethQuery = useCryptoHistory('ETHUSDT', '1d', 30);
+
+  return {
+    btcDailyHistory: btcQuery.data,
+    ethDailyHistory: ethQuery.data,
+    isLoading: btcQuery.isLoading || ethQuery.isLoading,
+  };
+}
+
+/**
  * Hook for crypto data in NormalizedIndicator format.
  * Returns BTC and ETH as NormalizedIndicator array for export dialog and overlay panel.
  * Uses Binance API for 365 days of daily history (interval='1d', limit=365).
