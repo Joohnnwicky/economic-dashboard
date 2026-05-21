@@ -29,6 +29,8 @@
 | **大宗商品** | 布伦特原油、WTI原油 | FRED | 每日 |
 | **大宗商品** | 伦敦金价 (LBMA) | Alpha Vantage (GLD ETF) | 每日 |
 | **预测市场** | Polymarket热门赌注 | Polymarket Gamma API | 分钟级 |
+| **中国房价** | 70城市房价排行、石家庄详情 | creprice.cn (爬虫) | 每日 |
+| **中国宏观** | GDP、CPI、PPI、M2 | AkShare (国家统计局) | 月度/季度 |
 
 ### A股自选股功能
 
