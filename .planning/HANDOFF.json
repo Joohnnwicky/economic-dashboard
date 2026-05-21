@@ -1,39 +1,43 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-20T17:30:00Z",
+  "timestamp": "2026-05-21T18:30:00Z",
   "phase": null,
   "phase_name": "NAS部署与新指标开发",
   "phase_dir": null,
   "plan": null,
-  "task": 5,
-  "total_tasks": 6,
+  "task": 8,
+  "total_tasks": 8,
   "status": "completed",
   "completed_tasks": [
     {"id": 1, "name": "修复油价图表横轴08:00显示问题", "status": "done", "commit": "5c3bf5a"},
     {"id": 2, "name": "实现美元指数面板 (FRED DTWEXBGS)", "status": "done", "commit": "5c3bf5a"},
     {"id": 3, "name": "实现主流汇率面板 (Frankfurter API)", "status": "done", "commit": "5c3bf5a"},
-    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "done", "commit": "973c447, 0d85251, 9681798, 6b5c5bf"},
+    {"id": 4, "name": "实现Polymarket热门赌注面板", "status": "done", "commit": "973c447"},
     {"id": 5, "name": "A股指数自动刷新修复", "status": "done", "commit": "bd74a96"},
-    {"id": 6, "name": "NAS Docker部署", "status": "done", "partial": "TradingAgents-CN构建失败"}
+    {"id": 6, "name": "NAS Docker部署", "status": "done", "commit": "部署成功"},
+    {"id": 7, "name": "中国房价面板 (creprice.cn爬虫)", "status": "done", "commit": "b585448"},
+    {"id": 8, "name": "nginx后端API代理修复 + 金价fallback", "status": "done", "commit": "079b4ea, b700de1"}
   ],
   "remaining_tasks": [
-    {"id": 7, "name": "TradingAgents-CN NAS部署", "status": "blocked", "reason": "Docker Hub镜像已删除,本地构建超时"},
-    {"id": 8, "name": "外网域名配置", "status": "pending", "reason": "用户正在注册顶级域名"}
+    {"id": 9, "name": "TradingAgents-CN NAS部署", "status": "blocked", "reason": "Docker Hub镜像已删除"},
+    {"id": 10, "name": "外网域名配置", "status": "pending", "reason": "用户正在注册顶级域名"},
+    {"id": 11, "name": "金价数据源问题", "status": "partial", "reason": "NAS网络无法访问Yahoo Finance等外部API"}
   ],
   "blockers": [
-    {"description": "TradingAgents-CN Docker Hub镜像 hsliup/tradingagents-*:v1.0.1 已被作者删除", "type": "external", "workaround": "从GitHub克隆源代码本地构建,但NAS CPU性能有限构建超时"}
+    {"description": "TradingAgents-CN Docker Hub镜像已被作者删除", "type": "external", "workaround": "手动SSH构建或放弃"},
+    {"description": "金价外部API在NAS网络环境下无法访问", "type": "technical", "workaround": "已添加后端fallback,等明天Alpha Vantage配额恢复"}
   ],
   "human_actions_pending": [
-    {"action": "等待顶级域名注册完成", "context": "用户正在注册域名,完成后配置外网访问", "blocking": false},
-    {"action": "TradingAgents-CN部署可选方案", "context": "手动SSH构建或放弃该项目", "blocking": false}
+    {"action": "等待顶级域名注册完成", "context": "用户正在注册域名", "blocking": false},
+    {"action": "决定是否需要数据库存储历史数据", "context": "用户暂不需要，后续可能添加", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Polymarket面板改名并过滤中国政治关键词", "rationale": "合规风险,托管到公网需避免敏感内容", "phase": null},
-    {"decision": "A股指数添加每小时自动刷新", "rationale": "面板显示每小时更新但实际没有refetchInterval", "phase": null},
-    {"decision": "NAS部署使用Docker Compose", "rationale": "前后端分离,nginx代理外部API", "phase": null},
-    {"decision": "TradingAgents后端端口改为8001", "rationale": "避免与Economic Dashboard后端8000端口冲突", "phase": null}
+    {"decision": "房价数据使用爬虫方案(creprice.cn)", "rationale": "无免费API，每日爬取一次", "phase": null},
+    {"decision": "nginx代理路径修复为/api/backend -> /api/", "rationale": "原路径缺失/api前缀导致404", "phase": null},
+    {"decision": "暂不实现数据库存储", "rationale": "用户认为当前JSON缓存足够", "phase": null},
+    {"decision": "金价前端优先调用后端缓存", "rationale": "避免Alpha Vantage API配额消耗", "phase": null}
   ],
-  "uncommitted_files": ["deploy_nas.py", "Dockerfile (modified)"],
-  "next_action": "等待用户域名注册完成后配置外网访问",
-  "context_notes": "Economic Dashboard已成功部署到NAS (http://192.168.31.153:9000)。TradingAgents-CN构建失败因Docker Hub镜像被删除。A股指数自动刷新已修复。Polymarket已过滤中国政治关键词合规化。"
+  "uncommitted_files": [],
+  "next_action": "等待用户域名注册完成或继续添加新功能",
+  "context_notes": "Economic Dashboard已部署到NAS (http://192.168.31.153:9000)。本次添加中国房价面板(312城市排行+石家庄详情)和中国宏观经济指标。nginx修复后房价、宏观、自选股API正常。金价因NAS网络问题暂不可用。已推送到GitHub。"
 }
