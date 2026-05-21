@@ -12,6 +12,7 @@ import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
 import { PolymarketPanel } from '../indicators/PolymarketPanel';
 import { TreasuryPanel } from '../indicators/TreasuryPanel';
 import { ChinaMacroPanel } from '../indicators/ChinaMacroPanel';
+import { HousingPricePanel } from '../indicators/HousingPricePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
@@ -46,6 +47,7 @@ export function Dashboard() {
             <USIndicesPanel />
             <ChineseIndicesPanel />
             <ChinaMacroPanel />
+            <HousingPricePanel />
             <CustomStocksPanel />
             <PBOCRatePanel />
             <PolymarketPanel />
