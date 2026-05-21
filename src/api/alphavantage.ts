@@ -99,9 +99,33 @@ export async function getAllIndicesData(): Promise<NormalizedIndicator[]> {
 
 /**
  * Get GLD ETF data (Gold price proxy)
- * GLD ETF tracks gold spot price, approximately 1/10 of gold price per ounce
+ * Uses backend cache to avoid Alpha Vantage API quota limits
  */
 export async function getGoldETFData(): Promise<NormalizedIndicator> {
+  // Try backend cache first (avoids Alpha Vantage quota)
+  try {
+    const backendResponse = await axios.get('/api/backend/gold-price');
+    if (backendResponse.data) {
+      const data = backendResponse.data;
+      return {
+        id: 'gold-gld',
+        name: '黄金ETF (GLD - SPDR Gold Shares)',
+        value: data.currentPrice || 0,
+        unit: 'USD',
+        timestamp: new Date(data.timestamp || new Date()),
+        change: data.change ? {
+          value: data.change.value,
+          percentage: data.change.percentage,
+          period: 'daily' as const,
+        } : undefined,
+        historical: data.historical || [],
+      };
+    }
+  } catch (backendError) {
+    console.warn('[Gold] Backend cache unavailable, falling back to Alpha Vantage');
+  }
+
+  // Fallback to Alpha Vantage API
   const apiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
 
   if (!apiKey) {
