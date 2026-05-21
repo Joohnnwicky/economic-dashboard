@@ -99,8 +99,8 @@ export function CryptoPanel() {
           日趋势图 (30天)
         </h4>
         <div className="grid grid-cols-2 gap-4">
-          {btcDailyHistory && <MiniChart data={btcDailyHistory} height={100} />}
-          {ethDailyHistory && <MiniChart data={ethDailyHistory} height={100} />}
+          {btcDailyHistory && <MiniChart data={btcDailyHistory} height={100} isDaily={true} />}
+          {ethDailyHistory && <MiniChart data={ethDailyHistory} height={100} isDaily={true} />}
         </div>
       </div>
 
