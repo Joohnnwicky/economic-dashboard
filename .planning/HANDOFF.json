@@ -1,25 +1,24 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-24T12:05:00",
+  "timestamp": "2026-05-24T14:00:00",
   "phase": "03",
   "phase_name": "professional-experience-gap-closure",
   "phase_dir": ".planning/phases/03-professional-experience",
   "status": "paused",
   "completed_tasks": [
     {"id": 1, "name": "诊断UAT错误（BLS 307, Polymarket无代理）", "status": "done"},
-    {"id": 2, "name": "修复BLS路由Body参数", "status": "done", "commit": "local"},
-    {"id": 3, "name": "添加vite代理（frankfurter/tencent/polymarket）", "status": "done"},
+    {"id": 2, "name": "修复BLS路由Body参数", "status": "done", "commit": "pending"},
+    {"id": 3, "name": "添加vite代理（frankfurter/tencent/polymarket）", "status": "done", "commit": "pending"},
     {"id": 4, "name": "NAS容器化部署", "status": "done"},
-    {"id": 5, "name": "修复NAS环境变量传递", "status": "done"},
-    {"id": 6, "name": "创建/docker-nas-deploy全局skill", "status": "done"}
+    {"id": 5, "name": "修复NAS环境变量传递", "status": "done", "commit": "pending"},
+    {"id": 6, "name": "创建/docker-nas-deploy全局skill", "status": "done"},
+    {"id": 7, "name": "nginx配置中国股市/Polymarket代理", "status": "done", "deployed": true, "verified": true}
   ],
   "remaining_tasks": [
-    {"id": 7, "name": "nginx配置中国股市/Polymarket代理", "status": "not_started"},
     {"id": 8, "name": "金价/美股数据源替换（Alpha Vantage配额耗尽）", "status": "not_started"}
   ],
   "blockers": [
-    {"description": "Alpha Vantage配额25次/天耗尽", "type": "external", "workaround": "等明天恢复或改用FRED金价"},
-    {"description": "vite代理生产环境不生效", "type": "technical", "workaround": "修改nginx.conf添加外部API代理"}
+    {"description": "Alpha Vantage配额25次/天耗尽", "type": "external", "workaround": "等明天恢复或改用FRED金价"}
   ],
   "uncommitted_files": [
     ".planning/STATE.md",
@@ -27,8 +26,12 @@
     "backend/api/bls.py",
     "src/constants/api.ts",
     "vite.config.ts",
-    ".continue-here.md"
+    "nginx.conf",
+    ".continue-here.md",
+    ".planning/HANDOFF.json",
+    "update_nas_nginx.py",
+    "check_nginx.py"
   ],
-  "next_action": "修改nginx.conf添加腾讯财经和Polymarket代理",
-  "context_notes": "NAS部署成功 http://192.168.31.153:9000。FRED API已修复。vite代理仅开发环境生效，生产需nginx配置。"
+  "next_action": "验证NAS上所有面板加载状态，解决Alpha Vantage配额问题（Task 8）",
+  "context_notes": "NAS部署成功 http://192.168.31.153:9000。所有API代理已配置完成：FRED、腾讯财经、Polymarket均已验证正常工作。仅剩Alpha Vantage配额问题待解决。"
 }
