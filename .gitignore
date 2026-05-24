@@ -37,3 +37,11 @@ npm-debug.log*
 # Misc
 *.tsbuildinfo
 .gstack/
+
+# Docker images (large tar files)
+*.tar
+*-image.tar
+
+# Cache files
+*_cache.json
+housing_price_cache.json
