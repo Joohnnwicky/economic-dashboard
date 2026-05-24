@@ -66,20 +66,63 @@ function normalizeCommodityData(
 }
 
 /**
- * Get LBMA Gold Price from FRED
- * Series: GOLDAMGBD228NLBM - London Gold Price AM Fixing
+ * Get Gold Price from Python backend cache (Alpha Vantage, updated hourly)
+ * This avoids consuming Alpha Vantage API quota (25 calls/day)
  */
-export async function getGoldPrice(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
+export async function getGoldPriceFromCache(): Promise<NormalizedIndicator> {
+  const response = await axios.get('/api/backend/gold-price');
+
+  const data = response.data;
+  if (!data || data.error) {
+    // 如果后端返回错误，fallback到FRED
+    return getGoldPriceFromFRED('1M');
+  }
+
+  // 转换为NormalizedIndicator格式
+  const historical: HistoricalDataPoint[] = (data.historical || []).map((h: any) => ({
+    timestamp: new Date(h.timestamp),
+    value: h.value,
+  }));
+
+  const current = historical[historical.length - 1];
+  const previous = historical[historical.length - 2];
+
+  let change = undefined;
+  if (current && previous && previous.value > 0) {
+    const changeValue = current.value - previous.value;
+    const changePct = (changeValue / previous.value) * 100;
+    change = {
+      value: changeValue,
+      percentage: changePct,
+      period: 'hourly' as const,
+    };
+  }
+
+  return {
+    id: 'gold-lbma',
+    name: '国际金价（XAU/USD）',
+    value: data.value || current?.value || 0,
+    unit: 'USD/oz',
+    timestamp: new Date(data.timestamp || current?.timestamp || new Date()),
+    change,
+    historical,
+  };
+}
+
+/**
+ * Fallback: Get Gold Price from FRED (only used if backend cache fails)
+ */
+async function getGoldPriceFromFRED(timeRange: TimeRange): Promise<NormalizedIndicator> {
   const apiKey = import.meta.env.VITE_FRED_API_KEY;
 
   if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
+    throw new Error('VITE_FRED_API_KEY not set');
   }
 
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_GOLD_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_GOLD_SERIES}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -88,20 +131,21 @@ export async function getGoldPrice(timeRange: TimeRange = '1Y'): Promise<Normali
       throw new Error('FRED Gold response missing observations');
     }
 
-    const data = normalizeCommodityData(
+    return normalizeCommodityData(
       response.data,
       'gold-lbma',
-      '伦敦金现货（LBMA Gold Price AM Fix）',
+      '伦敦金现货（LBMA Gold Price）',
       'USD/oz'
     );
-
-    // Downsample if too many points
-    if (data.historical.length > 365) {
-      data.historical = downsampleData(data.historical, 365);
-    }
-
-    return data;
   }, RATE_LIMITS.FRED);
+}
+
+/**
+ * Get Gold Price (from backend cache, fallback to FRED)
+ */
+export async function getGoldPrice(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
+  // 优先从后端缓存获取
+  return getGoldPriceFromCache();
 }
 
 /**
@@ -109,16 +153,11 @@ export async function getGoldPrice(timeRange: TimeRange = '1Y'): Promise<Normali
  * @param seriesId - DCOILBRENTEU (Brent) or DCOILWTICO (WTI)
  */
 export async function getOilPrice(seriesId: string, timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);

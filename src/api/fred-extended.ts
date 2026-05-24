@@ -39,16 +39,11 @@ function formatDate(date: Date): string {
  * Uses the same pattern as existing getFedRate function.
  */
 export async function getPCEData(seriesId: string, timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -62,12 +57,10 @@ export async function getPCEData(seriesId: string, timeRange: TimeRange = '1Y'):
       .map((obs) => ({
         timestamp: parseUTCDate(obs.date),
         value: parseFloat(obs.value),
-      }))
-      // 移除reverse，保持最旧→最新顺序（与FEDFUNDS一致）
+      }));
 
     const current = historical[historical.length - 1];
 
-    // Override names for PCE-specific display
     let name = 'PCE物价指数';
     let id = 'pcepi';
 
@@ -87,22 +80,12 @@ export async function getPCEData(seriesId: string, timeRange: TimeRange = '1Y'):
   }, RATE_LIMITS.FRED);
 }
 
-/**
- * Fetch FOMC target rate upper bound (DFEDTARU) for FOMC meeting detection.
- * Used to detect rate change points where FOMC meetings occurred (per D-13).
- * TimeRange defaults to '1Y' (past 1 year) per D-14.
- */
 export async function getFOMCTargetRates(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_FOMC_TARGET_UPPER}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_FOMC_TARGET_UPPER}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -117,7 +100,6 @@ export async function getFOMCTargetRates(timeRange: TimeRange = '1Y'): Promise<N
         timestamp: parseUTCDate(obs.date),
         value: parseFloat(obs.value),
       }));
-    // 移除reverse，保持最旧→最新顺序（与FEDFUNDS一致）
 
     const current = historical[historical.length - 1];
 

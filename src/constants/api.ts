@@ -1,8 +1,8 @@
-// 生产环境也使用nginx代理路径（NAS部署时代理转发请求）
-// 开发环境使用Vite代理，生产环境使用nginx代理
-const isDev = import.meta.env.DEV;
+// 所有API请求通过Python后端代理，API Key不暴露给前端
+export const BACKEND_BASE_URL = '/api/backend';
 
-export const FRED_BASE_URL = '/api/fred';
+// FRED API - 通过后端代理
+export const FRED_BASE_URL = `${BACKEND_BASE_URL}/fred`;
 export const FRED_FED_RATE_SERIES = 'FEDFUNDS';
 export const FRED_CPI_SERIES = 'CPIAUCSL';  // CPI All Urban Consumers
 
@@ -27,14 +27,14 @@ export const FRED_TREASURY_SERIES = {
 export const FRED_CHINA_SERIES = {
   GDP: 'CHNGDPNQDSMEI',       // China Gross Domestic Product (Quarterly)
   CPI: 'CHNCPIALLMINMEI',     // China Consumer Price Index
-  IP: 'CHNIPNINDXMEI',        // China Industrial Production Index
+  // IP: 'CHNIPNINDXMEI',     // China Industrial Production Index (series已失效)
 } as const;
 
-export const COINGECKO_BASE_URL = '/api/coingecko';
+// CoinGecko API - 通过后端代理（无key需求）
+export const COINGECKO_BASE_URL = `${BACKEND_BASE_URL}/coingecko`;
 
-// BLS API configuration - CRITICAL: 25 calls/day FREE tier!
-// 使用nginx代理路径
-export const BLS_BASE_URL = '/api/bls/timeseries/data/';
+// BLS API - 通过后端代理
+export const BLS_BASE_URL = `${BACKEND_BASE_URL}/bls/timeseries/data/`;
 
 // BLS series IDs
 export const BLS_SERIES = {
@@ -44,18 +44,18 @@ export const BLS_SERIES = {
   CPI_CORE: 'CUSR0000SA0L1E',        // Core CPI (excludes food/energy)
 } as const;
 
-// Alpha Vantage API configuration - CRITICAL: 25 calls/day FREE tier!
-// 使用nginx代理路径
-export const ALPHA_VANTAGE_BASE_URL = '/api/alphavantage';
+// Alpha Vantage API - 通过后端代理
+export const ALPHA_VANTAGE_BASE_URL = `${BACKEND_BASE_URL}/alphavantage/query`;
 
 // Alpha Vantage symbols for US indices
-// NOTE: Alpha Vantage TIME_SERIES_DAILY API doesn't support index symbols directly.
-// Using ETF proxies: DIA (Dow), QQQ (Nasdaq-100), SPY (S&P 500)
 export const ALPHA_VANTAGE_SYMBOLS = {
   DOW_JONES: 'DIA',           // Dow Jones Industrial Average ETF
   NASDAQ: 'QQQ',              // Nasdaq-100 ETF
   SP500: 'SPY',               // S&P 500 ETF
 } as const;
+
+// Binance API - 通过后端代理
+export const BINANCE_BASE_URL = `${BACKEND_BASE_URL}/binance`;
 
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },

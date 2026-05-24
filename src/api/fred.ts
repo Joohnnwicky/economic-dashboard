@@ -55,16 +55,11 @@ function normalizeFredData(
 }
 
 export async function getFedRate(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_FED_RATE_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_FED_RATE_SERIES}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -79,16 +74,11 @@ export async function getFedRate(timeRange: TimeRange = '1Y'): Promise<Normalize
 
 // Get CPI data from FRED
 export async function getCPI(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_CPI_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_CPI_SERIES}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -98,14 +88,12 @@ export async function getCPI(timeRange: TimeRange = '1Y'): Promise<NormalizedInd
     }
 
     // FRED返回数据：最旧→最新
-    // 移除reverse，保持原始顺序，横轴从左到右时间递增
     const historical: HistoricalDataPoint[] = response.data.observations
       .filter((obs) => obs.value !== '.')
       .map((obs) => ({
         timestamp: parseUTCDate(obs.date),
         value: parseFloat(obs.value),
-      }))
-      // 不使用reverse，保持最旧→最新顺序
+      }));
 
     const current = historical[historical.length - 1];
 

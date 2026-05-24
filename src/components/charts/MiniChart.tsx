@@ -34,18 +34,30 @@ function formatMiniChartDate(date: Date, dataId: string, forTooltip: boolean = f
 }
 
 export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProps) {
-  const isPositive = data.change !== undefined && data.change.percentage >= 0;
-  const lineColor = isPositive ? DARK_THEME.accent[1] : DARK_THEME.accent[2];
+  // 判断趋势颜色：涨=红，跌=绿
+  // 1. 如果有change字段，根据change.percentage判断
+  // 2. 如果没有change，根据历史数据首尾对比判断趋势
+  let isPositive: boolean;
+  if (data.change !== undefined) {
+    isPositive = data.change.percentage >= 0;
+  } else if (data.historical.length >= 2) {
+    const firstValue = data.historical[0].value;
+    const lastValue = data.historical[data.historical.length - 1].value;
+    isPositive = lastValue >= firstValue;
+  } else {
+    isPositive = true;  // 默认红色
+  }
+  const lineColor = isPositive ? DARK_THEME.positive : DARK_THEME.negative;
 
   const dataLength = data.historical.length;
   const labelInterval = dataLength > 200 ? 60 : dataLength > 100 ? 30 : dataLength > 50 ? 15 : Math.floor(dataLength / 6);
 
-  // 计算数据范围
+  // 计算数据范围 - 纵轴缩放到数据实际范围，不从0开始
   const values = data.historical.map(d => d.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const range = maxValue - minValue;
-  const yAxisMin = Math.max(0, minValue - range * 0.05);
+  const yAxisMin = minValue - range * 0.05;
   const yAxisMax = maxValue + range * 0.05;
 
   // 判断单位类型

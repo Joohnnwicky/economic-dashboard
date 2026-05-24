@@ -30,21 +30,7 @@ function getIndexName(symbol: string): string {
  * @returns NormalizedIndicator with historical data (limited to 365 days)
  */
 export async function getIndexData(symbol: string): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_ALPHA_VANTAGE_API_KEY not set in .env.local');
-  }
-
-  // Track quota
-  alphaVantageCallCount++;
-  console.warn(`[Alpha Vantage] Call #${alphaVantageCallCount} of ${MAX_AV_CALLS_PER_DAY} daily quota`);
-
-  if (alphaVantageCallCount >= MAX_AV_CALLS_PER_DAY - 5) {
-    console.error(`[Alpha Vantage] WARNING: Approaching daily quota! ${MAX_AV_CALLS_PER_DAY - alphaVantageCallCount} remaining`);
-  }
-
-  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`;
+  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${symbol}`;
 
   return rateLimiter.call('AlphaVantage', async () => {
     const response = await axios.get<AlphaVantageDailyResponse>(url);
@@ -55,18 +41,14 @@ export async function getIndexData(symbol: string): Promise<NormalizedIndicator>
 
     const timeSeries = response.data['Time Series (Daily)'];
 
-    // Transform to historical data points
-    // Alpha Vantage returns string values, parse to number
     const historical: HistoricalDataPoint[] = Object.entries(timeSeries)
       .map(([dateStr, values]) => ({
         timestamp: parseUTCDate(dateStr),
-        value: parseFloat(values['4. close']), // Use close price
+        value: parseFloat(values['4. close']),
       }))
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()); // Sort chronological
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-    // Limit to 365 days to prevent big data issues (Pitfall 5)
     const limitedHistorical = historical.slice(-365);
-
     const current = limitedHistorical[limitedHistorical.length - 1];
 
     return {
@@ -136,14 +118,21 @@ export async function getGoldETFData(): Promise<NormalizedIndicator> {
   alphaVantageCallCount++;
   console.warn(`[Alpha Vantage] Call #${alphaVantageCallCount} of ${MAX_AV_CALLS_PER_DAY} daily quota (GLD)`);
 
-  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=GLD&apikey=${apiKey}`;
+  // Fallback to Alpha Vantage API (via backend proxy)
+  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=GLD`;
 
   return rateLimiter.call('AlphaVantage', async () => {
     const response = await axios.get<AlphaVantageDailyResponse>(url);
 
     // Check for API limit message
-    if (response.data?.['Information'] || response.data?.['Note']) {
+    // Note: "Information" is rate limit warning (1 req/sec), just need to wait
+    // "Note" is daily quota limit (25 req/day), need to wait until tomorrow
+    if (response.data?.['Note']) {
       throw new Error('Alpha Vantage 日配额已用完 (25次/天)，请明天再试');
+    }
+    if (response.data?.['Information']) {
+      console.warn('[Alpha Vantage] Rate limit hit, data may be stale');
+      // Don't throw error for rate limit - it recovers in seconds
     }
 
     if (!response.data?.['Time Series (Daily)']) {

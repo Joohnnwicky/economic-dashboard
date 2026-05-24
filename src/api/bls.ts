@@ -16,21 +16,7 @@ export interface BLSSeriesData {
 }
 
 export async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange): Promise<Record<string, BLSSeriesData>> {
-  const apiKey = import.meta.env.VITE_BLS_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_BLS_API_KEY not set in .env.local');
-  }
-
-  // Track quota
-  blsCallCount++;
-  console.warn(`[BLS] Call #${blsCallCount} of ${MAX_BLS_CALLS_PER_DAY} daily quota`);
-
-  if (blsCallCount >= MAX_BLS_CALLS_PER_DAY - 5) {
-    console.error(`[BLS] WARNING: Approaching daily quota limit! ${MAX_BLS_CALLS_PER_DAY - blsCallCount} calls remaining`);
-  }
-
-  // Calculate date range
+  // API Key由后端注入，前端不传递
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
@@ -39,7 +25,6 @@ export async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange):
     seriesid: seriesIds,
     startyear: startDate.getFullYear().toString(),
     endyear: endDate.getFullYear().toString(),
-    registrationKey: apiKey,
   };
 
   return rateLimiter.call('BLS', async () => {

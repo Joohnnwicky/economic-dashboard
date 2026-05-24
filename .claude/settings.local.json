@@ -103,7 +103,32 @@
       "WebFetch(domain:sc.macromicro.me)",
       "WebFetch(domain:tradingeconomics.com)",
       "PowerShell($response = Invoke-RestMethod -Uri \"https://clob.polymarket.com/markets?active=true&limit=10\"; $response.data | Select-Object -First 3 | ForEach-Object { Write-Output \"Question: $\\($_.question\\)\"; Write-Output \"Active: $\\($_.active\\), Closed: $\\($_.closed\\)\"; Write-Output \"---\" })",
-      "PowerShell($response = Invoke-RestMethod -Uri \"https://clob.polymarket.com/markets?limit=50\"; $activeMarkets = $response.data | Where-Object { $_.closed -eq $false -and $_.accepting_orders -eq $true } | Select-Object -First 5; Write-Output \"Active markets with accepting_orders=true:\"; $activeMarkets | ForEach-Object { Write-Output \"Question: $\\($_.question\\)\"; Write-Output \"Accepting: $\\($_.accepting_orders\\), Closed: $\\($_.closed\\)\"; Write-Output \"---\" })"
+      "PowerShell($response = Invoke-RestMethod -Uri \"https://clob.polymarket.com/markets?limit=50\"; $activeMarkets = $response.data | Where-Object { $_.closed -eq $false -and $_.accepting_orders -eq $true } | Select-Object -First 5; Write-Output \"Active markets with accepting_orders=true:\"; $activeMarkets | ForEach-Object { Write-Output \"Question: $\\($_.question\\)\"; Write-Output \"Accepting: $\\($_.accepting_orders\\), Closed: $\\($_.closed\\)\"; Write-Output \"---\" })",
+      "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p 10000 15233616788@192.168.31.153 \"echo 'SSH连接成功'\")",
+      "Bash(where sshpass *)",
+      "Bash(git push *)",
+      "Bash(ssh *)",
+      "Bash(iconv -f utf-8 -t utf-8 -c)",
+      "Bash(docker *)",
+      "Bash(copy .env.docker .env /Y)",
+      "Bash(gh auth *)",
+      "WebFetch(domain:datahelpdesk.worldbank.org)",
+      "WebFetch(domain:akshare.akfamily.xyz)",
+      "WebFetch(domain:tushare.pro)",
+      "Bash(npx vite *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(findstr :8000)",
+      "Bash(taskkill /F /PID 27300 /PID 44096)",
+      "WebFetch(domain:data.eastmoney.com)",
+      "WebFetch(domain:www.stats.gov.cn)",
+      "WebFetch(domain:datainterface.eastmoney.com)",
+      "WebFetch(domain:m.creprice.cn)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Start-Sleep -Seconds 5 ; Invoke-WebRequest -Uri \"http://localhost:8000/api/housing-prices\" -UseBasicParsing | Select-Object StatusCode, Content)",
+      "Bash(ping *)",
+      "Bash($B goto *)"
     ]
   }
 }

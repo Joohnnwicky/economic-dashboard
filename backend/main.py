@@ -9,6 +9,10 @@ from api.stocks import router as stocks_router
 from api.china_macro import router as china_macro_router
 from api.gold import router as gold_router
 from api.housing_price import router as housing_price_router
+from api.fred import router as fred_router
+from api.bls import router as bls_router
+from api.alphavantage import router as alphavantage_router
+from api.binance import router as binance_router
 from services.gold_service import update_gold_price_cache, GoldPriceCache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
@@ -78,6 +82,10 @@ app.include_router(stocks_router, prefix="/api")
 app.include_router(china_macro_router, prefix="/api")
 app.include_router(gold_router, prefix="/api")
 app.include_router(housing_price_router, prefix="/api")
+app.include_router(fred_router, prefix="/api")
+app.include_router(bls_router, prefix="/api")
+app.include_router(alphavantage_router, prefix="/api")
+app.include_router(binance_router, prefix="/api")
 
 
 @app.get("/")

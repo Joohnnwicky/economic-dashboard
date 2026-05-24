@@ -45,16 +45,11 @@ const TREASURY_NAMES: Record<string, string> = {
  * Fetch a single Treasury yield series from FRED
  */
 export async function getTreasuryYield(seriesId: string, timeRange: TimeRange = '1Y'): Promise<TreasuryYieldData> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);

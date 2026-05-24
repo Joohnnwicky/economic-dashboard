@@ -21,6 +21,17 @@ function calculateStartDate(timeRange: TimeRange): Date {
   }
 }
 
+// China GDP data is quarterly and may lag 2+ years behind current date
+// Use 3 years lookback to ensure we get recent data
+function calculateChinaStartDate(timeRange: TimeRange): Date {
+  const now = new Date();
+  switch (timeRange) {
+    case '1Y': return subYears(now, 3);  // GDP lags ~2 years, need 3y lookback
+    case 'ALL': return new Date(1990, 0, 1);
+    default: return subYears(now, 3);
+  }
+}
+
 function formatDate(date: Date): string {
   return format(date, 'yyyy-MM-dd');
 }
@@ -38,13 +49,11 @@ interface ChinaMacroData {
 const CHINA_MACRO_NAMES: Record<string, string> = {
   CHNGDPNQDSMEI: '中国GDP',
   CHNCPIALLMINMEI: '中国CPI',
-  CHNIPNINDXMEI: '工业生产指数',
 };
 
 const CHINA_MACRO_UNITS: Record<string, string> = {
-  CHNGDPNQDSMEI: '美元',  // GDP in current US dollars
+  CHNGDPNQDSMEI: '人民币',  // GDP in Yuan Renminbi
   CHNCPIALLMINMEI: '指数',
-  CHNIPNINDXMEI: '指数',
 };
 
 // Format large GDP numbers to trillions/billions
@@ -61,16 +70,11 @@ function formatGDPValue(value: number): string {
  * Fetch a single China economic indicator from FRED
  */
 export async function getChinaMacroIndicator(seriesId: string, timeRange: TimeRange = '1Y'): Promise<ChinaMacroData> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set');
-  }
-
   const endDate = new Date();
-  const startDate = calculateStartDate(timeRange);
+  const startDate = calculateChinaStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${seriesId}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -117,15 +121,13 @@ export async function getChinaMacroIndicator(seriesId: string, timeRange: TimeRa
 export async function getChinaMacroIndicators(timeRange: TimeRange = '1Y'): Promise<{
   gdp: ChinaMacroData;
   cpi: ChinaMacroData;
-  ip: ChinaMacroData;
 }> {
-  const [gdp, cpi, ip] = await Promise.all([
+  const [gdp, cpi] = await Promise.all([
     getChinaMacroIndicator(FRED_CHINA_SERIES.GDP, timeRange),
     getChinaMacroIndicator(FRED_CHINA_SERIES.CPI, timeRange),
-    getChinaMacroIndicator(FRED_CHINA_SERIES.IP, timeRange),
   ]);
 
-  return { gdp, cpi, ip };
+  return { gdp, cpi };
 }
 
 /**

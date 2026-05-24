@@ -1,4 +1,4 @@
-import { useCryptoPrice, useCryptoHistories, useCryptoMultiDayChanges, useCryptoDailyHistories } from '../../hooks/useCrypto';
+import { useCryptoPrice, useCryptoMultiDayChanges, useCryptoDailyHistories } from '../../hooks/useCrypto';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
 import { BTC, ETH } from '../../constants/indicators';
@@ -19,11 +19,10 @@ function ChangeBadge({ label, value }: { label: string; value: number | undefine
 export function CryptoPanel() {
   // 30秒轮询更新，不再使用WebSocket实时更新
   const { btcPrice, ethPrice, isLoading: priceLoading, error } = useCryptoPrice();
-  const { btcHistory, ethHistory, isLoading: historyLoading } = useCryptoHistories();
   const { btc7dChange, btc30dChange, eth7dChange, eth30dChange, isLoading: multiDayLoading } = useCryptoMultiDayChanges();
   const { btcDailyHistory, ethDailyHistory, isLoading: dailyLoading } = useCryptoDailyHistories();
 
-  const isLoading = priceLoading || historyLoading || multiDayLoading || dailyLoading;
+  const isLoading = priceLoading || multiDayLoading || dailyLoading;
 
   return (
     <div className="space-y-4">
@@ -87,20 +86,40 @@ export function CryptoPanel() {
         </div>
       </div>
 
-      {/* Mini Charts - Hourly */}
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        {btcHistory && <MiniChart data={btcHistory} />}
-        {ethHistory && <MiniChart data={ethHistory} />}
-      </div>
-
       {/* Daily Trend Charts - 30 days */}
       <div className="mt-4">
         <h4 className="text-sm font-medium mb-2" style={{ color: DARK_THEME.textMuted }}>
           日趋势图 (30天)
         </h4>
         <div className="grid grid-cols-2 gap-4">
-          {btcDailyHistory && <MiniChart data={btcDailyHistory} height={100} isDaily={true} />}
-          {ethDailyHistory && <MiniChart data={ethDailyHistory} height={100} isDaily={true} />}
+          {btcDailyHistory && btcPrice && (
+            <MiniChart
+              data={{
+                ...btcDailyHistory,
+                change: {
+                  value: btcPrice.price * (btcPrice.change24h / 100),
+                  percentage: btcPrice.change24h,
+                  period: 'daily',
+                },
+              }}
+              height={100}
+              isDaily={true}
+            />
+          )}
+          {ethDailyHistory && ethPrice && (
+            <MiniChart
+              data={{
+                ...ethDailyHistory,
+                change: {
+                  value: ethPrice.price * (ethPrice.change24h / 100),
+                  percentage: ethPrice.change24h,
+                  period: 'daily',
+                },
+              }}
+              height={100}
+              isDaily={true}
+            />
+          )}
         </div>
       </div>
 

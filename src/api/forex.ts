@@ -69,16 +69,11 @@ function normalizeForexData(
  * Series: DTWEXBGS - Trade Weighted U.S. Dollar Index: Broad, Goods and Services
  */
 export async function getDollarIndex(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_DXY_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_DXY_SERIES}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);
@@ -107,16 +102,11 @@ export async function getDollarIndex(timeRange: TimeRange = '1Y'): Promise<Norma
  * Series: DEXCHUS - China / U.S. Foreign Exchange Rate
  */
 export async function getUSDCNYRate(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
-  const apiKey = import.meta.env.VITE_FRED_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_FRED_API_KEY not set in .env.local');
-  }
-
   const endDate = new Date();
   const startDate = calculateStartDate(timeRange);
 
-  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_USDCNY_SERIES}&api_key=${apiKey}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}&file_type=json`;
+  // API Key由后端注入，前端不传递
+  const url = `${FRED_BASE_URL}/series/observations?series_id=${FRED_USDCNY_SERIES}&observation_start=${formatDate(startDate)}&observation_end=${formatDate(endDate)}`;
 
   return rateLimiter.call('FRED', async () => {
     const response = await axios.get<FredSeriesResponse>(url);

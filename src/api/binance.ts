@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
+import { BINANCE_BASE_URL } from '../constants/api';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
-
-// Binance API base URL
-const BINANCE_API_URL = 'https://api.binance.com/api/v3';
 
 // Rate limit for Binance (much higher than CoinGecko)
 const BINANCE_RATE_LIMIT = {
@@ -19,12 +17,14 @@ export interface CryptoPriceData {
 }
 
 /**
- * Get current price for a crypto symbol from Binance
+ * Get current price for a crypto symbol from Binance (via backend proxy)
  * @param symbol - Binance symbol (e.g., 'BTCUSDT', 'ETHUSDT')
  */
 export async function getCryptoPriceFromBinance(symbol: string): Promise<CryptoPriceData> {
   return rateLimiter.call('Binance', async () => {
-    const response = await axios.get(`${BINANCE_API_URL}/ticker/24hr?symbol=${symbol}`);
+    const response = await axios.get(`${BINANCE_BASE_URL}/ticker/24hr`, {
+      params: { symbol },
+    });
 
     if (!response.data) {
       throw new Error('Binance response missing data');
@@ -54,7 +54,7 @@ export async function getCryptoPrices(): Promise<Record<string, CryptoPriceData>
 }
 
 /**
- * Get historical klines/candlestick data from Binance
+ * Get historical klines/candlestick data from Binance (via backend proxy)
  * @param symbol - Binance symbol (e.g., 'BTCUSDT')
  * @param interval - Kline interval (e.g., '1h' for hourly)
  * @param limit - Number of data points (max 1000)
@@ -65,18 +65,17 @@ export async function getCryptoHistoryFromBinance(
   limit: number = 24
 ): Promise<NormalizedIndicator> {
   return rateLimiter.call('Binance', async () => {
-    const response = await axios.get(
-      `${BINANCE_API_URL}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`
-    );
+    const response = await axios.get(`${BINANCE_BASE_URL}/klines`, {
+      params: { symbol, interval, limit },
+    });
 
-    if (!response.data || !Array.isArray(response.data)) {
+    if (!response.data?.klines || !Array.isArray(response.data.klines)) {
       throw new Error('Binance klines response missing data');
     }
 
-    // Binance klines format: [openTime, open, high, low, close, volume, closeTime, ...]
-    const historical: HistoricalDataPoint[] = response.data.map((kline: any[]) => ({
-      timestamp: new Date(kline[0]), // openTime
-      value: parseFloat(kline[4]),   // close price
+    const historical: HistoricalDataPoint[] = response.data.klines.map((kline: any[]) => ({
+      timestamp: new Date(kline[0]),
+      value: parseFloat(kline[4]),
     }));
 
     const current = historical[historical.length - 1];

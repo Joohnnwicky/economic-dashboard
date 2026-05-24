@@ -22,7 +22,7 @@ export interface StockSearchResult {
  */
 export async function searchStocks(keyword: string): Promise<StockSearchResult[]> {
   return rateLimiter.call('StockBackend', async () => {
-    const response = await axios.get(`${STOCK_BACKEND_URL}/api/stocks/search`, {
+    const response = await axios.get(`${STOCK_BACKEND_URL}/stocks/search`, {
       params: { q: keyword },
     });
     return response.data;
@@ -34,7 +34,7 @@ export async function searchStocks(keyword: string): Promise<StockSearchResult[]
  */
 export async function getStockQuote(code: string): Promise<NormalizedIndicator> {
   return rateLimiter.call('StockBackend', async () => {
-    const response = await axios.get(`${STOCK_BACKEND_URL}/api/stocks/${code}/quote`);
+    const response = await axios.get(`${STOCK_BACKEND_URL}/stocks/${code}/quote`);
     return response.data;
   }, STOCK_BACKEND_RATE_LIMIT);
 }
@@ -51,7 +51,7 @@ export async function getStockKline(
   limit: number = 365
 ): Promise<NormalizedIndicator> {
   return rateLimiter.call('StockBackend', async () => {
-    const response = await axios.get(`${STOCK_BACKEND_URL}/api/stocks/${code}/kline`, {
+    const response = await axios.get(`${STOCK_BACKEND_URL}/stocks/${code}/kline`, {
       params: { period, limit },
     });
     return response.data;
@@ -65,7 +65,7 @@ export async function getBatchStockQuotes(codes: string[]): Promise<NormalizedIn
   if (codes.length === 0) return [];
 
   return rateLimiter.call('StockBackend', async () => {
-    const response = await axios.get(`${STOCK_BACKEND_URL}/api/stocks/batch`, {
+    const response = await axios.get(`${STOCK_BACKEND_URL}/stocks/batch`, {
       params: { codes: codes.join(',') },
     });
     return response.data;
