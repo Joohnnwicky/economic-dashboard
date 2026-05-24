@@ -5,8 +5,11 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite)](https://vitejs.dev/)
 [![ECharts](https://img.shields.io/badge/ECharts-5.5-AA344D?logo=apache)](https://echarts.apache.org/)
+[![Deploy](https://img.shields.io/badge/NAS_Deployed-192.168.31.153-green?logo=docker)](http://192.168.31.153:9000)
 
 一个本地运行的全球经济指标实时监控看板，整合展示美联储利率、美国就业数据、通胀数据、加密货币行情、A股/美股指数、中国央行利率等核心经济指标。专业金融终端风格暗色界面，支持历史走势分析、跨市场对比和数据导出。
+
+**🚀 已部署：** NAS (http://192.168.31.153:9000) - Docker容器化部署，API代理配置完成
 <img width="1440" height="6517" alt="b36c4355-f456-4469-bfc3-9625bf840d68" src="https://github.com/user-attachments/assets/08359483-dd20-4f88-8901-7b285646524a" />
 
 
@@ -273,24 +276,35 @@ const WS_URL = 'wss://stream.binance.com:9443/ws/btcusdt@trade@ethusdt@trade';
 生产环境所有API请求通过nginx代理转发：
 
 ```nginx
-# FRED API
-location /api/fred/ {
-    proxy_pass https://api.stlouisfed.org/fred/;
+# Python后端代理（所有需要API Key的请求）
+location /api/backend/ {
+    proxy_pass http://backend:8000/api/;
 }
 
-# BLS API
-location /api/bls/ {
-    proxy_pass https://api.bls.gov/publicAPI/v2/;
+# 腾讯财经API（A股指数）
+location /api/tencent/ {
+    proxy_pass https://qt.gtimg.cn/;
+    proxy_set_header Host qt.gtimg.cn;
+    proxy_ssl_server_name on;
 }
 
-# Binance WebSocket
-# 前端直接连接 wss://stream.binance.com (不通过nginx)
+# Polymarket Gamma API（预测市场）
+location /api/polymarket/ {
+    proxy_pass https://gamma-api.polymarket.com/;
+    proxy_set_header Host gamma-api.polymarket.com;
+    proxy_ssl_server_name on;
+}
 ```
 
-好处：
-- 统一入口，便于管理
-- 可配置上游代理（OpenClash等）
-- 避免CORS问题
+**架构优势：**
+- ✅ API Key零暴露 - 前端JavaScript无任何API Key
+- ✅ 统一入口 - 所有外部API通过后端代理
+- ✅ 缓存层 - Python后端内置Redis缓存，防止配额耗尽
+- ✅ 中国大陆可用 - nginx可配置上游代理访问受限API
+
+**已验证部署：**
+- NAS地址: http://192.168.31.153:9000
+- FRED、腾讯财经、Polymarket API均正常工作
 
 ## 常见问题
 
