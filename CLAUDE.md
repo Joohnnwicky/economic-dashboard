@@ -57,24 +57,31 @@ This project uses **GSD (Get-Shit-Done)** framework.
 
 ### Current Status
 
-- **Phase:** 1 of 3 (Core Data Infrastructure)
+- **Phase:** 3 of 3 完成 (Gap Closure 已完成)
+- **UAT:** 测试暂停于 Test 3 (WebSocket Reconnection)
+- **新功能:** 中国房价面板已添加
+- **架构重构:** API Key 安全重构进行中 (WIP commit 9a179ea)
 - **Roadmap:** `.planning/ROADMAP.md`
 - **Requirements:** `.planning/REQUIREMENTS.md`
-- **Research:** `.planning/research/`
+
+### 两个活跃任务
+
+| 任务 | 位置 | 状态 |
+|------|------|------|
+| Phase 03 UAT验证 | `.planning/phases/03-professional-experience/.continue-here.md` | 暂停 (Test 3 blocked) |
+| API Key安全重构 | `.continue-here.md` (项目根目录) | WIP (Phase 1-3完成) |
 
 ### Commands
 
 ```bash
-# Plan current phase
-/gsd-plan-phase 1
+# 启动开发环境
+npm run dev                  # 前端 (localhost:5173)
+python -m uvicorn main:app   # 后端 (localhost:8000)
 
-# Execute plans
+# GSD commands
+/gsd-plan-phase
 /gsd-execute-phase
-
-# Verify work
 /gsd-verify-work
-
-# Progress check
 /gsd-progress
 ```
 
@@ -86,6 +93,23 @@ This project uses **GSD (Get-Shit-Done)** framework.
 | TanStack Query | Multi-API different refresh rates, caching essential |
 | Zustand over Redux | Personal tool, no complex state logic needed |
 | WebSocket + Polling | Crypto real-time, indices/economic data polled |
+| **后端代理架构** | 公网部署不暴露API key，所有外部API通过Python后端代理 |
+| Python FastAPI后端 | 缓存层 + API key隔离，支持内网穿透公网访问 |
+
+## Architecture (2026-05-24更新)
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌─────────────┐
+│   前端      │────▶│   Python后端     │────▶│  外部API    │
+│  (React)    │     │  (FastAPI)       │     │ (FRED/BLS)  │
+│  无API Key  │     │  缓存+代理       │     │             │
+└─────────────┘     └──────────────────┘     └─────────────┘
+      │                    │
+      │    /api/backend/*  │
+      └────────────────────┘
+```
+
+**API Key存储位置:** 仅在后端环境变量，前端JavaScript零API Key
 
 ## Out of Scope
 
@@ -112,4 +136,4 @@ This project uses **GSD (Get-Shit-Done)** framework.
 5. UTC timestamps display correctly in local time
 
 ---
-*Last updated: 2026-05-18*
+*Last updated: 2026-05-24*

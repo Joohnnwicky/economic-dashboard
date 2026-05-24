@@ -33,8 +33,8 @@ export const FRED_CHINA_SERIES = {
 // CoinGecko API - 通过后端代理（无key需求）
 export const COINGECKO_BASE_URL = `${BACKEND_BASE_URL}/coingecko`;
 
-// BLS API - 通过后端代理
-export const BLS_BASE_URL = `${BACKEND_BASE_URL}/bls/timeseries/data/`;
+// BLS API - 通过后端代理 (去掉尾部斜杠避免307重定向)
+export const BLS_BASE_URL = `${BACKEND_BASE_URL}/bls/timeseries/data`;
 
 // BLS series IDs
 export const BLS_SERIES = {

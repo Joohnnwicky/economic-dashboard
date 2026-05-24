@@ -13,6 +13,24 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/backend/, '/api'),
       },
+      // Frankfurter汇率API代理 (ECB数据，无API key)
+      '/api/frankfurter': {
+        target: 'https://api.frankfurter.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/frankfurter/, ''),
+      },
+      // 腾讯财经API代理 (A股指数)
+      '/api/tencent': {
+        target: 'https://qt.gtimg.cn',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/tencent/, ''),
+      },
+      // Polymarket Gamma API代理
+      '/api/polymarket': {
+        target: 'https://gamma-api.polymarket.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/polymarket/, ''),
+      },
     },
   },
   test: {
