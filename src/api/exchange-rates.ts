@@ -9,6 +9,14 @@ import { downsampleData } from '../utils/downsampling';
 // 使用nginx代理路径
 const FRANKFURTER_BASE_URL = '/api/frankfurter';
 
+// Frankfurter API v2 返回数组格式
+interface FrankfurterV2RateItem {
+  date: string;
+  base: string;
+  quote: string;
+  rate: number;
+}
+
 interface FrankfurterRatesResponse {
   amount: number;
   base: string;
@@ -56,17 +64,24 @@ export async function getLatestExchangeRates(): Promise<{
   const url = `${FRANKFURTER_BASE_URL}/v2/rates?base=USD&quotes=EUR,GBP,JPY,CNY`;
 
   // Frankfurter doesn't need rate limiting (free, no quota)
-  const response = await axios.get<FrankfurterRatesResponse>(url);
+  const response = await axios.get<FrankfurterV2RateItem[]>(url);
 
-  if (!response.data?.rates) {
+  // v2 returns array format: [{date, base, quote, rate}, ...]
+  if (!response.data || !Array.isArray(response.data)) {
     throw new Error('Frankfurter response missing rates');
   }
 
+  // Convert array to object format
+  const ratesMap: Record<string, number> = {};
+  for (const item of response.data) {
+    ratesMap[item.quote] = item.rate;
+  }
+
   return {
-    EUR: response.data.rates.EUR || 0,
-    GBP: response.data.rates.GBP || 0,
-    JPY: response.data.rates.JPY || 0,
-    CNY: response.data.rates.CNY || 0,
+    EUR: ratesMap.EUR || 0,
+    GBP: ratesMap.GBP || 0,
+    JPY: ratesMap.JPY || 0,
+    CNY: ratesMap.CNY || 0,
     timestamp: new Date(),
   };
 }
