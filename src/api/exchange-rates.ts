@@ -52,7 +52,8 @@ export async function getLatestExchangeRates(): Promise<{
   CNY: number;
   timestamp: Date;
 }> {
-  const url = `${FRANKFURTER_BASE_URL}/latest?from=USD&to=EUR,GBP,JPY,CNY`;
+  // Frankfurter API v2 format: /v2/rates?base=USD&quotes=EUR,GBP,JPY,CNY
+  const url = `${FRANKFURTER_BASE_URL}/v2/rates?base=USD&quotes=EUR,GBP,JPY,CNY`;
 
   // Frankfurter doesn't need rate limiting (free, no quota)
   const response = await axios.get<FrankfurterRatesResponse>(url);
@@ -81,7 +82,8 @@ export async function getHistoricalExchangeRate(
   const startDate = calculateStartDate(timeRange);
   const endDate = format(new Date(), 'yyyy-MM-dd');
 
-  const url = `${FRANKFURTER_BASE_URL}/${startDate}..${endDate}?from=USD&to=${toCurrency}`;
+  // Frankfurter API v2 format: /v2/rates?from=START&to=END&base=USD&quotes=XXX
+  const url = `${FRANKFURTER_BASE_URL}/v2/rates?from=${startDate}&to=${endDate}&base=USD&quotes=${toCurrency}`;
 
   const response = await axios.get<FrankfurterHistoricalResponse>(url);
 
