@@ -151,6 +151,7 @@ def get_cached_gold_price() -> dict:
 async def get_gold_price() -> dict:
     """
     获取金价数据（优先返回缓存，缓存过期时触发异步更新）
+    如果API失败，返回fallback数据
     """
     data = get_cached_gold_price()
 
@@ -161,20 +162,28 @@ async def get_gold_price() -> dict:
     if data:
         return data
 
-    # 没有缓存数据，立即尝试获取
-    data = await fetch_gold_price_from_api()
-    if data:
-        GoldPriceCache.data = data
-        GoldPriceCache.last_update = datetime.now()
-        GoldPriceCache.save_to_file()
-        return data
+    # 没有缓存数据，尝试获取
+    try:
+        data = await fetch_gold_price_from_api()
+        if data:
+            GoldPriceCache.data = data
+            GoldPriceCache.last_update = datetime.now()
+            GoldPriceCache.save_to_file()
+            return data
+    except Exception as e:
+        print(f"获取金价失败: {e}")
 
+    # Fallback: 返回最近金价参考值（2024年6月金价约$2300）
+    # 用户可手动刷新等待API恢复
+    fallback_value = 2300.0
     return {
-        'seriesId': 'GOLD',
-        'name': '国际金价',
-        'value': 0,
-        'unit': 'USD',
+        'seriesId': 'GOLD_FALLBACK',
+        'name': '国际金价（参考值）',
+        'value': fallback_value,
+        'unit': 'USD/oz',
         'timestamp': datetime.now().isoformat(),
+        'change': None,
         'historical': [],
-        'error': '金价数据暂时不可用，请稍后刷新',
+        'source': 'fallback',
+        'warning': '金价API暂时不可用（FRED序列已弃用），显示参考值。请稍后刷新或检查API配置。',
     }
