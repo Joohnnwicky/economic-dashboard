@@ -1,5 +1,5 @@
 """
-金价数据服务 - 多数据源备选，每小时更新一次
+金价数据服务 - 使用FRED LBMA Gold Price数据
 """
 import os
 import json
@@ -8,11 +8,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import httpx
 
-# Alpha Vantage API配置
-ALPHA_VANTAGE_API_KEY = os.environ.get('ALPHA_VANTAGE_API_KEY', '2Y0LWU9BXVKNO8G1')
-ALPHA_VANTAGE_URL = 'https://www.alphavantage.co/query'
+# FRED API配置
+FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
+FRED_GOLD_SERIES = 'GOLDAMGBD228NLBM'  # LBMA Gold Price AM Fix ($/oz)
+FRED_URL = 'https://api.stlouisfed.org/fred/series/observations'
 
-# 缓存文件路径 - 使用/app下的cache目录（Docker容器）
+# 缓存文件路径
 CACHE_DIR = Path('/app/cache')
 CACHE_FILE = CACHE_DIR / 'gold_price.json'
 
@@ -56,169 +57,69 @@ class GoldPriceCache:
             print(f"保存金价缓存失败: {e}")
 
 
-async def fetch_gold_from_goldapi() -> dict:
-    """
-    从goldapi.io获取金价（免费层有配额限制，但可作为备选）
-    """
-    try:
-        # goldapi.io免费层
-        url = "https://www.goldapi.io/api/XAU/USD"
-        headers = {
-            "User-Agent": "Mozilla/5.0",
-        }
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.get(url, headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                return {
-                    'seriesId': 'GOLD',
-                    'name': '国际金价',
-                    'value': float(data.get('price', 0)),
-                    'unit': 'USD',
-                    'timestamp': datetime.now().isoformat(),
-                    'historical': [],  # goldapi不提供历史数据
-                }
-    except Exception as e:
-        print(f"goldapi.io获取失败: {e}")
-    return None
-
-
-async def fetch_gold_from_yahoo() -> dict:
-    """
-    从Yahoo Finance获取金价（无需API key，但数据格式需解析）
-    """
-    try:
-        # Yahoo Finance查询金价XAUUSD=X
-        url = "https://query1.finance.yahoo.com/v8/finance/chart/XAUUSD=X"
-        params = {
-            'interval': '1h',
-            'range': '1d',
-        }
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        }
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.get(url, params=params, headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                result = data.get('chart', {}).get('result', [])
-                if result:
-                    meta = result[0].get('meta', {})
-                    timestamps = result[0].get('timestamp', [])
-                    indicators = result[0].get('indicators', {}).get('quote', [])
-
-                    if indicators and timestamps:
-                        closes = indicators[0].get('close', [])
-                        historical = []
-                        for i, ts in enumerate(timestamps):
-                            if i < len(closes) and closes[i] is not None:
-                                historical.append({
-                                    'timestamp': datetime.fromtimestamp(ts).isoformat(),
-                                    'value': float(closes[i]),
-                                })
-
-                        latest_price = meta.get('regularMarketPrice', closes[-1] if closes else 0)
-
-                        return {
-                            'seriesId': 'GOLD',
-                            'name': '国际金价',
-                            'value': float(latest_price) if latest_price else 0,
-                            'unit': 'USD',
-                            'timestamp': datetime.now().isoformat(),
-                            'historical': historical,
-                        }
-    except Exception as e:
-        print(f"Yahoo Finance获取失败: {e}")
-    return None
-
-
-async def fetch_gold_from_tradingeconomics() -> dict:
-    """
-    从Trading Economics网页获取金价（无需API，但需解析HTML）
-    """
-    try:
-        url = "https://tradingeconomics.com/commodity/gold"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        }
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.get(url, headers=headers)
-            if response.status_code == 200:
-                # 简单解析价格（从页面中提取）
-                import re
-                text = response.text
-                # 寻找价格模式
-                match = re.search(r'Gold\s*[\d,]+\.\d+', text)
-                if match:
-                    price_str = match.group(0).replace('Gold', '').replace(',', '')
-                    price = float(price_str.strip())
-                    return {
-                        'seriesId': 'GOLD',
-                        'name': '国际金价',
-                        'value': price,
-                        'unit': 'USD',
-                        'timestamp': datetime.now().isoformat(),
-                        'historical': [],
-                    }
-    except Exception as e:
-        print(f"Trading Economics获取失败: {e}")
-    return None
-
-
 async def fetch_gold_price_from_api() -> dict:
     """
-    从多个数据源获取金价，按优先级尝试
+    从FRED获取LBMA金价数据
     """
-    # 优先级1: Yahoo Finance（免费，无需API key）
-    data = await fetch_gold_from_yahoo()
-    if data and data['value'] > 0:
-        print(f"从Yahoo Finance获取金价成功: ${data['value']:.2f}")
-        return data
+    if not FRED_API_KEY:
+        raise ValueError("FRED_API_KEY环境变量未设置")
 
-    # 优先级2: Trading Economics
-    data = await fetch_gold_from_tradingeconomics()
-    if data and data['value'] > 0:
-        print(f"从Trading Economics获取金价成功: ${data['value']:.2f}")
-        return data
+    # 获取最近30天的金价数据
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
 
-    # 优先级3: Alpha Vantage（有配额限制）
-    try:
-        params = {
-            'function': 'FX_DAILY',
-            'from_symbol': 'XAU',
-            'to_symbol': 'USD',
-            'apikey': ALPHA_VANTAGE_API_KEY,
-            'outputsize': 'compact',
+    params = {
+        'series_id': FRED_GOLD_SERIES,
+        'api_key': FRED_API_KEY,
+        'file_type': 'json',
+        'observation_start': start_date,
+        'observation_end': end_date,
+    }
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        response = await client.get(FRED_URL, params=params)
+        data = response.json()
+
+        if 'observations' not in data:
+            raise ValueError(f"FRED API返回错误: {data.get('error', 'unknown')}")
+
+        observations = data['observations']
+        historical = []
+
+        for obs in observations:
+            if obs['value'] != '.':
+                historical.append({
+                    'timestamp': f"{obs['date']}T00:00:00",
+                    'value': float(obs['value']),
+                })
+
+        if not historical:
+            raise ValueError("FRED金价数据为空")
+
+        latest = historical[-1]
+        previous = historical[-2] if len(historical) > 1 else None
+
+        change = None
+        if previous and previous['value'] > 0:
+            change_value = latest['value'] - previous['value']
+            change_pct = (change_value / previous['value']) * 100
+            change = {
+                'value': change_value,
+                'percentage': change_pct,
+            }
+
+        print(f"从FRED获取金价成功: ${latest['value']:.2f}")
+
+        return {
+            'seriesId': 'GOLDAMGBD228NLBM',
+            'name': '国际金价（LBMA Gold Price AM Fix）',
+            'value': latest['value'],
+            'unit': 'USD/oz',
+            'timestamp': latest['timestamp'],
+            'change': change,
+            'historical': historical,
+            'source': 'FRED',
         }
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.get(ALPHA_VANTAGE_URL, params=params)
-            data_json = response.json()
-
-            if 'Time Series FX (Daily)' in data_json:
-                ts_data = data_json['Time Series FX (Daily)']
-                historical = []
-                for date, values in sorted(ts_data.items(), reverse=True)[:30]:
-                    historical.append({
-                        'timestamp': f"{date}T00:00:00",
-                        'value': float(values['4. close']),
-                    })
-                historical.reverse()
-                latest = historical[-1] if historical else None
-
-                print(f"从Alpha Vantage获取金价成功: ${latest['value'] if latest else 0:.2f}")
-                return {
-                    'seriesId': 'GOLD',
-                    'name': '国际金价',
-                    'value': latest['value'] if latest else 0,
-                    'unit': 'USD',
-                    'timestamp': latest['timestamp'] if latest else datetime.now().isoformat(),
-                    'historical': historical,
-                }
-    except Exception as e:
-        print(f"Alpha Vantage获取失败: {e}")
-
-    # 所有数据源都失败
-    raise ValueError("所有金价数据源均获取失败")
 
 
 async def update_gold_price_cache():
