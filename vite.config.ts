@@ -15,7 +15,7 @@ export default defineConfig({
       },
       // Frankfurter汇率API代理 (ECB数据，无API key)
       '/api/frankfurter': {
-        target: 'https://api.frankfurter.app',
+        target: 'https://api.frankfurter.dev',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/frankfurter/, ''),
       },

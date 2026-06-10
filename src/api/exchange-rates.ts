@@ -1,15 +1,9 @@
 import axios from 'axios';
-import { rateLimiter } from './rate-limiter';
-import { RATE_LIMITS } from '../constants/api';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
-import { TimeRange } from '../types/api';
-import { format, subYears, subMonths, subDays, subWeeks } from 'date-fns';
-import { downsampleData } from '../utils/downsampling';
+import { subYears, format } from 'date-fns';
 
-// 使用nginx代理路径
-const FRANKFURTER_BASE_URL = '/api/frankfurter';
+const FRANKFURTER_BASE_URL = '/api/backend/frankfurter';
 
-// Frankfurter API v2 返回数组格式
 interface FrankfurterV2RateItem {
   date: string;
   base: string;
@@ -17,42 +11,6 @@ interface FrankfurterV2RateItem {
   rate: number;
 }
 
-interface FrankfurterRatesResponse {
-  amount: number;
-  base: string;
-  start_date?: string;
-  end_date?: string;
-  rates: Record<string, number>;
-}
-
-interface FrankfurterHistoricalResponse {
-  amount: number;
-  base: string;
-  start_date: string;
-  end_date: string;
-  rates: Record<string, Record<string, number>>;
-}
-
-function calculateStartDate(timeRange: TimeRange): string {
-  const now = new Date();
-  let startDate: Date;
-  switch (timeRange) {
-    case '1D': startDate = subDays(now, 1); break;
-    case '1W': startDate = subWeeks(now, 1); break;
-    case '1M': startDate = subMonths(now, 1); break;
-    case '3M': startDate = subMonths(now, 3); break;
-    case '6M': startDate = subMonths(now, 6); break;
-    case '1Y': startDate = subYears(now, 1); break;
-    case 'ALL': startDate = subYears(now, 10); break;
-    default: startDate = subYears(now, 1);
-  }
-  return format(startDate, 'yyyy-MM-dd');
-}
-
-/**
- * Get latest exchange rates from USD to multiple currencies
- * Uses Frankfurter API (ECB data, no API key required)
- */
 export async function getLatestExchangeRates(): Promise<{
   EUR: number;
   GBP: number;
@@ -60,18 +18,13 @@ export async function getLatestExchangeRates(): Promise<{
   CNY: number;
   timestamp: Date;
 }> {
-  // Frankfurter API v2 format: /v2/rates?base=USD&quotes=EUR,GBP,JPY,CNY
   const url = `${FRANKFURTER_BASE_URL}/v2/rates?base=USD&quotes=EUR,GBP,JPY,CNY`;
-
-  // Frankfurter doesn't need rate limiting (free, no quota)
   const response = await axios.get<FrankfurterV2RateItem[]>(url);
 
-  // v2 returns array format: [{date, base, quote, rate}, ...]
-  if (!response.data || !Array.isArray(response.data)) {
+  if (!Array.isArray(response.data)) {
     throw new Error('Frankfurter response missing rates');
   }
 
-  // Convert array to object format
   const ratesMap: Record<string, number> = {};
   for (const item of response.data) {
     ratesMap[item.quote] = item.rate;
@@ -86,39 +39,32 @@ export async function getLatestExchangeRates(): Promise<{
   };
 }
 
-/**
- * Get historical exchange rate data for a specific currency pair
- * @param toCurrency - Target currency (EUR, GBP, JPY, CNY)
- */
 export async function getHistoricalExchangeRate(
   toCurrency: string,
-  timeRange: TimeRange = '1Y'
 ): Promise<NormalizedIndicator> {
-  const startDate = calculateStartDate(timeRange);
-  const endDate = format(new Date(), 'yyyy-MM-dd');
+  const now = new Date();
+  const startDate = format(subYears(now, 1), 'yyyy-MM-dd');
+  const endDate = format(now, 'yyyy-MM-dd');
 
-  // Frankfurter API v2 format: /v2/rates?from=START&to=END&base=USD&quotes=XXX
   const url = `${FRANKFURTER_BASE_URL}/v2/rates?from=${startDate}&to=${endDate}&base=USD&quotes=${toCurrency}`;
+  const response = await axios.get<FrankfurterV2RateItem[]>(url);
 
-  const response = await axios.get<FrankfurterHistoricalResponse>(url);
-
-  if (!response.data?.rates) {
+  if (!Array.isArray(response.data)) {
     throw new Error(`Frankfurter historical response missing rates for ${toCurrency}`);
   }
 
-  // Convert rates object to historical data points
-  const historical: HistoricalDataPoint[] = Object.entries(response.data.rates)
-    .map(([dateStr, rates]) => ({
-      timestamp: new Date(dateStr + 'T00:00:00Z'),
-      value: rates[toCurrency] || 0,
+  const historical: HistoricalDataPoint[] = response.data
+    .map((item) => ({
+      timestamp: new Date(item.date + 'T00:00:00Z'),
+      value: item.rate,
     }))
     .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
   const current = historical[historical.length - 1];
   const previous = historical[historical.length - 2];
 
-  let change = undefined;
-  if (current && previous && previous.value > 0) {
+  let change: NormalizedIndicator['change'] = undefined;
+  if (current && previous && previous.value != null && current.value != null && previous.value > 0) {
     const changeValue = current.value - previous.value;
     const changePct = (changeValue / previous.value) * 100;
     change = {
@@ -129,10 +75,10 @@ export async function getHistoricalExchangeRate(
   }
 
   const currencyNames: Record<string, string> = {
-    EUR: '美元/欧元汇率（USD/EUR）',
-    GBP: '美元/英镑汇率（USD/GBP）',
-    JPY: '美元/日元汇率（USD/JPY）',
-    CNY: '美元/人民币汇率（USD/CNY）',
+    EUR: '美元/欧元（USD/EUR）',
+    GBP: '美元/英镑（USD/GBP）',
+    JPY: '美元/日元（USD/JPY）',
+    CNY: '美元/人民币（USD/CNY）',
   };
 
   if (historical.length > 365) {
@@ -150,18 +96,15 @@ export async function getHistoricalExchangeRate(
   };
 }
 
-/**
- * Get all major currency exchange rates in one call
- */
-export async function getAllExchangeRates(timeRange: TimeRange = '1Y'): Promise<{
+export async function getAllExchangeRates(): Promise<{
   EUR: NormalizedIndicator;
   GBP: NormalizedIndicator;
   JPY: NormalizedIndicator;
 }> {
   const [eur, gbp, jpy] = await Promise.all([
-    getHistoricalExchangeRate('EUR', timeRange),
-    getHistoricalExchangeRate('GBP', timeRange),
-    getHistoricalExchangeRate('JPY', timeRange),
+    getHistoricalExchangeRate('EUR'),
+    getHistoricalExchangeRate('GBP'),
+    getHistoricalExchangeRate('JPY'),
   ]);
 
   return { EUR: eur, GBP: gbp, JPY: jpy };

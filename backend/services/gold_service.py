@@ -1,100 +1,69 @@
 """
-金价数据服务 - 使用FRED LBMA Gold Price数据
+金价数据服务 - 使用AkShare获取上海黄金期货主力合约数据（元/克）
 """
-import os
-import json
-import asyncio
-from datetime import datetime, timedelta
-from pathlib import Path
-import httpx
+import akshare as ak
+from typing import Dict, Optional
+from datetime import datetime
+import pandas as pd
 
-# FRED API配置
-FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
-FRED_GOLD_SERIES = 'GOLDAMGBD228NLBM'  # LBMA Gold Price AM Fix ($/oz)
-FRED_URL = 'https://api.stlouisfed.org/fred/series/observations'
 
-# 缓存文件路径
-CACHE_DIR = Path('/app/cache')
-CACHE_FILE = CACHE_DIR / 'gold_price.json'
-
-# 缓存数据结构
 class GoldPriceCache:
-    data: dict = None
-    last_update: datetime = None
+    """金价内存缓存，1小时TTL"""
+    _data: Optional[Dict] = None
+    _timestamp: Optional[datetime] = None
+    TTL_SECONDS = 3600
 
     @classmethod
-    def is_expired(cls) -> bool:
-        """检查缓存是否过期（超过1小时）"""
-        if cls.last_update is None:
-            return True
-        elapsed = datetime.now() - cls.last_update
-        return elapsed.total_seconds() >= 3600
+    def get(cls) -> Optional[Dict]:
+        if cls._data is None or cls._timestamp is None:
+            return None
+        elapsed = (datetime.now() - cls._timestamp).total_seconds()
+        if elapsed >= cls.TTL_SECONDS:
+            cls._data = None
+            cls._timestamp = None
+            return None
+        return cls._data
 
     @classmethod
-    def load_from_file(cls):
-        """从文件加载缓存"""
-        if CACHE_FILE.exists():
-            try:
-                with open(CACHE_FILE, 'r', encoding='utf-8') as f:
-                    cached = json.load(f)
-                    cls.data = cached.get('data')
-                    cls.last_update = datetime.fromisoformat(cached.get('last_update', ''))
-                    print(f"从文件加载金价缓存: ${cls.data.get('value', 0) if cls.data else 0}")
-            except Exception as e:
-                print(f"加载金价缓存失败: {e}")
-
-    @classmethod
-    def save_to_file(cls):
-        """保存缓存到文件"""
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        try:
-            with open(CACHE_FILE, 'w', encoding='utf-8') as f:
-                json.dump({
-                    'data': cls.data,
-                    'last_update': cls.last_update.isoformat() if cls.last_update else None,
-                }, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"保存金价缓存失败: {e}")
+    def set(cls, data: Dict):
+        cls._data = data
+        cls._timestamp = datetime.now()
 
 
-async def fetch_gold_price_from_api() -> dict:
+def fetch_gold_price() -> Dict:
     """
-    从FRED获取LBMA金价数据
+    从AkShare获取上海黄金期货主力合约数据
+    futures_main_sina列: [0]日期 [1]开盘 [2]最高 [3]最低 [4]收盘 [5]成交量 [6]持仓量 [7]结算价
     """
-    if not FRED_API_KEY:
-        raise ValueError("FRED_API_KEY环境变量未设置")
+    cached = GoldPriceCache.get()
+    if cached:
+        return cached
 
-    # 获取最近30天的金价数据
-    end_date = datetime.now().strftime('%Y-%m-%d')
-    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    try:
+        # 取最近30个交易日数据
+        end_date = datetime.now().strftime('%Y%m%d')
+        start_date = '20260101'  # 宽范围，取尾部30条即可
+        df = ak.futures_main_sina(symbol='AU0', start_date=start_date, end_date=end_date)
 
-    params = {
-        'series_id': FRED_GOLD_SERIES,
-        'api_key': FRED_API_KEY,
-        'file_type': 'json',
-        'observation_start': start_date,
-        'observation_end': end_date,
-    }
+        recent = df.tail(30)
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(FRED_URL, params=params)
-        data = response.json()
-
-        if 'observations' not in data:
-            raise ValueError(f"FRED API返回错误: {data.get('error', 'unknown')}")
-
-        observations = data['observations']
         historical = []
-
-        for obs in observations:
-            if obs['value'] != '.':
-                historical.append({
-                    'timestamp': f"{obs['date']}T00:00:00",
-                    'value': float(obs['value']),
-                })
+        for _, row in recent.iterrows():
+            close_val = row.iloc[4]  # 收盘价
+            if pd.isna(close_val) or close_val == 0:
+                continue
+            date_val = row.iloc[0]  # 日期
+            if hasattr(date_val, 'strftime'):
+                ts = f"{date_val.strftime('%Y-%m-%d')}T00:00:00"
+            else:
+                ts = f"{date_val}T00:00:00"
+            historical.append({
+                'timestamp': ts,
+                'value': float(close_val),
+            })
 
         if not historical:
-            raise ValueError("FRED金价数据为空")
+            raise ValueError("黄金期货数据为空")
 
         latest = historical[-1]
         previous = historical[-2] if len(historical) > 1 else None
@@ -104,86 +73,47 @@ async def fetch_gold_price_from_api() -> dict:
             change_value = latest['value'] - previous['value']
             change_pct = (change_value / previous['value']) * 100
             change = {
-                'value': change_value,
-                'percentage': change_pct,
+                'value': round(change_value, 2),
+                'percentage': round(change_pct, 2),
             }
 
-        print(f"从FRED获取金价成功: ${latest['value']:.2f}")
-
-        return {
-            'seriesId': 'GOLDAMGBD228NLBM',
-            'name': '国际金价（LBMA Gold Price AM Fix）',
+        result = {
+            'seriesId': 'GOLD_SHFE_AU',
+            'name': '国内金价（上海黄金期货主力）',
             'value': latest['value'],
-            'unit': 'USD/oz',
+            'unit': '元/克',
             'timestamp': latest['timestamp'],
             'change': change,
             'historical': historical,
-            'source': 'FRED',
+            'source': 'AkShare',
+        }
+
+        GoldPriceCache.set(result)
+        print(f"获取国内金价成功: {latest['value']:.2f} 元/克")
+        return result
+
+    except Exception as e:
+        print(f"获取国内金价失败: {e}")
+        return {
+            'seriesId': 'GOLD_FALLBACK',
+            'name': '国内金价（参考值）',
+            'value': 0,
+            'unit': '元/克',
+            'timestamp': datetime.now().isoformat(),
+            'change': None,
+            'historical': [],
+            'source': 'fallback',
+            'warning': '金价数据暂时不可用，请稍后刷新',
         }
 
 
+async def get_gold_price() -> Dict:
+    """API路由调用入口"""
+    return fetch_gold_price()
+
+
 async def update_gold_price_cache():
-    """
-    更新金价缓存（每小时调用一次）
-    """
-    try:
-        data = await fetch_gold_price_from_api()
-        GoldPriceCache.data = data
-        GoldPriceCache.last_update = datetime.now()
-        GoldPriceCache.save_to_file()
-        print(f"[{datetime.now().isoformat()}] 金价缓存已更新: ${data['value']:.2f}")
-        return data
-    except Exception as e:
-        print(f"更新金价缓存失败: {e}")
-        return None
-
-
-def get_cached_gold_price() -> dict:
-    """
-    获取缓存的金价数据
-    """
-    if GoldPriceCache.data is None:
-        GoldPriceCache.load_from_file()
-
-    return GoldPriceCache.data
-
-
-async def get_gold_price() -> dict:
-    """
-    获取金价数据（优先返回缓存，缓存过期时触发异步更新）
-    如果API失败，返回fallback数据
-    """
-    data = get_cached_gold_price()
-
-    if data is None or GoldPriceCache.is_expired():
-        # 缓存过期，触发后台更新
-        asyncio.create_task(update_gold_price_cache())
-
-    if data:
-        return data
-
-    # 没有缓存数据，尝试获取
-    try:
-        data = await fetch_gold_price_from_api()
-        if data:
-            GoldPriceCache.data = data
-            GoldPriceCache.last_update = datetime.now()
-            GoldPriceCache.save_to_file()
-            return data
-    except Exception as e:
-        print(f"获取金价失败: {e}")
-
-    # Fallback: 返回最近金价参考值（2024年6月金价约$2300）
-    # 用户可手动刷新等待API恢复
-    fallback_value = 2300.0
-    return {
-        'seriesId': 'GOLD_FALLBACK',
-        'name': '国际金价（参考值）',
-        'value': fallback_value,
-        'unit': 'USD/oz',
-        'timestamp': datetime.now().isoformat(),
-        'change': None,
-        'historical': [],
-        'source': 'fallback',
-        'warning': '金价API暂时不可用（FRED序列已弃用），显示参考值。请稍后刷新或检查API配置。',
-    }
+    """手动刷新缓存"""
+    GoldPriceCache._data = None
+    GoldPriceCache._timestamp = None
+    return fetch_gold_price()

@@ -88,23 +88,26 @@ export async function getGoldETFData(): Promise<NormalizedIndicator> {
   try {
     const backendResponse = await axios.get('/api/backend/gold-price');
     if (backendResponse.data) {
-      const data = backendResponse.data;
+      const d = backendResponse.data;
       return {
-        id: 'gold-gld',
-        name: '黄金ETF (GLD - SPDR Gold Shares)',
-        value: data.currentPrice || 0,
-        unit: 'USD',
-        timestamp: new Date(data.timestamp || new Date()),
-        change: data.change ? {
-          value: data.change.value,
-          percentage: data.change.percentage,
+        id: 'gold-shfe',
+        name: d.name || '国内金价（上海黄金期货主力）',
+        value: d.value || 0,
+        unit: d.unit || '元/克',
+        timestamp: new Date(d.timestamp || new Date()),
+        change: d.change ? {
+          value: d.change.value,
+          percentage: d.change.percentage,
           period: 'daily' as const,
         } : undefined,
-        historical: data.historical || [],
+        historical: (d.historical || []).map((h: { timestamp: string; value: number }) => ({
+          timestamp: new Date(h.timestamp),
+          value: h.value,
+        })),
       };
     }
   } catch (backendError) {
-    console.warn('[Gold] Backend cache unavailable, falling back to Alpha Vantage');
+    console.warn('[Gold] Backend unavailable, falling back to Alpha Vantage');
   }
 
   // Fallback to Alpha Vantage API

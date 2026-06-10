@@ -8,56 +8,31 @@ export function GoldPricePanel() {
 
   if (isLoading && !data) {
     return (
-      <div>
-        <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          国际金价（Gold Price）
-        </h3>
-        <div className="flex items-center justify-center h-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
-        </div>
+      <div className="flex items-center justify-center h-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
       </div>
     );
   }
 
   if (error && !data) {
     return (
-      <div>
-        <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          国际金价（Gold Price）
-        </h3>
-        <div className="p-4 bg-red-900/20 rounded text-red-400">
-          加载失败: {error.message}
-        </div>
+      <div className="p-4 bg-red-900/20 rounded text-red-400">
+        加载失败: {error.message}
       </div>
     );
   }
 
   if (!data) {
-    return (
-      <div>
-        <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          国际金价（Gold Price）
-        </h3>
-        <div className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-          暂无数据
-        </div>
-      </div>
-    );
+    return <div className="text-sm" style={{ color: DARK_THEME.textMuted }}>暂无数据</div>;
   }
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-          国际金价（Gold Price）
-          {isFetching && (
-            <span className="ml-2 text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
-              更新中...
-            </span>
-          )}
-        </h3>
-      </div>
+      {isFetching && (
+        <span className="text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
+          更新中...
+        </span>
+      )}
 
       {/* Price Card */}
       <IndicatorCard
@@ -78,7 +53,7 @@ export function GoldPricePanel() {
 
       {/* Update Frequency Notice */}
       <p className="text-xs mt-2" style={{ color: DARK_THEME.textMuted }}>
-        数据每日更新 (Alpha Vantage · GLD黄金ETF)
+        数据每日更新 (AkShare · 上海黄金期货主力)
       </p>
     </div>
   );

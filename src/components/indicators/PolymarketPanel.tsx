@@ -6,26 +6,16 @@ export function PolymarketPanel() {
 
   if (isLoading && markets.length === 0) {
     return (
-      <div>
-        <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          Polymarket
-        </h3>
-        <div className="flex items-center justify-center h-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
-        </div>
+      <div className="flex items-center justify-center h-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
       </div>
     );
   }
 
   if (error && markets.length === 0) {
     return (
-      <div>
-        <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-          Polymarket
-        </h3>
-        <div className="p-4 bg-red-900/20 rounded text-red-400">
-          加载失败: {(error as Error).message}
-        </div>
+      <div className="p-4 bg-red-900/20 rounded text-red-400">
+        加载失败: {(error as Error).message}
       </div>
     );
   }
@@ -33,14 +23,11 @@ export function PolymarketPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-          Polymarket
-          {isFetching && (
-            <span className="ml-2 text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
-              更新中...
-            </span>
-          )}
-        </h3>
+        {isFetching && (
+          <span className="text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
+            更新中...
+          </span>
+        )}
         <a
           href="https://polymarket.com"
           target="_blank"
@@ -60,7 +47,7 @@ export function PolymarketPanel() {
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-lg p-3 flex items-center justify-between hover:opacity-80 transition-opacity"
-            style={{ backgroundColor: DARK_THEME.panel }}
+            style={{ backgroundColor: DARK_THEME.background }}
           >
             <div className="flex-1 mr-3">
               <p className="text-sm font-medium" style={{ color: DARK_THEME.text }}>

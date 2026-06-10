@@ -9,26 +9,16 @@ export function TreasuryPanel() {
 
   if (isLoading && !dgs10) {
     return (
-      <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_THEME.text }}>
-          美国国债收益率（US Treasury Yields）
-        </h3>
-        <div className="flex items-center justify-center h-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
-        </div>
+      <div className="flex items-center justify-center h-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
       </div>
     );
   }
 
   if (error && !dgs10) {
     return (
-      <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_THEME.text }}>
-          美国国债收益率（US Treasury Yields）
-        </h3>
-        <div className="p-4 bg-red-900/20 rounded text-red-400">
-          加载失败: {error.message}
-        </div>
+      <div className="p-4 bg-red-900/20 rounded text-red-400">
+        加载失败: {error.message}
       </div>
     );
   }
@@ -42,22 +32,18 @@ export function TreasuryPanel() {
     : DARK_THEME.textMuted;
 
   return (
-    <div className="p-4 rounded-lg border space-y-4" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-          美国国债收益率（US Treasury Yields）
-        </h3>
-        {/* Yield Curve Status */}
-        {spread !== undefined && (
+    <div className="space-y-4">
+      {/* Yield Curve Status */}
+      {spread !== undefined && (
+        <div className="flex justify-end">
           <span
             className="px-2 py-1 rounded text-sm"
             style={{ backgroundColor: `${curveColor}20`, color: curveColor }}
           >
             收益率曲线: {curveStatus} ({spread.toFixed(2)}%)
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Yield Cards - Grid */}
       <div className="grid grid-cols-2 gap-3">

@@ -16,7 +16,9 @@ from api.fred import router as fred_router
 from api.bls import router as bls_router
 from api.alphavantage import router as alphavantage_router
 from api.binance import router as binance_router
-from services.gold_service import update_gold_price_cache, GoldPriceCache
+from api.oil import router as oil_router
+from api.frankfurter import router as frankfurter_router
+from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
 # 定时任务：每小时更新金价缓存
@@ -35,12 +37,10 @@ async def scheduled_gold_update():
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时：加载缓存并启动定时任务
-    GoldPriceCache.load_from_file()
     HousingPriceCache.load_from_file()
 
-    # 如果金价缓存为空或过期，立即更新
-    if GoldPriceCache.data is None or GoldPriceCache.is_expired():
-        await update_gold_price_cache()
+    # 金价使用AkShare，首次请求时自动获取并缓存
+    await update_gold_price_cache()
 
     # 如果房价缓存为空或过期，立即更新
     if HousingPriceCache.data is None or HousingPriceCache.is_expired():
@@ -89,6 +89,8 @@ app.include_router(fred_router, prefix="/api")
 app.include_router(bls_router, prefix="/api")
 app.include_router(alphavantage_router, prefix="/api")
 app.include_router(binance_router, prefix="/api")
+app.include_router(oil_router, prefix="/api")
+app.include_router(frankfurter_router, prefix="/api")
 
 
 @app.get("/")

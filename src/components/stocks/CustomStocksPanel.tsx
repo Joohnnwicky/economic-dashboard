@@ -19,39 +19,29 @@ export function CustomStocksPanel() {
   // Empty state
   if (stocks.length === 0) {
     return (
-      <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg" style={{ color: DARK_THEME.text }}>自选股</h3>
-        </div>
-
-        <div className="text-center py-6" style={{ color: DARK_THEME.textMuted }}>
-          <p className="mb-2">暂无自选股</p>
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="px-4 py-2 rounded border hover:bg-[#21262d]"
-            style={{ borderColor: DARK_THEME.accent[0], color: DARK_THEME.accent[0] }}
-          >
-            + 添加自选股
-          </button>
-        </div>
-
+      <div className="text-center py-6" style={{ color: DARK_THEME.textMuted }}>
+        <p className="mb-2">暂无自选股</p>
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="px-4 py-2 rounded border hover:bg-[#21262d]"
+          style={{ borderColor: DARK_THEME.accent[0], color: DARK_THEME.accent[0] }}
+        >
+          + 添加自选股
+        </button>
         <StockSearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
       </div>
     );
   }
 
   return (
-    <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg" style={{ color: DARK_THEME.text }}>
-          自选股 ({stocks.length})
-          {isFetching && (
-            <span className="ml-2 text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
-              更新中...
-            </span>
-          )}
-        </h3>
+    <div className="space-y-4">
+      {/* Header controls */}
+      <div className="flex items-center justify-between">
+        {isFetching && (
+          <span className="text-xs animate-pulse" style={{ color: DARK_THEME.textMuted }}>
+            更新中...
+          </span>
+        )}
         <div className="flex gap-2">
           <button
             onClick={() => setSearchOpen(true)}
@@ -117,7 +107,7 @@ export function CustomStocksPanel() {
       )}
 
       {/* Footer */}
-      <p className="mt-4 text-xs" style={{ color: DARK_THEME.textMuted }}>
+      <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>
         数据每1分钟更新一次 (通达信后端) · 自选股已保存到本地
       </p>
 

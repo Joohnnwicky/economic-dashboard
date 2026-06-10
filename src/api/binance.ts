@@ -17,8 +17,20 @@ export interface CryptoPriceData {
 }
 
 /**
+ * Top volume crypto item from Binance
+ */
+export interface TopVolumeCrypto {
+  symbol: string;
+  base: string;
+  price: number;
+  change24h: number;
+  volume24h: number;
+  high24h: number;
+  low24h: number;
+}
+
+/**
  * Get current price for a crypto symbol from Binance (via backend proxy)
- * @param symbol - Binance symbol (e.g., 'BTCUSDT', 'ETHUSDT')
  */
 export async function getCryptoPriceFromBinance(symbol: string): Promise<CryptoPriceData> {
   return rateLimiter.call('Binance', async () => {
@@ -55,9 +67,6 @@ export async function getCryptoPrices(): Promise<Record<string, CryptoPriceData>
 
 /**
  * Get historical klines/candlestick data from Binance (via backend proxy)
- * @param symbol - Binance symbol (e.g., 'BTCUSDT')
- * @param interval - Kline interval (e.g., '1h' for hourly)
- * @param limit - Number of data points (max 1000)
  */
 export async function getCryptoHistoryFromBinance(
   symbol: string,
@@ -91,4 +100,17 @@ export async function getCryptoHistoryFromBinance(
       historical,
     };
   }, BINANCE_RATE_LIMIT);
+}
+
+/**
+ * Get top N crypto by 24h trading volume from Binance
+ */
+export async function getTopVolumeCrypto(top: number = 10): Promise<TopVolumeCrypto[]> {
+  const response = await axios.get(`${BINANCE_BASE_URL}/top-volume`, {
+    params: { top },
+  });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Binance top-volume response missing data');
+  }
+  return response.data;
 }

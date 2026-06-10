@@ -193,3 +193,56 @@ def normalize_binance_klines(data: dict) -> dict:
         'timestamp': current['timestamp'],
         'historical': historical,
     }
+
+
+async def fetch_top_volume_symbols(top_n: int = 10) -> list:
+    """
+    获取币安USDT交易对24h交易量排行
+    返回前top_n个交易对的行情数据
+    """
+    cache_key = f"top_volume_{top_n}"
+    cached = BinanceCache.get(cache_key)
+    if cached:
+        return cached
+
+    url = f"{APIConfig.BINANCE_BASE_URL}/ticker/24hr"
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.get(url)
+        data = response.json()
+
+    if not isinstance(data, list):
+        return []
+
+    # 只筛选USDT交易对，排除稳定币对
+    stablecoins = {'USDT', 'BUSD', 'FDUSD', 'TUSD', 'DAI', 'USDC', 'USD1', 'USTC', 'PYUSD'}
+    usdt_pairs = [
+        t for t in data
+        if t.get('symbol', '').endswith('USDT')
+        and t.get('symbol', '')[:-4] not in stablecoins
+    ]
+
+    # 按24h交易量(USDT)排序
+    usdt_pairs.sort(key=lambda x: float(x.get('quoteVolume', 0)), reverse=True)
+
+    top = usdt_pairs[:top_n]
+
+    result = []
+    for t in top:
+        symbol = t['symbol']
+        base = symbol[:-4]  # 去掉USDT
+        try:
+            result.append({
+                'symbol': symbol,
+                'base': base,
+                'price': float(t['lastPrice']),
+                'change24h': float(t['priceChangePercent']),
+                'volume24h': float(t['quoteVolume']),
+                'high24h': float(t['highPrice']),
+                'low24h': float(t['lowPrice']),
+            })
+        except (ValueError, TypeError):
+            continue
+
+    BinanceCache.set(cache_key, result)
+    return result

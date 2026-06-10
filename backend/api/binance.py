@@ -9,6 +9,7 @@ from services.binance_service import (
     fetch_multiple_binance_tickers,
     normalize_binance_ticker,
     normalize_binance_klines,
+    fetch_top_volume_symbols,
 )
 
 router = APIRouter()
@@ -80,3 +81,14 @@ async def api_get_binance_prices(
         results[sym] = normalize_binance_ticker(ticker, sym)
 
     return results
+
+
+@router.get("/binance/top-volume")
+async def api_get_top_volume(
+    top: int = Query(10, ge=1, le=50, description="返回前N个币种"),
+):
+    """
+    获取币安USDT交易对24h交易量排行
+    """
+    data = await fetch_top_volume_symbols(top)
+    return data

@@ -40,7 +40,7 @@ export function USIndicesPanel() {
 
   if (isLoading) {
     return (
-      <div className="p-4 rounded" style={{ backgroundColor: DARK_THEME.panel, color: DARK_THEME.textMuted }}>
+      <div className="flex items-center justify-center h-20" style={{ color: DARK_THEME.textMuted }}>
         正在加载美股指数数据...
       </div>
     );
@@ -52,10 +52,6 @@ export function USIndicesPanel() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-        美国股市指数（U.S. Stock Indices）
-      </h3>
-
       {/* Disclaimer about static data */}
       <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
         美股闭市时间静态数据 · 每日更新

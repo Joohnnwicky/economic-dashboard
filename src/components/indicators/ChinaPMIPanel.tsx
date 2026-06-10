@@ -8,26 +8,16 @@ export function ChinaPMIPanel() {
 
   if (isLoading && !pmi?.nbs_mfg) {
     return (
-      <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_THEME.text }}>
-          中国PMI指标（China PMI Indicators）
-        </h3>
-        <div className="flex items-center justify-center h-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
-        </div>
+      <div className="flex items-center justify-center h-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: DARK_THEME.accent[0] }}></div>
       </div>
     );
   }
 
   if (error && !pmi?.nbs_mfg) {
     return (
-      <div className="p-4 rounded-lg border" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_THEME.text }}>
-          中国PMI指标（China PMI Indicators）
-        </h3>
-        <div className="p-4 bg-red-900/20 rounded text-red-400">
-          加载失败: {error.message}
-        </div>
+      <div className="p-4 bg-red-900/20 rounded text-red-400">
+        加载失败: {error.message}
       </div>
     );
   }
@@ -47,12 +37,7 @@ export function ChinaPMIPanel() {
   }));
 
   return (
-    <div className="p-4 rounded-lg border space-y-4" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
-      {/* Header */}
-      <h3 className="text-lg font-medium" style={{ color: DARK_THEME.text }}>
-        中国PMI指标（China PMI Indicators）
-      </h3>
-
+    <div className="space-y-4">
       {/* PMI Indicator Cards - 2x2 grid */}
       <div className="grid grid-cols-2 gap-3">
         {pmiSeries.map((s) => {

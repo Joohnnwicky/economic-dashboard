@@ -1,41 +1,43 @@
 import { useEmploymentData } from '../../hooks/useBlsData';
 import { LineChart } from '../charts/LineChart';
-import { GridPanel } from '../layout/GridPanel';
-import { useDashboardStore } from '../../stores/dashboardStore';
 import { DARK_THEME } from '../../constants/colors';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 export function EmploymentPanel() {
   const timeRange = useDashboardStore((state) => state.timeRange);
-  const { data, isLoading, error, dataUpdatedAt } = useEmploymentData();
+  const { data, isLoading, error } = useEmploymentData();
+
+  if (isLoading && !data) {
+    return (
+      <div className="flex items-center justify-center h-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#58a6ff]"></div>
+      </div>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <div className="p-2 bg-red-900/20 rounded text-red-400">
+        加载失败: {error.message}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-2" style={{ color: DARK_THEME.text }}>
-        美国劳动力市场（U.S. Labor Market）
-      </h3>
-
-      <div className="grid grid-cols-1 gap-4">
-        {data?.map((indicator) => (
-          <GridPanel
-            key={indicator.id}
-            title={indicator.name}
-            isLoading={isLoading}
-            lastUpdated={dataUpdatedAt ? new Date(dataUpdatedAt) : undefined}
-          >
-            {error && (
-              <div className="p-2 bg-red-900/20 rounded text-red-400 mb-2">
-                加载失败: {error.message}
-              </div>
-            )}
-            <LineChart
-              data={indicator}
-              timeRange={timeRange}
-              height={300}
-              gridLeft="6%"
-            />
-          </GridPanel>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 gap-4">
+      {data?.map((indicator) => (
+        <div key={indicator.id}>
+          <h4 className="text-sm font-medium mb-2" style={{ color: DARK_THEME.textMuted }}>
+            {indicator.name}
+          </h4>
+          <LineChart
+            data={indicator}
+            timeRange={timeRange}
+            height={300}
+            gridLeft="6%"
+          />
+        </div>
+      ))}
     </div>
   );
 }
