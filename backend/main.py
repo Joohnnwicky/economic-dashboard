@@ -1,6 +1,9 @@
 """
 A股数据后端服务 - 使用通达信(mootdx)获取K线和实时行情，AkShare获取中国宏观经济数据，Alpha Vantage获取金价
 """
+from dotenv import load_dotenv
+load_dotenv()  # 加载.env文件中的环境变量
+
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI

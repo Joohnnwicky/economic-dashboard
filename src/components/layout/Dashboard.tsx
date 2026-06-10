@@ -12,6 +12,9 @@ import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
 import { PolymarketPanel } from '../indicators/PolymarketPanel';
 import { TreasuryPanel } from '../indicators/TreasuryPanel';
 import { ChinaMacroPanel } from '../indicators/ChinaMacroPanel';
+import { ChinaPMIPanel } from '../indicators/ChinaPMIPanel';
+import { ChinaTradePanel } from '../indicators/ChinaTradePanel';
+import { ChinaCreditPanel } from '../indicators/ChinaCreditPanel';
 import { HousingPricePanel } from '../indicators/HousingPricePanel';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
@@ -40,13 +43,16 @@ export function Dashboard() {
             <OilPricePanel />
           </div>
 
-          {/* Right Column: Market Data */}
+          {/* Right Column: Market Data + China Economy */}
           <div className="space-y-4">
             <CryptoPanel />
             <ExchangeRatesPanel />
             <USIndicesPanel />
             <ChineseIndicesPanel />
             <ChinaMacroPanel />
+            <ChinaPMIPanel />
+            <ChinaTradePanel />
+            <ChinaCreditPanel />
             <HousingPricePanel />
             <CustomStocksPanel />
             <PBOCRatePanel />
@@ -65,7 +71,7 @@ export function Dashboard() {
           style={{ borderColor: DARK_THEME.gridLine, color: DARK_THEME.textMuted }}
         >
           <p className="text-sm">
-            全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage, 东方财富
+            全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage, AkShare, 东方财富
           </p>
           <p className="text-xs mt-2">
             本工具仅供个人使用，数据可能存在延迟或误差

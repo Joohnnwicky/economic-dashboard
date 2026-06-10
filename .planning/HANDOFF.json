@@ -1,23 +1,58 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-24T15:00:00",
-  "phase": "03",
-  "phase_name": "professional-experience-gap-closure",
-  "phase_dir": ".planning/phases/03-professional-experience",
-  "status": "completed",
+  "timestamp": "2026-06-10T18:00:00",
+  "phase": null,
+  "phase_name": "china-macro-extension",
+  "phase_dir": ".",
+  "plan": null,
+  "task": 3,
+  "total_tasks": 7,
+  "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "诊断UAT错误（BLS 307, Polymarket无代理）", "status": "done"},
-    {"id": 2, "name": "修复BLS路由Body参数", "status": "done", "commit": "pushed"},
-    {"id": 3, "name": "添加vite代理（frankfurter/tencent/polymarket）", "status": "done", "commit": "pushed"},
-    {"id": 4, "name": "NAS容器化部署", "status": "done"},
-    {"id": 5, "name": "修复NAS环境变量传递", "status": "done", "commit": "pushed"},
-    {"id": 6, "name": "创建/docker-nas-deploy全局skill", "status": "done"},
-    {"id": 7, "name": "nginx配置中国股市/Polymarket代理", "status": "done", "deployed": true, "verified": true, "commit": "pushed"},
-    {"id": 8, "name": "金价/美股数据源替换（Alpha Vantage配额耗尽）", "status": "ignored", "reason": "用户决定忽略，等待配额自动恢复"}
+    {"id": 1, "name": "后端缓存层 + 11个新AkShare数据函数", "status": "done", "commit": "pending"},
+    {"id": 2, "name": "失业率爬虫服务（东方财富+静态JSON双保险）", "status": "done", "commit": "pending"},
+    {"id": 3, "name": "前端API类型 + Hooks扩展", "status": "done", "commit": "pending"},
+    {"id": 4, "name": "ChinaPMIPanel面板", "status": "done", "commit": "pending"},
+    {"id": 5, "name": "ChinaTradePanel面板", "status": "done", "commit": "pending"},
+    {"id": 6, "name": "ChinaCreditPanel + 扩展现有面板 + PBOC OMO利率", "status": "done", "commit": "pending"},
+    {"id": 7, "name": "Dashboard集成 + 修复jin10数据排序bug", "status": "done", "progress": "jin10数据修复已完成但后端未重启验证"}
   ],
-  "remaining_tasks": [],
-  "blockers": [],
-  "uncommitted_files": [],
-  "next_action": "所有任务已完成，项目部署成功",
-  "context_notes": "NAS部署成功 http://192.168.31.153:9000。所有API代理已配置并验证：FRED、腾讯财经、Polymarket正常工作。代码已推送到GitHub。Alpha Vantage配额问题已忽略（用户决定）。"
+  "remaining_tasks": [
+    {"id": 8, "name": "修复国际金价无数据问题", "status": "not_started"},
+    {"id": 9, "name": "国际油价换更实时API", "status": "not_started"},
+    {"id": 10, "name": "修复主要汇率加载失败", "status": "not_started"},
+    {"id": 11, "name": "虚拟币增加币安交易量前10币种", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "后端uvicorn进程无法从CLI杀掉（Windows权限问题），需要用户手动Ctrl+C重启", "type": "human_action", "workaround": "用户手动关闭终端后重启"},
+    {"description": "jin10数据排序bug已修复（_parse_jin10_series取最后36条而非前36条），但旧进程仍在运行返回旧数据", "type": "technical", "workaround": "重启后端即可"}
+  ],
+  "human_actions_pending": [
+    {"action": "手动关闭后端进程(Ctrl+C)并重启: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000", "context": "修复后jin10数据返回2025年最新数据而非90年代旧数据", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "AkShare作为13/14个中国指标的主要数据源", "rationale": "免费无Key，jin10统一格式便于解析，覆盖PMI/贸易/信贷/工业增加值/外汇储备"},
+    {"decision": "失业率用爬虫+静态JSON双保险", "rationale": "NBS API返回403，AkShare函数失效，东方财富爬虫也不稳定"},
+    {"decision": "7天OMO利率手动维护在pboc-rates.json", "rationale": "AkShare无7天OMO利率数据，只有旧的基准利率"},
+    {"decision": "jin10数据从DataFrame末尾取（index -1 = 最新）", "rationale": "验证发现jin10返回数据index 0 = 2005年(最早)，index -1 = 2025年(最新)"}
+  ],
+  "uncommitted_files": [
+    "backend/services/china_macro_service.py",
+    "backend/services/unemployment_service.py",
+    "backend/api/china_macro.py",
+    "src/api/china-macro-backend.ts",
+    "src/hooks/useChinaMacroBackend.ts",
+    "src/hooks/usePBOCRate.ts",
+    "src/hooks/__tests__/usePBOCRate.test.tsx",
+    "src/components/indicators/ChinaPMIPanel.tsx",
+    "src/components/indicators/ChinaTradePanel.tsx",
+    "src/components/indicators/ChinaCreditPanel.tsx",
+    "src/components/indicators/ChinaMacroPanel.tsx",
+    "src/components/indicators/PBOCRatePanel.tsx",
+    "src/components/layout/Dashboard.tsx",
+    "public/data/china-unemployment.json",
+    "public/data/pboc-rates.json"
+  ],
+  "next_action": "1. 用户手动重启后端验证jin10数据修复 2. 修复金价/油价/汇率/币安前10等问题",
+  "context_notes": "Barclays中国展望报告驱动的指标扩展。核心bug：jin10格式数据排列是从旧到新，之前代码取了前36条（最老数据）。已修复为取最后36条，Python直接调用验证OK。但uvicorn旧进程无法从bash杀掉，需要用户手动重启。"
 }

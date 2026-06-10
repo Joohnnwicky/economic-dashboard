@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
+import { NormalizedIndicator } from '../types/indicator';
 
 interface PBOCRateEntry {
   date: string;
@@ -7,57 +7,61 @@ interface PBOCRateEntry {
   type: string;
 }
 
+interface PBOCRates {
+  lpr: NormalizedIndicator;
+  omo7d: NormalizedIndicator;
+}
+
 /**
  * Fetches PBOC historical rate data from static JSON file
- *
- * Note: PBOC rate data is static historical data with rare updates.
- * No API polling needed. staleTime: Infinity prevents unnecessary fetches.
+ * Supports both LPR-1Y and OMO-7D rate types
  */
-async function fetchPBOCRate(): Promise<NormalizedIndicator> {
-  // Fetch static JSON file from public directory
+async function fetchPBOCRates(): Promise<PBOCRates> {
   const response = await fetch('/data/pboc-rates.json');
   const data: PBOCRateEntry[] = await response.json();
 
-  // Sort by date ascending (oldest first) for chronological display
-  const sorted = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  // Filter and sort by type
+  const lprEntries = data
+    .filter(e => e.type === 'LPR-1Y')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const latest = sorted[sorted.length - 1];
+  const omoEntries = data
+    .filter(e => e.type === 'OMO-7D')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Convert to historical data points (oldest first, newest last)
-  const historical: HistoricalDataPoint[] = sorted.map((entry) => ({
-    timestamp: new Date(entry.date),
-    value: entry.rate,
-  }));
+  const latestLpr = lprEntries[lprEntries.length - 1];
+  const latestOmo = omoEntries[omoEntries.length - 1];
 
   return {
-    id: 'pboc-rate',
-    name: '中国贷款市场报价利率（LPR Loan Prime Rate）',
-    value: latest.rate,
-    unit: '%',
-    timestamp: new Date(latest.date),
-    historical,
+    lpr: {
+      id: 'pboc-lpr',
+      name: 'LPR 1年期',
+      value: latestLpr.rate,
+      unit: '%',
+      timestamp: new Date(latestLpr.date),
+      historical: lprEntries.map(e => ({ timestamp: new Date(e.date), value: e.rate })),
+    },
+    omo7d: {
+      id: 'pboc-omo-7d',
+      name: '7天逆回购',
+      value: latestOmo.rate,
+      unit: '%',
+      timestamp: new Date(latestOmo.date),
+      historical: omoEntries.map(e => ({ timestamp: new Date(e.date), value: e.rate })),
+    },
   };
 }
 
 /**
- * TanStack Query hook loading PBOC historical rate data from static JSON
- *
- * Cache configuration:
- * - staleTime: 24 hours - static data but allow daily refresh for updates
- * - gcTime: Infinity - keep cached data indefinitely in memory
- * - refetchOnMount: true - refetch when component mounts (ensures latest data)
- * - retry: false - static file should load successfully on first attempt
- *
- * Per RESEARCH.md, PBOC rate is historical static data with rare updates.
- * Note: staleTime changed from Infinity to 24h to allow data updates.
+ * TanStack Query hook for PBOC rate data (LPR + OMO)
  */
 export function usePBOCRate() {
   return useQuery({
-    queryKey: ['pboc-rate'],
-    queryFn: fetchPBOCRate,
-    staleTime: 24 * 60 * 60 * 1000,  // 24 hours - allow daily refresh
-    gcTime: Infinity,                // Keep cached indefinitely in memory
-    refetchOnMount: true,            // Refetch when component mounts
-    retry: false,                    // Static file should load on first attempt
+    queryKey: ['pboc-rates'],
+    queryFn: fetchPBOCRates,
+    staleTime: 24 * 60 * 60 * 1000,  // 24 hours
+    gcTime: Infinity,
+    refetchOnMount: true,
+    retry: false,
   });
 }

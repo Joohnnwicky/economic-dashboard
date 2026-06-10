@@ -3,7 +3,7 @@ import { getChinaMacroFromBackend } from '../api/china-macro-backend';
 
 /**
  * Hook for fetching China macro economic indicators from Python backend (AkShare)
- * Returns GDP, CPI, PPI, M2
+ * Returns GDP, CPI, PPI, M2, PMI, Trade, Credit, Other, Unemployment
  */
 export function useChinaMacro() {
   const query = useQuery({
@@ -23,6 +23,11 @@ export function useChinaMacro() {
     cpi: query.data?.cpi,
     ppi: query.data?.ppi,
     m2: query.data?.m2,
+    pmi: query.data?.pmi,
+    trade: query.data?.trade,
+    credit: query.data?.credit,
+    other: query.data?.other,
+    unemployment: query.data?.unemployment,
     isLoading: query.isLoading,
     error: query.error,
   };

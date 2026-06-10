@@ -8,29 +8,23 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('usePBOCRate', () => {
-  it('returns NormalizedIndicator with id="pboc-rate"', async () => {
+  it('returns PBOCRates with lpr and omo7d', async () => {
     const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
+      defaultOptions: { queries: { retry: false } },
     });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
 
     const mockData = [
       { date: '2024-10-21', rate: 3.10, type: 'LPR-1Y' },
       { date: '2024-07-22', rate: 3.35, type: 'LPR-1Y' },
+      { date: '2024-10-21', rate: 1.50, type: 'OMO-7D' },
+      { date: '2024-07-22', rate: 1.80, type: 'OMO-7D' },
     ];
 
-    mockFetch.mockResolvedValueOnce({
-      json: async () => mockData,
-    });
+    mockFetch.mockResolvedValueOnce({ json: async () => mockData });
 
     const { result } = renderHook(() => usePBOCRate(), { wrapper });
 
@@ -38,32 +32,26 @@ describe('usePBOCRate', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(result.current.data?.id).toBe('pboc-rate');
+    expect(result.current.data?.lpr.id).toBe('pboc-lpr');
+    expect(result.current.data?.omo7d.id).toBe('pboc-omo-7d');
   });
 
-  it('parses pboc-rates.json correctly into historical data', async () => {
+  it('parses historical data correctly', async () => {
     const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
+      defaultOptions: { queries: { retry: false } },
     });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
 
     const mockData = [
       { date: '2024-10-21', rate: 3.10, type: 'LPR-1Y' },
       { date: '2024-07-22', rate: 3.35, type: 'LPR-1Y' },
+      { date: '2024-10-21', rate: 1.50, type: 'OMO-7D' },
     ];
 
-    mockFetch.mockResolvedValueOnce({
-      json: async () => mockData,
-    });
+    mockFetch.mockResolvedValueOnce({ json: async () => mockData });
 
     const { result } = renderHook(() => usePBOCRate(), { wrapper });
 
@@ -71,75 +59,9 @@ describe('usePBOCRate', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    const historical = result.current.data?.historical;
-    expect(historical).toHaveLength(2);
-    expect(historical?.[0].value).toBe(3.10); // Sorted descending, latest first (2024-10-21)
-    expect(historical?.[1].value).toBe(3.35); // Older entry (2024-07-22)
-  });
-
-  it('sets unit="%" for rate display', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    );
-
-    const mockData = [
-      { date: '2024-10-21', rate: 3.10, type: 'LPR-1Y' },
-    ];
-
-    mockFetch.mockResolvedValueOnce({
-      json: async () => mockData,
-    });
-
-    const { result } = renderHook(() => usePBOCRate(), { wrapper });
-
-    await vi.waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    expect(result.current.data?.unit).toBe('%');
-  });
-
-  it('latest value is most recent rate from JSON', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
-
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    );
-
-    const mockData = [
-      { date: '2024-07-22', rate: 3.35, type: 'LPR-1Y' },
-      { date: '2024-10-21', rate: 3.10, type: 'LPR-1Y' }, // More recent
-    ];
-
-    mockFetch.mockResolvedValueOnce({
-      json: async () => mockData,
-    });
-
-    const { result } = renderHook(() => usePBOCRate(), { wrapper });
-
-    await vi.waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    expect(result.current.data?.value).toBe(3.10); // Most recent rate
-    expect(result.current.data?.timestamp).toEqual(new Date('2024-10-21'));
+    expect(result.current.data?.lpr.historical).toHaveLength(2);
+    expect(result.current.data?.lpr.unit).toBe('%');
+    expect(result.current.data?.lpr.value).toBe(3.10);
+    expect(result.current.data?.omo7d.value).toBe(1.50);
   });
 });

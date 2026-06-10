@@ -24,8 +24,17 @@ function formatChangeValue(value: number): { text: string; color: string } {
   };
 }
 
+// Format large number (外汇储备等)
+function formatLargeValue(value: number, unit: string): string {
+  if (unit === '亿美元') {
+    if (value >= 10000) return `${(value / 10000).toFixed(2)}万亿`;
+    return value.toFixed(0);
+  }
+  return value.toFixed(1);
+}
+
 export function ChinaMacroPanel() {
-  const { gdp, cpi, ppi, m2, isLoading, error } = useChinaMacro();
+  const { gdp, cpi, ppi, m2, other, unemployment, isLoading, error } = useChinaMacro();
 
   if (isLoading && !gdp) {
     return (
@@ -56,6 +65,8 @@ export function ChinaMacroPanel() {
   const gdpFormatted = gdp ? formatChangeValue(gdp.value) : null;
   const cpiFormatted = cpi ? formatChangeValue(cpi.value) : null;
   const ppiFormatted = ppi ? formatChangeValue(ppi.value) : null;
+  const ipFormatted = other?.industrial_production ? formatChangeValue(other.industrial_production.value) : null;
+  const unempFormatted = unemployment ? { text: unemployment.value.toFixed(1), color: DARK_THEME.text } : null;
 
   return (
     <div className="p-4 rounded-lg border space-y-4" style={{ backgroundColor: DARK_THEME.panel, borderColor: DARK_THEME.gridLine }}>
@@ -142,7 +153,7 @@ export function ChinaMacroPanel() {
               <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
                 元
               </span>
-              {m2.yoyChange !== undefined && (
+              {m2.yoyChange !== undefined && m2.yoyChange !== null && (
                 <span
                   className="ml-2 px-2 py-0.5 rounded text-xs"
                   style={{
@@ -153,6 +164,66 @@ export function ChinaMacroPanel() {
                   YoY: {m2.yoyChange >= 0 ? '+' : ''}{m2.yoyChange.toFixed(1)}%
                 </span>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Industrial Production */}
+        {other?.industrial_production && ipFormatted && (
+          <div className="flex items-center justify-between p-3 rounded" style={{ backgroundColor: DARK_THEME.background }}>
+            <div className="flex-1">
+              <span className="font-medium" style={{ color: DARK_THEME.text }}>{other.industrial_production.name}</span>
+              <span className="ml-2 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                (月度)
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-semibold" style={{ color: ipFormatted.color }}>
+                {ipFormatted.text}
+              </span>
+              <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                {other.industrial_production.unit}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Unemployment */}
+        {unemployment && unempFormatted && (
+          <div className="flex items-center justify-between p-3 rounded" style={{ backgroundColor: DARK_THEME.background }}>
+            <div className="flex-1">
+              <span className="font-medium" style={{ color: DARK_THEME.text }}>{unemployment.name}</span>
+              <span className="ml-2 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                (月度{unemployment.source === 'static_json' ? ' · 手动更新' : ''})
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-semibold" style={{ color: unempFormatted.color }}>
+                {unempFormatted.text}
+              </span>
+              <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                {unemployment.unit}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* FX Reserves */}
+        {other?.fx_reserves && (
+          <div className="flex items-center justify-between p-3 rounded" style={{ backgroundColor: DARK_THEME.background }}>
+            <div className="flex-1">
+              <span className="font-medium" style={{ color: DARK_THEME.text }}>{other.fx_reserves.name}</span>
+              <span className="ml-2 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                (月度)
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-semibold" style={{ color: DARK_THEME.text }}>
+                {formatLargeValue(other.fx_reserves.value, other.fx_reserves.unit)}
+              </span>
+              <span className="ml-1 text-sm" style={{ color: DARK_THEME.textMuted }}>
+                {other.fx_reserves.unit}
+              </span>
             </div>
           </div>
         )}
@@ -172,11 +243,20 @@ export function ChinaMacroPanel() {
         {m2 && m2.historical.length > 0 && (
           <MiniChart data={chinaMacroBackendToNormalized(m2)} height={80} isDaily={true} />
         )}
+        {other?.industrial_production && other.industrial_production.historical.length > 0 && (
+          <MiniChart data={chinaMacroBackendToNormalized(other.industrial_production)} height={80} isDaily={true} />
+        )}
+        {unemployment && unemployment.historical.length > 0 && (
+          <MiniChart data={chinaMacroBackendToNormalized(unemployment)} height={80} isDaily={true} />
+        )}
+        {other?.fx_reserves && other.fx_reserves.historical.length > 0 && (
+          <MiniChart data={chinaMacroBackendToNormalized(other.fx_reserves)} height={80} isDaily={true} />
+        )}
       </div>
 
       {/* Update Frequency Notice */}
       <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>
-        数据来源: AkShare (国家统计局) | GDP季度更新, CPI/PPI/M2月度更新
+        数据来源: AkShare (国家统计局/外管局) | GDP季度更新, 其他月度更新
       </p>
     </div>
   );
