@@ -59,11 +59,10 @@ export const BINANCE_BASE_URL = `${BACKEND_BASE_URL}/binance`;
 
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
-  // WARNING: BLS free tier = 25 calls/day. With 30-min cache, max 2 calls per hour = 48 calls/day possible
-  // MUST cache aggressively or quota will be exhausted in minutes!
-  BLS: { maxCallsPerDay: 25, minIntervalMs: 3600000, cacheTtlMs: 1800000 },
-  // WARNING: Alpha Vantage free tier = 25 calls/day. With 60-min cache, max 24 calls per day
-  // Indices update slowly, so 60-min cache is acceptable for real-time display
-  AlphaVantage: { maxCallsPerDay: 25, minIntervalMs: 3600000, cacheTtlMs: 3600000 },
+  // BLS free tier = 25 calls/day. 后端已有30分钟缓存+API key配额管控，前端不再硬限速。
+  // 共用同一'BLS' rateLimiter计数器会让多个BLS hook串行排队1小时，导致面板永远加载不出来。
+  BLS: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 1800000 },
+  // Alpha Vantage free tier = 25 calls/day. 同上，后端已缓存1小时，前端不再叠加限速。
+  AlphaVantage: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 3600000 },
   CoinGecko: { maxCallsPerDay: 500, minIntervalMs: 1200, cacheTtlMs: 60000 },
 } as const;

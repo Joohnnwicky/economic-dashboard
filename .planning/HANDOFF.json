@@ -1,58 +1,40 @@
 {
   "version": "1.0",
-  "timestamp": "2026-06-10T18:00:00",
+  "timestamp": "2026-06-13T13:15:29",
   "phase": null,
-  "phase_name": "china-macro-extension",
-  "phase_dir": ".",
+  "phase_name": "us-stocks-tracker",
+  "phase_dir": ".planning",
   "plan": null,
-  "task": 3,
-  "total_tasks": 7,
+  "task": 4,
+  "total_tasks": 5,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "后端缓存层 + 11个新AkShare数据函数", "status": "done", "commit": "pending"},
-    {"id": 2, "name": "失业率爬虫服务（东方财富+静态JSON双保险）", "status": "done", "commit": "pending"},
-    {"id": 3, "name": "前端API类型 + Hooks扩展", "status": "done", "commit": "pending"},
-    {"id": 4, "name": "ChinaPMIPanel面板", "status": "done", "commit": "pending"},
-    {"id": 5, "name": "ChinaTradePanel面板", "status": "done", "commit": "pending"},
-    {"id": 6, "name": "ChinaCreditPanel + 扩展现有面板 + PBOC OMO利率", "status": "done", "commit": "pending"},
-    {"id": 7, "name": "Dashboard集成 + 修复jin10数据排序bug", "status": "done", "progress": "jin10数据修复已完成但后端未重启验证"}
+    {"id": 1, "name": "修复BLS/AlphaVantage前端限速器（共用计数器导致BLS子指标永远loading）", "status": "done", "commit": "pending"},
+    {"id": 2, "name": "新建 src/api/us-stocks.ts — Mag 7 + AVGO/AMD/TSM + DXYZ 配置 + 批量获取", "status": "done", "commit": "pending"},
+    {"id": 3, "name": "新建 src/hooks/useUSStocks.ts — TanStack Query hook（1小时缓存）", "status": "done", "commit": "pending"},
+    {"id": 4, "name": "新建 src/components/indicators/USStocksPanel.tsx — 按category分组展示", "status": "done", "commit": "pending"}
   ],
   "remaining_tasks": [
-    {"id": 8, "name": "修复国际金价无数据问题", "status": "not_started"},
-    {"id": 9, "name": "国际油价换更实时API", "status": "not_started"},
-    {"id": 10, "name": "修复主要汇率加载失败", "status": "not_started"},
-    {"id": 11, "name": "虚拟币增加币安交易量前10币种", "status": "not_started"}
+    {"id": 5, "name": "Dashboard集成：layoutConfig.ts 加 US_STOCKS key/title/order；Dashboard.tsx 加 import 和 componentMap entry", "status": "not_started"}
   ],
-  "blockers": [
-    {"description": "后端uvicorn进程无法从CLI杀掉（Windows权限问题），需要用户手动Ctrl+C重启", "type": "human_action", "workaround": "用户手动关闭终端后重启"},
-    {"description": "jin10数据排序bug已修复（_parse_jin10_series取最后36条而非前36条），但旧进程仍在运行返回旧数据", "type": "technical", "workaround": "重启后端即可"}
-  ],
+  "blockers": [],
   "human_actions_pending": [
-    {"action": "手动关闭后端进程(Ctrl+C)并重启: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000", "context": "修复后jin10数据返回2025年最新数据而非90年代旧数据", "blocking": true}
+    {"action": "刷新浏览器验证美股面板是否正常显示（在task 5完成后）", "context": "Alpha Vantage 25/天 配额，11只股票首次加载将消耗11次。后续命中后端1小时缓存。", "blocking": false}
   ],
   "decisions": [
-    {"decision": "AkShare作为13/14个中国指标的主要数据源", "rationale": "免费无Key，jin10统一格式便于解析，覆盖PMI/贸易/信贷/工业增加值/外汇储备"},
-    {"decision": "失业率用爬虫+静态JSON双保险", "rationale": "NBS API返回403，AkShare函数失效，东方财富爬虫也不稳定"},
-    {"decision": "7天OMO利率手动维护在pboc-rates.json", "rationale": "AkShare无7天OMO利率数据，只有旧的基准利率"},
-    {"decision": "jin10数据从DataFrame末尾取（index -1 = 最新）", "rationale": "验证发现jin10返回数据index 0 = 2005年(最早)，index -1 = 2025年(最新)"}
+    {"decision": "BLS/AlphaVantage前端 minIntervalMs 从 3600000 改为 100", "rationale": "前端 rateLimiter 共用 'BLS' key 让多个BLS hook串行排队1小时。后端已有缓存+配额管控，前端不应叠加硬限速。"},
+    {"decision": "美股个股范围 = Mag 7 + AVGO/AMD/TSM + DXYZ", "rationale": "用户决策：Mag 7 + 半导体扩展（AI算力链） + DXYZ作为SpaceX代理"},
+    {"decision": "SpaceX 用 DXYZ ETF 代理（Destiny Tech100）", "rationale": "DXYZ持仓近50%是SpaceX，盘中实时反映二级市场估值，无需爬虫或付费API"},
+    {"decision": "数据源用 Alpha Vantage 后端代理", "rationale": "后端已有 backend/api/alphavantage.py，1小时缓存，25/天配额够2次完整刷新"},
+    {"decision": "面板按 category 分组（mag7 / semiconductor / spacex-proxy）展示", "rationale": "用户视觉上区分3类资产的不同含义"}
   ],
   "uncommitted_files": [
-    "backend/services/china_macro_service.py",
-    "backend/services/unemployment_service.py",
-    "backend/api/china_macro.py",
-    "src/api/china-macro-backend.ts",
-    "src/hooks/useChinaMacroBackend.ts",
-    "src/hooks/usePBOCRate.ts",
-    "src/hooks/__tests__/usePBOCRate.test.tsx",
-    "src/components/indicators/ChinaPMIPanel.tsx",
-    "src/components/indicators/ChinaTradePanel.tsx",
-    "src/components/indicators/ChinaCreditPanel.tsx",
-    "src/components/indicators/ChinaMacroPanel.tsx",
-    "src/components/indicators/PBOCRatePanel.tsx",
-    "src/components/layout/Dashboard.tsx",
-    "public/data/china-unemployment.json",
-    "public/data/pboc-rates.json"
+    ".planning/STATE.md",
+    "src/constants/api.ts",
+    "src/api/us-stocks.ts",
+    "src/components/indicators/USStocksPanel.tsx",
+    "src/hooks/useUSStocks.ts"
   ],
-  "next_action": "1. 用户手动重启后端验证jin10数据修复 2. 修复金价/油价/汇率/币安前10等问题",
-  "context_notes": "Barclays中国展望报告驱动的指标扩展。核心bug：jin10格式数据排列是从旧到新，之前代码取了前36条（最老数据）。已修复为取最后36条，Python直接调用验证OK。但uvicorn旧进程无法从bash杀掉，需要用户手动重启。"
+  "next_action": "完成Task 5：(1) src/constants/layoutConfig.ts 加 US_STOCKS: 'us-stocks' + PANEL_TITLES 加 '美股头部股票（含SpaceX代理）' + DEFAULT_ORDER 在 US_INDICES 后插入 US_STOCKS。(2) src/components/layout/Dashboard.tsx import USStocksPanel + componentMap 加 'us-stocks': USStocksPanel。(3) 浏览器刷新验证。",
+  "context_notes": "用户的两个独立请求：(1) 美国劳动力市场加载不出 — 已修复（前端限速器问题）。(2) 美股头部+SpaceX跟踪 — 已写完API/hook/panel三个文件，差Dashboard集成2处小改动。本次会话context到75%停手。所有新文件已写好不会丢失。前后端都在运行（任务ID b2re17hen后端 / b6jrt9tsn前端）。"
 }
