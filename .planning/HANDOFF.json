@@ -1,40 +1,41 @@
 {
   "version": "1.0",
-  "timestamp": "2026-06-13T13:15:29",
+  "timestamp": "2026-06-13T14:58:01.933Z",
   "phase": null,
-  "phase_name": "us-stocks-tracker",
+  "phase_name": "us-stocks-enhancement",
   "phase_dir": ".planning",
   "plan": null,
-  "task": 4,
+  "task": 5,
   "total_tasks": 5,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "修复BLS/AlphaVantage前端限速器（共用计数器导致BLS子指标永远loading）", "status": "done", "commit": "pending"},
-    {"id": 2, "name": "新建 src/api/us-stocks.ts — Mag 7 + AVGO/AMD/TSM + DXYZ 配置 + 批量获取", "status": "done", "commit": "pending"},
-    {"id": 3, "name": "新建 src/hooks/useUSStocks.ts — TanStack Query hook（1小时缓存）", "status": "done", "commit": "pending"},
-    {"id": 4, "name": "新建 src/components/indicators/USStocksPanel.tsx — 按category分组展示", "status": "done", "commit": "pending"}
+    {"id": 1, "name": "前端 us-stocks.ts 检查后端 error 字段（修复假 warning bug）", "status": "done", "commit": "uncommitted"},
+    {"id": 2, "name": "后端 AV 串行节流 ≤5/min（asyncio.Lock + 13s 间隔）+ 错误负缓存 60s", "status": "done", "commit": "uncommitted"},
+    {"id": 3, "name": "前端 USStocksPanel 区分日配额耗尽/分钟限速/数据不可用三种文案", "status": "done", "commit": "uncommitted"},
+    {"id": 4, "name": "DXYZ → SPCX 替换（SpaceX 2026-06-12 NASDAQ IPO，正股代码 SPCX，收盘 $160.95）", "status": "done", "commit": "uncommitted"},
+    {"id": 5, "name": "每张股票卡片底部嵌 60px MiniChart 走势线（保留 100 天 historical）", "status": "done", "commit": "uncommitted"}
   ],
-  "remaining_tasks": [
-    {"id": 5, "name": "Dashboard集成：layoutConfig.ts 加 US_STOCKS key/title/order；Dashboard.tsx 加 import 和 componentMap entry", "status": "not_started"}
-  ],
+  "remaining_tasks": [],
   "blockers": [],
   "human_actions_pending": [
-    {"action": "刷新浏览器验证美股面板是否正常显示（在task 5完成后）", "context": "Alpha Vantage 25/天 配额，11只股票首次加载将消耗11次。后续命中后端1小时缓存。", "blocking": false}
+    {"action": "刷新 localhost:5173 验证：(1) 11 只股票全部加载（首次约 2.5 分钟节流排队，二次秒开）(2) 卡片底部出现走势线 (3) SPCX 卡片显示 $160.95，分类标题=SpaceX (SPCX)", "context": "后端节流要起效需重启 uvicorn — 已重启过；前端 Vite HMR 自动热更新", "blocking": false}
   ],
   "decisions": [
-    {"decision": "BLS/AlphaVantage前端 minIntervalMs 从 3600000 改为 100", "rationale": "前端 rateLimiter 共用 'BLS' key 让多个BLS hook串行排队1小时。后端已有缓存+配额管控，前端不应叠加硬限速。"},
-    {"decision": "美股个股范围 = Mag 7 + AVGO/AMD/TSM + DXYZ", "rationale": "用户决策：Mag 7 + 半导体扩展（AI算力链） + DXYZ作为SpaceX代理"},
-    {"decision": "SpaceX 用 DXYZ ETF 代理（Destiny Tech100）", "rationale": "DXYZ持仓近50%是SpaceX，盘中实时反映二级市场估值，无需爬虫或付费API"},
-    {"decision": "数据源用 Alpha Vantage 后端代理", "rationale": "后端已有 backend/api/alphavantage.py，1小时缓存，25/天配额够2次完整刷新"},
-    {"decision": "面板按 category 分组（mag7 / semiconductor / spacex-proxy）展示", "rationale": "用户视觉上区分3类资产的不同含义"}
+    {"decision": "保留 USStockQuote.historical 字段（100 天 AV compact 输出）", "rationale": "MiniChart 需要 historical 渲染走势线；AV TIME_SERIES_DAILY 默认就返回，之前在前端被丢弃属于浪费"},
+    {"decision": "卡片不复用 IndicatorCard，改手写", "rationale": "IndicatorCard 没有给走势线留位置；手写卡片复用同套样式 + 嵌 MiniChart"},
+    {"decision": "SPCX 当作 SpaceX 正股处理（用户提供事实：2026-06-12 NASDAQ IPO，发行价 $135，首日收 $160.95）", "rationale": "AV API 返回的 6/12 单日成交量 5.22 亿股，量级符合 IPO 首日特征，与用户描述吻合"},
+    {"decision": "AV 后端节流 13s 间隔 + 60s 错误负缓存", "rationale": "AV 免费 5次/分钟硬限速；前端 Promise.allSettled 并发 11 个会瞬间打爆。串行排队 13s × 11 ≈ 2.5 分钟首次完整加载，之后命中 1 小时正缓存秒开"}
   ],
   "uncommitted_files": [
-    ".planning/STATE.md",
-    "src/constants/api.ts",
+    "backend/services/alphavantage_service.py",
     "src/api/us-stocks.ts",
-    "src/components/indicators/USStocksPanel.tsx",
-    "src/hooks/useUSStocks.ts"
+    "src/components/indicators/USStocksPanel.tsx"
   ],
-  "next_action": "完成Task 5：(1) src/constants/layoutConfig.ts 加 US_STOCKS: 'us-stocks' + PANEL_TITLES 加 '美股头部股票（含SpaceX代理）' + DEFAULT_ORDER 在 US_INDICES 后插入 US_STOCKS。(2) src/components/layout/Dashboard.tsx import USStocksPanel + componentMap 加 'us-stocks': USStocksPanel。(3) 浏览器刷新验证。",
-  "context_notes": "用户的两个独立请求：(1) 美国劳动力市场加载不出 — 已修复（前端限速器问题）。(2) 美股头部+SpaceX跟踪 — 已写完API/hook/panel三个文件，差Dashboard集成2处小改动。本次会话context到75%停手。所有新文件已写好不会丢失。前后端都在运行（任务ID b2re17hen后端 / b6jrt9tsn前端）。"
+  "untracked_files": [
+    "od-prompt.json",
+    "od-response.txt",
+    "public/pixel-preview.html"
+  ],
+  "next_action": "用户刷新 localhost:5173 验证。验证通过后：commit 三个修改文件 + 决定 untracked 三个文件去留（od-* 是 Open Design 临时产物，public/pixel-preview.html 用途待定）",
+  "context_notes": "美股面板从功能层面已经完整：bug 修复 + 节流 + IPO 替换 + 走势线 = 5/5。SPCX 6/12 IPO 当天 AV 只有 1 个数据点，走势线因 historical.length<2 不渲染，明天起出现。其他 10 只股票（Mag7 + AVGO/AMD/TSM）有 100 天日线立刻可见。两个服务都在跑：后端 8000 任务 bzi22tm6y / 前端 5173 任务 b81v4o3w5。"
 }
