@@ -32,6 +32,7 @@ import { OilPricePanel } from '../indicators/OilPricePanel';
 import { CryptoPanel } from '../indicators/CryptoPanel';
 import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
 import { USIndicesPanel } from '../indicators/USIndicesPanel';
+import { USStocksPanel } from '../indicators/USStocksPanel';
 import { ChineseIndicesPanel } from '../indicators/ChineseIndicesPanel';
 import { ChinaMacroPanel } from '../indicators/ChinaMacroPanel';
 import { ChinaPMIPanel } from '../indicators/ChinaPMIPanel';
@@ -54,6 +55,7 @@ const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'crypto': CryptoPanel,
   'exchange-rates': ExchangeRatesPanel,
   'us-indices': USIndicesPanel,
+  'us-stocks': USStocksPanel,
   'chinese-indices': ChineseIndicesPanel,
   'china-macro': ChinaMacroPanel,
   'china-pmi': ChinaPMIPanel,

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { PanelKey, DEFAULT_ORDER } from '../constants/layoutConfig';
 
 const STORAGE_KEY = 'dashboard-panel-order';
-const ORDER_VERSION = 2;
+const ORDER_VERSION = 3;
 
 export function usePanelOrder() {
   const [order, setOrder] = useState<PanelKey[]>(() => {
