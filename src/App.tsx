@@ -6,7 +6,6 @@ import { ExportDialog } from './components/ui/ExportDialog';
 import { DARK_THEME } from './constants/colors';
 import { useFedRate } from './hooks/useFedRate';
 import { useCrypto } from './hooks/useCrypto';
-import { useEmploymentSubMetrics } from './hooks/useEmploymentSubMetrics';
 import { useInflationSubMetrics } from './hooks/useInflationSubMetrics';
 import { usePCEData } from './hooks/usePCEData';
 import { useChineseIndices } from './hooks/useChineseIndices';
@@ -27,24 +26,22 @@ const queryClient = new QueryClient({
 function AppContent() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
-  // Gather available indicators for export dialog
   const fedRate = useFedRate();
   const crypto = useCrypto();
-  const employment = useEmploymentSubMetrics();
   const inflation = useInflationSubMetrics();
   const pce = usePCEData();
   const chineseIndices = useChineseIndices();
   const pbocRate = usePBOCRate();
 
-  // Combine all indicators for export
+  const pbocIndicators = pbocRate.data ? [pbocRate.data.lpr, pbocRate.data.omo7d] : [];
+
   const allIndicators: NormalizedIndicator[] = [
     fedRate.data ? [fedRate.data] : [],
     crypto.data || [],
-    employment.data || [],
     inflation.data || [],
     pce.data || [],
     chineseIndices.data || [],
-    pbocRate.data ? [pbocRate.data] : [],
+    pbocIndicators,
   ].flat();
 
   return (
@@ -54,8 +51,6 @@ function AppContent() {
     >
       <Header onExportClick={() => setExportDialogOpen(true)} />
       <Dashboard />
-
-      {/* Export Dialog Modal */}
       <ExportDialog
         isOpen={exportDialogOpen}
         onClose={() => setExportDialogOpen(false)}

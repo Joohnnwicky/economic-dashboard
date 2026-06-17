@@ -23,7 +23,6 @@ import { DARK_THEME } from '../../constants/colors';
 // Import all panel content components
 import { FedRatePanel } from '../indicators/FedRatePanel';
 import { TreasuryPanel } from '../indicators/TreasuryPanel';
-import { EmploymentPanel } from '../indicators/EmploymentPanel';
 import { InflationPanel } from '../indicators/InflationPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
 import { DollarIndexPanel } from '../indicators/DollarIndexPanel';
@@ -46,7 +45,6 @@ import { PolymarketPanel } from '../indicators/PolymarketPanel';
 const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'fed-rate': FedRatePanel,
   'treasury': TreasuryPanel,
-  'employment': EmploymentPanel,
   'inflation': InflationPanel,
   'inflation-sub': InflationSubMetricsPanel,
   'dollar-index': DollarIndexPanel,

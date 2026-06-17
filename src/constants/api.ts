@@ -57,6 +57,9 @@ export const ALPHA_VANTAGE_SYMBOLS = {
 // Binance API - 通过后端代理
 export const BINANCE_BASE_URL = `${BACKEND_BASE_URL}/binance`;
 
+// yfinance API - 通过后端代理（无key，无日配额，5分钟缓存）
+export const YFINANCE_BASE_URL = `${BACKEND_BASE_URL}/yfinance`;
+
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
   // BLS free tier = 25 calls/day. 后端已有30分钟缓存+API key配额管控，前端不再硬限速。

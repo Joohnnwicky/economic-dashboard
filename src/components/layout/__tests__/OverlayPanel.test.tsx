@@ -42,7 +42,11 @@ vi.mock('../../../hooks/usePBOCRate', () => ({
 // Mock OverlayComparisonChart
 vi.mock('../../charts/OverlayComparisonChart', () => ({
   OverlayComparisonChart: vi.fn(({ availableIndicators }) => (
-    <div data-testid="overlay-comparison-chart" data-indicator-count={availableIndicators.length}>
+    <div
+      data-testid="overlay-comparison-chart"
+      data-indicator-count={availableIndicators.length}
+      data-indicator-ids={availableIndicators.map((ind: { id?: string }) => ind.id).join(',')}
+    >
       Mocked OverlayComparisonChart
     </div>
   )),
@@ -98,7 +102,10 @@ describe('OverlayPanel', () => {
     } as any);
 
     vi.mocked(pbocHook.usePBOCRate).mockReturnValue({
-      data: { id: 'pboc-lpr1y', name: 'LPR 1年', value: 3.45, unit: '%', timestamp: new Date(), historical: [] },
+      data: {
+        lpr: { id: 'pboc-lpr', name: 'LPR 1年', value: 3.45, unit: '%', timestamp: new Date(), historical: [] },
+        omo7d: { id: 'pboc-omo-7d', name: '7天逆回购', value: 1.5, unit: '%', timestamp: new Date(), historical: [] },
+      },
       isLoading: false,
       isSuccess: true,
     } as any);
@@ -127,6 +134,15 @@ describe('OverlayPanel', () => {
     const chart = screen.getByTestId('overlay-comparison-chart');
     const indicatorCount = chart.getAttribute('data-indicator-count');
     expect(parseInt(indicatorCount || '0')).toBeGreaterThanOrEqual(7);
+  });
+
+  it('passes both PBOC indicators to the comparison chart', () => {
+    render(<OverlayPanel />, { wrapper: createWrapper() });
+
+    const chart = screen.getByTestId('overlay-comparison-chart');
+    expect(chart.getAttribute('data-indicator-ids')).toContain('pboc-lpr');
+    expect(chart.getAttribute('data-indicator-ids')).toContain('pboc-omo-7d');
+    expect(chart.getAttribute('data-indicator-ids')).not.toContain('undefined');
   });
 
   it('shows failed message when all data sources fail', () => {

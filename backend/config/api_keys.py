@@ -29,6 +29,7 @@ class APIConfig:
         'BLS': 1800,        # 30分钟 (配额限制25次/天)
         'AlphaVantage': 3600,  # 1小时 (配额限制25次/天)
         'Binance': 30,      # 30秒 (实时数据)
+        'YFinance': 300,    # 5分钟 (无配额，避免Yahoo限流)
     }
 
     @classmethod

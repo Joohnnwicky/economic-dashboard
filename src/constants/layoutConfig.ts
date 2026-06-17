@@ -1,7 +1,6 @@
 export const PANEL_KEYS = {
   FED_RATE: 'fed-rate',
   TREASURY: 'treasury',
-  EMPLOYMENT: 'employment',
   INFLATION: 'inflation',
   INFLATION_SUB: 'inflation-sub',
   DOLLAR_INDEX: 'dollar-index',
@@ -27,7 +26,6 @@ export type PanelKey = typeof PANEL_KEYS[keyof typeof PANEL_KEYS];
 export const PANEL_TITLES: Record<PanelKey, string> = {
   [PANEL_KEYS.FED_RATE]: '美国联邦基金利率（FFR）',
   [PANEL_KEYS.TREASURY]: '美国国债收益率（US Treasury Yields）',
-  [PANEL_KEYS.EMPLOYMENT]: '美国劳动力市场（U.S. Labor Market）',
   [PANEL_KEYS.INFLATION]: '美国消费者物价指数（CPI）',
   [PANEL_KEYS.INFLATION_SUB]: '通胀细分指标（CPI & PCE）',
   [PANEL_KEYS.DOLLAR_INDEX]: '美元指数（US Dollar Index）',
@@ -36,7 +34,7 @@ export const PANEL_TITLES: Record<PanelKey, string> = {
   [PANEL_KEYS.CRYPTO]: '加密货币行情（Crypto Top 10）',
   [PANEL_KEYS.EXCHANGE_RATES]: '主要汇率（Major Exchange Rates）',
   [PANEL_KEYS.US_INDICES]: '美股指数（US Stock Indices）',
-  [PANEL_KEYS.US_STOCKS]: '美股头部股票（含SpaceX代理）',
+  [PANEL_KEYS.US_STOCKS]: '美股头部股票',
   [PANEL_KEYS.CHINESE_INDICES]: '中国股市指数（Chinese Stock Indices）',
   [PANEL_KEYS.CHINA_MACRO]: '中国宏观经济指标（China Macro）',
   [PANEL_KEYS.CHINA_PMI]: '中国PMI指标（China PMI）',
@@ -52,7 +50,6 @@ export const PANEL_TITLES: Record<PanelKey, string> = {
 export const DEFAULT_ORDER: PanelKey[] = [
   PANEL_KEYS.FED_RATE,
   PANEL_KEYS.TREASURY,
-  PANEL_KEYS.EMPLOYMENT,
   PANEL_KEYS.INFLATION,
   PANEL_KEYS.INFLATION_SUB,
   PANEL_KEYS.DOLLAR_INDEX,

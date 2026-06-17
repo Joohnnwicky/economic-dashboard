@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // Python后端代理 (所有API请求通过后端)
       '/api/backend': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/backend/, '/api'),
       },
@@ -25,12 +25,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/tencent/, ''),
       },
-      // Polymarket Gamma API代理
-      '/api/polymarket': {
-        target: 'https://gamma-api.polymarket.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/polymarket/, ''),
-      },
+      // Polymarket API — 已迁移到后端代理 (/api/backend/polymarket)
     },
   },
   test: {

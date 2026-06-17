@@ -28,7 +28,11 @@ export async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange):
   };
 
   return rateLimiter.call('BLS', async () => {
-    const response = await axios.post<BLSResponse>(BLS_BASE_URL, body);
+    const response = await axios.post<BLSResponse & { error?: string }>(BLS_BASE_URL, body);
+
+    if (response.data?.error) {
+      throw new Error(response.data.error);
+    }
 
     if (!response.data?.Results?.series) {
       throw new Error('BLS response missing Results.series');

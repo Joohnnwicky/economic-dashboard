@@ -1,21 +1,23 @@
 import axios from 'axios';
-import { ALPHA_VANTAGE_BASE_URL } from '../constants/api';
+import { YFINANCE_BASE_URL } from '../constants/api';
+import { HistoricalDataPoint } from '../types/indicator';
 
 export interface USStockQuote {
   symbol: string;
   name: string;
-  category: 'mag7' | 'semiconductor' | 'spacex-proxy';
+  category: 'mag7' | 'semiconductor' | 'spacex';
   value: number;
   change?: {
     value: number;
     percentage: number;
   };
   timestamp: Date;
+  /** 近 100 天日线收盘价，按时间升序 */
+  historical: HistoricalDataPoint[];
   warning?: string;
 }
 
-// Mag 7 + Semiconductor expansion + SpaceX proxy (DXYZ)
-// 排序：按用户决策（Mag 7 → 半导体扩展 → SpaceX 代理）
+// Mag 7 + Semiconductor expansion + SpaceX
 export const TRACKED_STOCKS: Array<{
   symbol: string;
   name: string;
@@ -33,107 +35,29 @@ export const TRACKED_STOCKS: Array<{
   { symbol: 'AVGO', name: '博通（Broadcom）', category: 'semiconductor' },
   { symbol: 'AMD', name: 'AMD', category: 'semiconductor' },
   { symbol: 'TSM', name: '台积电（TSMC）', category: 'semiconductor' },
-  // SpaceX proxy
-  { symbol: 'DXYZ', name: 'SpaceX 代理（Destiny Tech100 ETF）', category: 'spacex-proxy' },
+  // SpaceX (2026-06-12 NASDAQ IPO)
+  { symbol: 'SPCX', name: 'SpaceX', category: 'spacex' },
 ];
 
-interface AlphaVantageResponse {
-  'Meta Data'?: {
-    '2. Symbol': string;
-    '3. Last Refreshed': string;
-  };
-  'Time Series (Daily)'?: Record<string, {
-    '1. open': string;
-    '2. high': string;
-    '3. low': string;
-    '4. close': string;
-    '5. volume': string;
-  }>;
-  warning?: string;
-  symbol?: string;
-}
-
 /**
- * 获取单个美股代码的最新报价
- * 后端做了 1 小时缓存 + 25/天配额管理，遇配额耗尽返回 {warning, symbol}
- */
-export async function getUSStockQuote(
-  symbol: string,
-  name: string,
-  category: USStockQuote['category'],
-): Promise<USStockQuote> {
-  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=compact`;
-
-  const response = await axios.get<AlphaVantageResponse>(url);
-  const data = response.data;
-
-  // 后端配额耗尽时返回 {warning, symbol}
-  if (data.warning) {
-    return {
-      symbol,
-      name,
-      category,
-      value: 0,
-      timestamp: new Date(),
-      warning: data.warning,
-    };
-  }
-
-  const timeSeries = data['Time Series (Daily)'];
-  if (!timeSeries) {
-    throw new Error(`${symbol}: 响应缺少 Time Series (Daily)`);
-  }
-
-  // 按日期降序排序，取最新和前一日
-  const dates = Object.keys(timeSeries).sort().reverse();
-  if (dates.length === 0) {
-    throw new Error(`${symbol}: 无可用数据`);
-  }
-
-  const latest = timeSeries[dates[0]];
-  const previous = dates.length > 1 ? timeSeries[dates[1]] : null;
-
-  const close = parseFloat(latest['4. close']);
-  const prevClose = previous ? parseFloat(previous['4. close']) : null;
-
-  const change = prevClose !== null && prevClose > 0
-    ? {
-        value: close - prevClose,
-        percentage: ((close - prevClose) / prevClose) * 100,
-      }
-    : undefined;
-
-  return {
-    symbol,
-    name,
-    category,
-    value: close,
-    change,
-    timestamp: new Date(dates[0]),
-  };
-}
-
-/**
- * 批量并发获取追踪列表内所有美股报价
- * 单个失败不影响其他，失败的项返回 warning 字段
+ * 批量获取所有追踪美股
+ * 后端 yfinance 一次拿 11 只股票，5 分钟缓存，无配额限制
+ * 后端返回已规范化的数据，直接映射到 USStockQuote
  */
 export async function getTrackedUSStocks(): Promise<USStockQuote[]> {
-  const results = await Promise.allSettled(
-    TRACKED_STOCKS.map(s => getUSStockQuote(s.symbol, s.name, s.category)),
-  );
+  const url = `${YFINANCE_BASE_URL}/us-stocks`;
 
-  return results.map((result, idx) => {
-    if (result.status === 'fulfilled') {
-      return result.value;
-    }
-    const stock = TRACKED_STOCKS[idx];
-    return {
-      symbol: stock.symbol,
-      name: stock.name,
-      category: stock.category,
-      value: 0,
-      timestamp: new Date(),
-      warning: result.reason instanceof Error ? result.reason.message : '加载失败',
-    };
+  const response = await axios.get<USStockQuote[]>(url, {
+    timeout: 60000, // 后端逐个获取需 ~25 秒，设 60 秒足够
   });
+
+  // 后端返回 ISO 字符串时间戳，前端需转 Date 对象
+  return response.data.map(stock => ({
+    ...stock,
+    timestamp: new Date(stock.timestamp as unknown as string),
+    historical: stock.historical.map(h => ({
+      timestamp: new Date(h.timestamp as unknown as string),
+      value: h.value,
+    })),
+  }));
 }

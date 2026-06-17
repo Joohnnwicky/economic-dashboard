@@ -53,9 +53,12 @@ async def fetch_binance_ticker(symbol: str = 'BTCUSDT') -> dict:
     url = f"{APIConfig.BINANCE_BASE_URL}/ticker/24hr"
     params = {'symbol': symbol}
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url, params=params)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'error': f'网络连接失败: {type(e).__name__}', 'symbol': symbol}
 
     # 缓存结果
     if 'lastPrice' in data:
@@ -94,9 +97,12 @@ async def fetch_binance_klines(
         'limit': limit,
     }
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url, params=params)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'klines': [], 'symbol': symbol, 'error': f'网络连接失败: {type(e).__name__}'}
 
     # 缓存结果
     if isinstance(data, list) and len(data) > 0:
@@ -207,9 +213,12 @@ async def fetch_top_volume_symbols(top_n: int = 10) -> list:
 
     url = f"{APIConfig.BINANCE_BASE_URL}/ticker/24hr"
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout):
+        return []
 
     if not isinstance(data, list):
         return []

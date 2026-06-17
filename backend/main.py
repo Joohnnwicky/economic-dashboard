@@ -18,6 +18,8 @@ from api.alphavantage import router as alphavantage_router
 from api.binance import router as binance_router
 from api.oil import router as oil_router
 from api.frankfurter import router as frankfurter_router
+from api.polymarket import router as polymarket_router
+from api.yfinance import router as yfinance_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
@@ -91,6 +93,8 @@ app.include_router(alphavantage_router, prefix="/api")
 app.include_router(binance_router, prefix="/api")
 app.include_router(oil_router, prefix="/api")
 app.include_router(frankfurter_router, prefix="/api")
+app.include_router(polymarket_router, prefix="/api")
+app.include_router(yfinance_router, prefix="/api")
 
 
 @app.get("/")

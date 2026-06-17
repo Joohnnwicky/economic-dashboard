@@ -26,9 +26,15 @@ async def proxy_frankfurter_rates(
         params['to'] = to_date
 
     url = f'{FRANKFURTER_BASE}/v2/rates'
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(url, params=params)
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(url, params=params)
+            return JSONResponse(
+                content=response.json(),
+                status_code=response.status_code,
+            )
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout):
         return JSONResponse(
-            content=response.json(),
-            status_code=response.status_code,
+            content={'error': '汇率数据源连接失败，请稍后重试'},
+            status_code=502,
         )

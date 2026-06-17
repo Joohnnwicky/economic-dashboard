@@ -1,6 +1,5 @@
 import { useFedRate } from '../../hooks/useFedRate';
 import { useCrypto } from '../../hooks/useCrypto';
-import { useEmploymentSubMetrics } from '../../hooks/useEmploymentSubMetrics';
 import { useInflationSubMetrics } from '../../hooks/useInflationSubMetrics';
 import { usePCEData } from '../../hooks/usePCEData';
 import { useChineseIndices } from '../../hooks/useChineseIndices';
@@ -17,21 +16,21 @@ export function OverlayPanel() {
   // Gather all indicators from hooks
   const fedRate = useFedRate();
   const crypto = useCrypto();
-  const employment = useEmploymentSubMetrics();
   const inflation = useInflationSubMetrics();
   const pce = usePCEData();
   const chineseIndices = useChineseIndices();
   const pbocRate = usePBOCRate();
 
   // Combine all available indicators (ignore loading state for partial display)
+  const pbocIndicators = pbocRate.data ? [pbocRate.data.lpr, pbocRate.data.omo7d] : [];
+
   const allIndicators: NormalizedIndicator[] = [
     fedRate.data ? [fedRate.data] : [],
     crypto.data || [],
-    employment.data || [],
     inflation.data || [],
     pce.data || [],
     chineseIndices.data || [],
-    pbocRate.data ? [pbocRate.data] : [],
+    pbocIndicators,
   ].flat();
 
   // Show chart if we have at least 2 indicators
@@ -41,7 +40,6 @@ export function OverlayPanel() {
   const allFailed = allIndicators.length === 0 &&
     !fedRate.isLoading &&
     !crypto.isLoading &&
-    !employment.isLoading &&
     !inflation.isLoading &&
     !pce.isLoading &&
     !chineseIndices.isLoading &&

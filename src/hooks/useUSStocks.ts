@@ -2,20 +2,19 @@ import { useQuery } from '@tanstack/react-query';
 import { getTrackedUSStocks } from '../api/us-stocks';
 
 /**
- * Hook for tracking US stocks (Mag 7 + Semiconductor + SpaceX proxy)
+ * Hook for tracking US stocks (Mag 7 + Semiconductor + SpaceX)
  *
- * 数据来源：Alpha Vantage（后端代理，1小时缓存）
- * 配额：25次/天。后端缓存意味着每股每小时最多调1次。
- * 11只股票 × 每天2次完整刷新 = 22次/天，刚好在配额内。
+ * 数据来源：yfinance（后端代理，5分钟缓存）
+ * 无日配额限制，后端一次获取全部 11 只股票
  */
 export function useUSStocks() {
   return useQuery({
     queryKey: ['us-stocks-tracked'],
     queryFn: getTrackedUSStocks,
-    staleTime: 60 * 60 * 1000,        // 1小时（后端也缓存1小时）
-    gcTime: 4 * 60 * 60 * 1000,       // 4小时
-    refetchInterval: 60 * 60 * 1000,  // 每小时刷新一次
-    retry: 1,
-    refetchOnWindowFocus: false,      // 切换标签页不重拉，省配额
+    staleTime: 5 * 60 * 1000,           // 5分钟（匹配后端缓存）
+    gcTime: 30 * 60 * 1000,            // 30分钟
+    refetchInterval: 5 * 60 * 1000,    // 5分钟自动刷新
+    retry: 2,
+    refetchOnWindowFocus: true,        // 无配额压力，可以刷新
   });
 }
