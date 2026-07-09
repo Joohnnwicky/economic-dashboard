@@ -40,7 +40,7 @@ export function MultiSeriesChart({
           justifyContent: 'center',
           backgroundColor: DARK_THEME.background,
           color: DARK_THEME.textMuted,
-          borderRadius: '8px',
+          borderRadius: '0px',
         }}
       >
         No data to display
@@ -164,7 +164,7 @@ export function MultiSeriesChart({
           lineStyle: { color: DARK_THEME.accent[0] },
           areaStyle: { color: DARK_THEME.accent[0], opacity: 0.3 },
         },
-        fillerColor: 'rgba(88, 166, 255, 0.2)',
+        fillerColor: 'rgba(140, 154, 224, 0.25)',
         borderColor: DARK_THEME.gridLine,
         handleStyle: {
           color: DARK_THEME.accent[0],

@@ -47,6 +47,12 @@ public/pixel-preview.html
 *.tar
 *-image.tar
 
+# Local-only deploy script (contains NAS SSH credentials)
+deploy_nas.py
+
+# Claude Code local settings
+.claude/settings.local.json
+
 # Cache files
 *_cache.json
 housing_price_cache.json

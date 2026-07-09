@@ -49,28 +49,31 @@ export function HousingPricePanel() {
         <div className="text-sm mb-2 font-medium" style={{ color: DARK_THEME.textMuted }}>
           全国房价排行 TOP10
         </div>
-        <div className="space-y-1">
-          {topCities.map((city, idx) => (
-            <div key={city.city} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <span className="w-5 text-center" style={{ color: DARK_THEME.accent[idx % 4] }}>
-                  #{city.rank}
-                </span>
-                <span style={{ color: DARK_THEME.text }}>{city.city}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span style={{ color: DARK_THEME.text }}>
-                  {city.price.toLocaleString()}元/㎡
-                </span>
-                {city.change !== null && (
-                  <span style={{ color: city.change > 0 ? DARK_THEME.up : DARK_THEME.down }}>
-                    {city.change > 0 ? '+' : ''}{city.change.toFixed(2)}%
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid #000' }}>
+              <th className="text-left font-sans font-bold py-1 pr-2" style={{ color: DARK_THEME.textMuted }}>#</th>
+              <th className="text-left font-sans font-bold py-1 px-2" style={{ color: DARK_THEME.textMuted }}>城市</th>
+              <th className="text-right font-sans font-bold py-1 px-2" style={{ color: DARK_THEME.textMuted }}>元/㎡</th>
+              <th className="text-right font-sans font-bold py-1 pl-2" style={{ color: DARK_THEME.textMuted }}>涨跌</th>
+            </tr>
+          </thead>
+          <tbody>
+            {topCities.map((city, idx) => (
+              <tr key={city.city} style={{ borderBottom: '1px solid #000' }}>
+                <td className="py-1 pr-2" style={{ color: DARK_THEME.accent[idx % 4] }}>#{city.rank}</td>
+                <td className="py-1 px-2" style={{ color: DARK_THEME.text }}>{city.city}</td>
+                <td className="py-1 px-2 text-right" style={{ color: DARK_THEME.text }}>{city.price.toLocaleString()}</td>
+                <td
+                  className="py-1 pl-2 text-right"
+                  style={{ color: city.change !== null ? (city.change > 0 ? DARK_THEME.up : DARK_THEME.down) : DARK_THEME.textMuted }}
+                >
+                  {city.change !== null ? `${city.change > 0 ? '+' : ''}${city.change.toFixed(2)}%` : '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* 石家庄详情 */}

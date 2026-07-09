@@ -58,7 +58,7 @@ export function USStocksPanel() {
           >
             {group.label}
           </h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {group.stocks.map(stock => (
               <USStockCard key={stock.symbol} stock={stock} />
             ))}
@@ -105,7 +105,7 @@ function USStockCard({ stock }: { stock: USStockQuote }) {
         <div className="flex items-center gap-2 mt-2">
           <span
             style={{
-              color: stock.change.percentage >= 0 ? DARK_THEME.accent[1] : DARK_THEME.accent[2],
+              color: stock.change.percentage >= 0 ? DARK_THEME.positive : DARK_THEME.negative,
             }}
           >
             {stock.change.percentage >= 0 ? '+' : ''}{stock.change.percentage.toFixed(2)}%
