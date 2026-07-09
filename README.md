@@ -7,6 +7,7 @@
 [![ECharts](https://img.shields.io/badge/ECharts-5.5-AA344D?logo=apache)](https://echarts.apache.org/)
 
 一个本地运行的全球经济指标实时监控看板，整合展示美联储利率、美国就业数据、通胀数据、加密货币行情、A股/美股指数、中国央行利率等核心经济指标。专业金融终端风格暗色界面，支持历史走势分析、跨市场对比和数据导出。
+
 <img width="1440" height="8614" alt="FireShot Capture 034 - 全球经济指标看板 -  192 168 31 153" src="https://github.com/user-attachments/assets/e9035abb-1aaa-41b0-86f5-71b4207029a1" />
 
 
