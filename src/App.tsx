@@ -46,7 +46,7 @@ function AppContent() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="min-h-screen flex flex-col dell-frame max-w-[1600px] mx-auto md:my-6"
       style={{ backgroundColor: DARK_THEME.background }}
     >
       <Header onExportClick={() => setExportDialogOpen(true)} />

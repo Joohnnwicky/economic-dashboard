@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
-import { DARK_THEME } from '../../constants/colors';
 
 interface HeaderProps {
   onExportClick?: () => void;
@@ -21,43 +20,35 @@ export function Header({ onExportClick }: HeaderProps) {
 
   return (
     <header
-      className="px-4 py-3 border-b flex items-center justify-between"
-      style={{
-        backgroundColor: DARK_THEME.panel,
-        borderColor: DARK_THEME.gridLine,
-      }}
+      className="dell-banner px-4 py-3 flex items-center justify-between"
+      style={{ borderBottom: '1px solid #000' }}
     >
       {/* Title */}
       <div>
-        <h1 className="text-xl font-bold" style={{ color: DARK_THEME.text }}>
+        <h1 className="font-display text-2xl tracking-tight" style={{ color: '#ffffff' }}>
           全球经济指标看板
         </h1>
-        <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-          实时监控 · 美联储利率 · 就业数据 · 通胀指标 · 加密货币 · 美股指数
+        <p className="text-sm font-sans" style={{ color: '#cccccc' }}>
+          实时监控 · 美联储利率 · 通胀 · 加密货币 · 美股指数
         </p>
       </div>
 
-      {/* Right side: Export button and Current Time */}
+      {/* Right side: LIVE callout (phone-callout style) + Export sticker */}
       <div className="flex items-center gap-4">
-        {/* Export Button */}
+        <div className="dell-phone-callout dell-bevel px-2 py-1 text-right">
+          <div className="text-[10px] leading-none">实时 LIVE</div>
+          <div className="text-sm leading-tight">
+            {format(currentTime, 'yyyy-MM-dd HH:mm', { locale: zhCN })}
+          </div>
+        </div>
         {onExportClick && (
           <button
             onClick={onExportClick}
-            className="px-3 py-1 bg-[#3fb950] text-[#0d1117] rounded hover:bg-[#3fb950]/80 text-sm font-medium"
+            className="dell-sticker dell-bevel px-3 py-1 text-sm"
           >
-            导出数据
+            导出 DATA
           </button>
         )}
-
-        {/* Current Time */}
-        <div className="text-right">
-          <p className="text-sm font-medium" style={{ color: DARK_THEME.text }}>
-            {format(currentTime, 'yyyy-MM-dd HH:mm', { locale: zhCN })}
-          </p>
-          <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>
-            {format(currentTime, 'EEEE', { locale: zhCN })}
-          </p>
-        </div>
       </div>
     </header>
   );

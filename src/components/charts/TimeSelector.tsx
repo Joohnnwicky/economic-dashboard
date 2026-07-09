@@ -1,5 +1,4 @@
 import { TimeRange } from '../../types/api';
-import { DARK_THEME } from '../../constants/colors';
 
 interface TimeSelectorProps {
   value: TimeRange;
@@ -25,11 +24,11 @@ export function TimeSelector({ value, onChange }: TimeSelectorProps) {
         <button
           key={option}
           onClick={() => onChange(option)}
-          className="px-3 py-1 rounded text-sm transition-colors"
+          className="px-3 py-1 text-sm font-sans font-bold transition-colors"
           style={{
-            backgroundColor: value === option ? DARK_THEME.accent[0] : DARK_THEME.panel,
-            color: value === option ? DARK_THEME.background : DARK_THEME.text,
-            border: `1px solid ${DARK_THEME.gridLine}`,
+            backgroundColor: value === option ? '#000000' : '#ffffff',
+            color: value === option ? '#ffffff' : '#000000',
+            border: '1px solid #000000',
           }}
         >
           {TIME_LABELS[option]}

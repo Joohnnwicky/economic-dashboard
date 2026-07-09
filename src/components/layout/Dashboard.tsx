@@ -14,11 +14,11 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { usePanelOrder } from '../../hooks/useGridLayout';
-import { PANEL_TITLES, PanelKey } from '../../constants/layoutConfig';
+import { PANEL_TITLES, PanelKey, DEFAULT_ORDER } from '../../constants/layoutConfig';
+import { RIBBON_TINTS } from '../../constants/colors';
 import { DashboardItem } from './DashboardItem';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
-import { DARK_THEME } from '../../constants/colors';
 
 // Import all panel content components
 import { FedRatePanel } from '../indicators/FedRatePanel';
@@ -65,6 +65,17 @@ const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'polymarket': PolymarketPanel,
 };
 
+// Panels flagged with a yellow "NEW!" burst sticker (recent additions).
+const NEW_PANELS: Set<PanelKey> = new Set<PanelKey>([
+  'us-stocks',
+  'housing-price',
+  'polymarket',
+]);
+
+// Stable tint per panel keyed by its default position, so dragging doesn't reshuffle colors.
+const tintFor = (key: PanelKey): string =>
+  RIBBON_TINTS[DEFAULT_ORDER.indexOf(key) % RIBBON_TINTS.length];
+
 export function Dashboard() {
   const { order, movePanel, resetOrder } = usePanelOrder();
 
@@ -91,8 +102,8 @@ export function Dashboard() {
       <div className="mb-4 flex justify-end">
         <button
           onClick={resetOrder}
-          className="px-3 py-1 rounded text-sm hover:bg-[#21262d] transition-colors"
-          style={{ color: DARK_THEME.textMuted }}
+          className="px-3 py-1 text-sm font-sans font-bold transition-colors hover:bg-[#000] hover:text-white"
+          style={{ color: '#000', border: '1px solid #000', backgroundColor: '#fff' }}
         >
           重置布局
         </button>
@@ -100,12 +111,21 @@ export function Dashboard() {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 items-start"
+            style={{ gridAutoRows: '8px', gridAutoFlow: 'dense', rowGap: '8px', columnGap: '16px' }}
+          >
             {order.map((key) => {
               const Component = COMPONENT_MAP[key];
               if (!Component) return null;
               return (
-                <DashboardItem key={key} panelKey={key} title={PANEL_TITLES[key]}>
+                <DashboardItem
+                  key={key}
+                  panelKey={key}
+                  title={PANEL_TITLES[key]}
+                  tint={tintFor(key)}
+                  isNew={NEW_PANELS.has(key)}
+                >
                   <Component />
                 </DashboardItem>
               );
@@ -119,13 +139,15 @@ export function Dashboard() {
       </div>
 
       <footer
-        className="mt-8 text-center py-4 border-t"
-        style={{ borderColor: DARK_THEME.gridLine, color: DARK_THEME.textMuted }}
+        className="mt-8 text-center py-4 border-t font-serif"
+        style={{ borderColor: '#000', backgroundColor: '#fff', color: '#000' }}
       >
-        <p className="text-sm">
+        <p className="text-xs">
           全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage, AkShare, 东方财富
         </p>
         <p className="text-xs mt-2">
+          <a href="#" className="underline" style={{ color: '#0000ee' }}>Copyright</a>
+          {' · '}
           本工具仅供个人使用，数据可能存在延迟或误差
         </p>
       </footer>
