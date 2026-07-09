@@ -2,7 +2,6 @@
 yfinance US stock data routes - 无API Key，5分钟缓存
 """
 from fastapi import APIRouter
-from typing import Optional
 from services.yfinance_service import fetch_us_stocks_batch, fetch_us_stock_single
 
 router = APIRouter()

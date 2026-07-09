@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
-import { ALPHA_VANTAGE_BASE_URL, ALPHA_VANTAGE_SYMBOLS, RATE_LIMITS } from '../constants/api';
+import { ALPHA_VANTAGE_BASE_URL, RATE_LIMITS } from '../constants/api';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 import { AlphaVantageDailyResponse } from './types';
 import { parseUTCDate } from '../utils/utc';
@@ -9,75 +9,6 @@ import { parseUTCDate } from '../utils/utc';
 // CRITICAL: Alpha Vantage free tier = 25 calls/day
 let alphaVantageCallCount = 0;
 const MAX_AV_CALLS_PER_DAY = 25;
-
-// Helper to map ETF symbol to index name
-function getIndexName(symbol: string): string {
-  const names: Record<string, string> = {
-    'DIA': '道琼斯指数 (DIA ETF)',
-    'QQQ': '纳斯达克指数 (QQQ ETF)',
-    'SPY': '标普500指数 (SPY ETF)',
-    'DJI': '道琼斯指数',
-    'NASDAQ': '纳斯达克指数',
-    'SPX': '标普500指数',
-    'GLD': '黄金ETF (GLD - SPDR Gold Shares)',
-  };
-  return names[symbol] || symbol;
-}
-
-/**
- * Get daily time series for an index
- * @param symbol - Alpha Vantage symbol (DJI, NASDAQ, SPX)
- * @returns NormalizedIndicator with historical data (limited to 365 days)
- */
-export async function getIndexData(symbol: string): Promise<NormalizedIndicator> {
-  const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${symbol}`;
-
-  return rateLimiter.call('AlphaVantage', async () => {
-    const response = await axios.get<AlphaVantageDailyResponse>(url);
-
-    if (!response.data?.['Time Series (Daily)']) {
-      throw new Error('Alpha Vantage response missing Time Series (Daily)');
-    }
-
-    const timeSeries = response.data['Time Series (Daily)'];
-
-    const historical: HistoricalDataPoint[] = Object.entries(timeSeries)
-      .map(([dateStr, values]) => ({
-        timestamp: parseUTCDate(dateStr),
-        value: parseFloat(values['4. close']),
-      }))
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-
-    const limitedHistorical = historical.slice(-365);
-    const current = limitedHistorical[limitedHistorical.length - 1];
-
-    return {
-      id: symbol.toLowerCase(),
-      name: getIndexName(symbol),
-      value: current?.value || 0,
-      unit: 'index',
-      timestamp: current?.timestamp || new Date(),
-      historical: limitedHistorical,
-    };
-  }, RATE_LIMITS.AlphaVantage);
-}
-
-/**
- * Get all US indices data in parallel
- * @returns Array of NormalizedIndicator for DJI, NASDAQ, SPX
- */
-export async function getAllIndicesData(): Promise<NormalizedIndicator[]> {
-  const symbols = [
-    ALPHA_VANTAGE_SYMBOLS.DOW_JONES,
-    ALPHA_VANTAGE_SYMBOLS.NASDAQ,
-    ALPHA_VANTAGE_SYMBOLS.SP500,
-  ];
-
-  // Fetch all indices in parallel
-  const results = await Promise.all(symbols.map(symbol => getIndexData(symbol)));
-
-  return results;
-}
 
 /**
  * Get GLD ETF data (Gold price proxy)

@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OverlayPanel } from '../OverlayPanel';
 import * as fedRateHook from '../../../hooks/useFedRate';
 import * as cryptoHook from '../../../hooks/useCrypto';
-import * as employmentHook from '../../../hooks/useEmploymentSubMetrics';
 import * as inflationHook from '../../../hooks/useInflationSubMetrics';
 import * as pceHook from '../../../hooks/usePCEData';
 import * as chineseHook from '../../../hooks/useChineseIndices';
@@ -17,10 +16,6 @@ vi.mock('../../../hooks/useFedRate', () => ({
 
 vi.mock('../../../hooks/useCrypto', () => ({
   useCrypto: vi.fn(),
-}));
-
-vi.mock('../../../hooks/useEmploymentSubMetrics', () => ({
-  useEmploymentSubMetrics: vi.fn(),
 }));
 
 vi.mock('../../../hooks/useInflationSubMetrics', () => ({
@@ -70,13 +65,6 @@ describe('OverlayPanel', () => {
       ],
       isLoading: false,
       isSuccess: true,
-    } as any);
-
-    vi.mocked(employmentHook.useEmploymentSubMetrics).mockReturnValue({
-      data: [
-        { id: 'labor', name: '劳动参与率', value: 62.5, unit: '%', timestamp: new Date(), historical: [] },
-      ],
-      isLoading: false,
     } as any);
 
     vi.mocked(inflationHook.useInflationSubMetrics).mockReturnValue({
@@ -152,10 +140,6 @@ describe('OverlayPanel', () => {
       data: undefined,
     } as any);
     vi.mocked(cryptoHook.useCrypto).mockReturnValue({
-      isLoading: false,
-      data: [],
-    } as any);
-    vi.mocked(employmentHook.useEmploymentSubMetrics).mockReturnValue({
       isLoading: false,
       data: [],
     } as any);

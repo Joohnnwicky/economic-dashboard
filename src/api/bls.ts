@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { rateLimiter } from './rate-limiter';
-import { BLS_BASE_URL, BLS_SERIES, RATE_LIMITS } from '../constants/api';
-import { NormalizedIndicator } from '../types/indicator';
+import { BLS_BASE_URL, RATE_LIMITS } from '../constants/api';
 import { TimeRange } from '../types/api';
 import { BLSResponse } from './types';
 import { parseBLSDate, calculateStartDate } from '../utils/utc';
@@ -57,42 +56,4 @@ export async function fetchBLSSeries(seriesIds: string[], timeRange: TimeRange):
 
     return result;
   }, RATE_LIMITS.BLS);
-}
-
-// Get Employment data (NFP + Unemployment Rate)
-export async function getEmploymentData(timeRange: TimeRange): Promise<NormalizedIndicator[]> {
-  const seriesIds = [BLS_SERIES.NFP, BLS_SERIES.UNEMPLOYMENT_RATE];
-  const data = await fetchBLSSeries(seriesIds, timeRange);
-
-  return seriesIds.map(seriesId => {
-    const seriesData = data[seriesId];
-    const current = seriesData?.data[seriesData.data.length - 1];
-
-    return {
-      id: seriesId === BLS_SERIES.NFP ? 'nfp' : 'unemployment-rate',
-      name: seriesId === BLS_SERIES.NFP ? '非农就业人数（NFP Nonfarm Payrolls）' : '失业率（UR Unemployment Rate）',
-      value: current?.value || 0,
-      unit: seriesId === BLS_SERIES.NFP ? 'K' : '%',
-      timestamp: current?.timestamp || new Date(),
-      historical: seriesData?.data || [],
-    };
-  });
-}
-
-// Get CPI inflation data
-export async function getInflationData(timeRange: TimeRange): Promise<NormalizedIndicator> {
-  const seriesIds = [BLS_SERIES.CPI];
-  const data = await fetchBLSSeries(seriesIds, timeRange);
-
-  const cpiData = data[BLS_SERIES.CPI]?.data || [];
-  const current = cpiData[cpiData.length - 1];
-
-  return {
-    id: 'cpi',
-    name: 'CPI消费者物价指数',
-    value: current?.value || 0,
-    unit: 'index',
-    timestamp: current?.timestamp || new Date(),
-    historical: cpiData,
-  };
 }

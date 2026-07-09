@@ -18,15 +18,6 @@ vi.mock('../../../stores/dashboardStore', () => ({
   useDashboardStore: vi.fn(() => ({ timeRange: '1Y' })),
 }));
 
-vi.mock('../../layout/GridPanel', () => ({
-  GridPanel: vi.fn(({ title, children }) => (
-    <div data-testid="grid-panel">
-      <h2>{title}</h2>
-      {children}
-    </div>
-  )),
-}));
-
 vi.mock('../../charts/FedRateChart', () => ({
   FedRateChart: vi.fn(() => <div data-testid="fed-rate-chart">FedRateChart</div>),
 }));
@@ -87,7 +78,7 @@ describe('FedRatePanel', () => {
     } as any);
 
     render(<FedRatePanel />, { wrapper: createWrapper() });
-    expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('fed-rate-chart')).toBeInTheDocument();
   });
 
   it('calls useFOMCTargetRates for DFEDTARU data', () => {
@@ -169,7 +160,7 @@ describe('FedRatePanel', () => {
     } as any);
 
     render(<FedRatePanel />, { wrapper: createWrapper() });
-    expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
+    expect(screen.queryByTestId('fed-rate-chart')).not.toBeInTheDocument();
   });
 
   it('Error handling for FOMC fetch failure', () => {
@@ -194,6 +185,6 @@ describe('FedRatePanel', () => {
     } as any);
 
     render(<FedRatePanel />, { wrapper: createWrapper() });
-    expect(screen.getByTestId('grid-panel')).toBeInTheDocument();
+    expect(screen.getByText(/FOMC数据加载失败/)).toBeInTheDocument();
   });
 });

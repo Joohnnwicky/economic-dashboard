@@ -2,7 +2,6 @@
 Binance API代理路由 - 无需API Key，代理绕过地理限制
 """
 from fastapi import APIRouter, Query
-from typing import Optional, List
 from services.binance_service import (
     fetch_binance_ticker,
     fetch_binance_klines,
