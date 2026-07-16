@@ -5,19 +5,12 @@ import { parseUTCDate } from '../utils/utc';
 
 // 使用nginx代理路径
 const TENCENT_FINANCE_URL = '/api/tencent';
-const EASTMONEY_KLINE_URL = '/api/eastmoneykline';
 
 // Rate limit configuration
 const TENCENT_RATE_LIMIT = {
   maxCallsPerDay: 1000,
   minIntervalMs: 60000,  // 60 seconds minimum interval
   cacheTtlMs: 3600000,   // 60 minutes cache TTL
-};
-
-const EASTMONEY_KLINE_RATE_LIMIT = {
-  maxCallsPerDay: 100,
-  minIntervalMs: 60000,
-  cacheTtlMs: 3600000,
 };
 
 // A股指数代码映射（东方财富secid格式：市场代码.指数代码）
@@ -98,5 +91,3 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
     return parsedData;
   }, TENCENT_RATE_LIMIT);
 }
-
-// Rate limit configuration

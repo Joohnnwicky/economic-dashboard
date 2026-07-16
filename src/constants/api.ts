@@ -30,9 +30,6 @@ export const FRED_CHINA_SERIES = {
   // IP: 'CHNIPNINDXMEI',     // China Industrial Production Index (series已失效)
 } as const;
 
-// CoinGecko API - 通过后端代理（无key需求）
-export const COINGECKO_BASE_URL = `${BACKEND_BASE_URL}/coingecko`;
-
 // BLS API - 通过后端代理 (去掉尾部斜杠避免307重定向)
 export const BLS_BASE_URL = `${BACKEND_BASE_URL}/bls/timeseries/data`;
 
@@ -67,5 +64,4 @@ export const RATE_LIMITS = {
   BLS: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 1800000 },
   // Alpha Vantage free tier = 25 calls/day. 同上，后端已缓存1小时，前端不再叠加限速。
   AlphaVantage: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 3600000 },
-  CoinGecko: { maxCallsPerDay: 500, minIntervalMs: 1200, cacheTtlMs: 60000 },
 } as const;

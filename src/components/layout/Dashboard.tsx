@@ -143,7 +143,7 @@ export function Dashboard() {
         style={{ borderColor: '#000', backgroundColor: '#fff', color: '#000' }}
       >
         <p className="text-xs">
-          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, CoinGecko, Alpha Vantage, AkShare, 东方财富
+          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, Alpha Vantage, AkShare, Binance, 东方财富
         </p>
         <p className="text-xs mt-2">
           <a href="#" className="underline" style={{ color: '#0000ee' }}>Copyright</a>

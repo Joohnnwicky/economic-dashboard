@@ -5,11 +5,6 @@ import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
 import { AlphaVantageDailyResponse } from './types';
 import { parseUTCDate } from '../utils/utc';
 
-// Track daily call count for quota warning
-// CRITICAL: Alpha Vantage free tier = 25 calls/day
-let alphaVantageCallCount = 0;
-const MAX_AV_CALLS_PER_DAY = 25;
-
 /**
  * Get GLD ETF data (Gold price proxy)
  * Uses backend cache to avoid Alpha Vantage API quota limits
@@ -41,18 +36,7 @@ export async function getGoldETFData(): Promise<NormalizedIndicator> {
     console.warn('[Gold] Backend unavailable, falling back to Alpha Vantage');
   }
 
-  // Fallback to Alpha Vantage API
-  const apiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('VITE_ALPHA_VANTAGE_API_KEY not set in .env.local');
-  }
-
-  // Track quota
-  alphaVantageCallCount++;
-  console.warn(`[Alpha Vantage] Call #${alphaVantageCallCount} of ${MAX_AV_CALLS_PER_DAY} daily quota (GLD)`);
-
-  // Fallback to Alpha Vantage API (via backend proxy)
+  // Fallback to Alpha Vantage API (via backend proxy - key injected server-side)
   const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=GLD`;
 
   return rateLimiter.call('AlphaVantage', async () => {
