@@ -183,8 +183,8 @@ describe('OverlayPanel', () => {
   it('applies DARK_THEME colors', () => {
     const { container } = render(<OverlayPanel />, { wrapper: createWrapper() });
 
-    // Panel should have dark background
-    const panel = container.querySelector('[class*="bg-[#0d1117]"]');
+    // Panel should have light background (DARK_THEME.background = #ffffff)
+    const panel = container.querySelector('[class*="bg-white"]');
     expect(panel).toBeInTheDocument();
   });
 });

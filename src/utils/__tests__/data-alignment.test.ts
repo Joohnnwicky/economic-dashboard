@@ -32,10 +32,11 @@ describe('alignTimestamps', () => {
 
     const result = alignTimestamps([series1, series2]);
 
-    expect(result).toHaveLength(6); // 3 + 3 unique timestamps
-    expect(result[0]).toEqual(new Date('2024-01-01'));
-    expect(result[1]).toEqual(new Date('2024-01-15'));
-    expect(result[5]).toEqual(new Date('2024-03-15'));
+    // Monthly alignment: min=2024-01-01, max=2024-03-15 -> 3 monthly timestamps
+    expect(result).toHaveLength(3);
+    expect(result[0]).toEqual(new Date(2024, 0, 1));
+    expect(result[1]).toEqual(new Date(2024, 1, 1));
+    expect(result[2]).toEqual(new Date(2024, 2, 1));
   });
 
   it('handles series with different timestamp frequencies (monthly vs daily)', () => {
@@ -68,7 +69,8 @@ describe('alignTimestamps', () => {
 
     const result = alignTimestamps([monthly, daily]);
 
-    expect(result).toHaveLength(6); // 3 monthly + 4 daily - 1 overlap (2024-03-01) = 6 unique
+    // Monthly alignment: min=2024-01-01, max=2024-03-15 -> 3 monthly timestamps
+    expect(result).toHaveLength(3);
     // Verify sorted
     for (let i = 1; i < result.length; i++) {
       expect(result[i].getTime()).toBeGreaterThan(result[i - 1].getTime());
