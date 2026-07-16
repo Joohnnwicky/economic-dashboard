@@ -133,5 +133,8 @@ async def get_crypto_signals() -> Dict:
         'aboveMa200': ma_trend['aboveMa200'],
         'timestamp': datetime.now().isoformat(),
     }
-    CryptoSignalsCache.set(result)
+    # 仅在恐惧贪婪成功时长缓存；alternative.me 抖动返回 None 时不缓存，
+    # 下次请求立即重试，避免单点失败被锁存 1 小时
+    if result['fearGreed'] is not None:
+        CryptoSignalsCache.set(result)
     return result

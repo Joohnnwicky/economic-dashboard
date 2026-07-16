@@ -4,8 +4,8 @@ import { getTrackedUSStocks } from '../api/us-stocks';
 /**
  * Hook for tracking US stocks (Mag 7 + Semiconductor + SpaceX)
  *
- * 数据来源：yfinance（后端代理，5分钟缓存）
- * 无日配额限制，后端一次获取全部 11 只股票
+ * 数据来源：腾讯日K（后端代理，5分钟缓存）
+ * 国内稳定、无 key、无配额限制，后端并发获取全部 18 只股票
  */
 export function useUSStocks() {
   return useQuery({

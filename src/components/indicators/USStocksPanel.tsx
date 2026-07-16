@@ -48,7 +48,7 @@ export function USStocksPanel() {
   return (
     <div className="space-y-6">
       <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-        美股头部追踪 · yfinance 日线收盘价 · 缓存 5 分钟
+        美股头部追踪 · 腾讯日线收盘价 · 缓存 5 分钟
       </p>
 
       {grouped.map(group => (
