@@ -60,6 +60,9 @@ export const YFINANCE_BASE_URL = `${BACKEND_BASE_URL}/yfinance`;
 // Coinbase API - 通过后端代理（溢价指数 = Coinbase BTC/USD - Binance BTC/USDT）
 export const COINBASE_BASE_URL = `${BACKEND_BASE_URL}/coinbase`;
 
+// 加密牛熊信号 - 通过后端代理（恐惧贪婪+200日均线偏离+PiCycle）
+export const CRYPTO_SIGNALS_BASE_URL = `${BACKEND_BASE_URL}/crypto-signals`;
+
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
   // BLS free tier = 25 calls/day. 后端已有30分钟缓存+API key配额管控，前端不再硬限速。

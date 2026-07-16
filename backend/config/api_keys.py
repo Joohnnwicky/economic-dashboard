@@ -31,6 +31,7 @@ class APIConfig:
         'Binance': 30,      # 30秒 (实时数据)
         'YFinance': 300,    # 5分钟 (无配额，避免Yahoo限流)
         'Coinbase': 60,     # 1分钟 (溢价指数，实时但无需高频)
+        'CryptoSignals': 3600,  # 1小时 (恐惧贪婪/均线，低频)
     }
 
     @classmethod

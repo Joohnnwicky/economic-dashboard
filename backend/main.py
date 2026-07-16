@@ -21,6 +21,7 @@ from api.frankfurter import router as frankfurter_router
 from api.polymarket import router as polymarket_router
 from api.yfinance import router as yfinance_router
 from api.coinbase import router as coinbase_router
+from api.crypto_signals import router as crypto_signals_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
@@ -97,6 +98,7 @@ app.include_router(frankfurter_router, prefix="/api")
 app.include_router(polymarket_router, prefix="/api")
 app.include_router(yfinance_router, prefix="/api")
 app.include_router(coinbase_router, prefix="/api")
+app.include_router(crypto_signals_router, prefix="/api")
 
 
 @app.get("/")

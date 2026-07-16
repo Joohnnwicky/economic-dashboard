@@ -33,7 +33,7 @@ export const PANEL_TITLES: Record<PanelKey, string> = {
   [PANEL_KEYS.GOLD_PRICE]: '国内金价（Gold Price）',
   [PANEL_KEYS.OIL_PRICE]: '油价（Oil Price）',
   [PANEL_KEYS.CRYPTO]: '加密货币行情（Crypto Top 10）',
-  [PANEL_KEYS.COINBASE_PREMIUM]: 'Coinbase 比特币溢价指数（BTC Premium）',
+  [PANEL_KEYS.COINBASE_PREMIUM]: '加密牛熊综合判断（BTC Bull/Bear）',
   [PANEL_KEYS.EXCHANGE_RATES]: '主要汇率（Major Exchange Rates）',
   [PANEL_KEYS.US_INDICES]: '美股指数（US Stock Indices）',
   [PANEL_KEYS.US_STOCKS]: '美股头部股票',
