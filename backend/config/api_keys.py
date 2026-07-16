@@ -30,6 +30,7 @@ class APIConfig:
         'AlphaVantage': 3600,  # 1小时 (配额限制25次/天)
         'Binance': 30,      # 30秒 (实时数据)
         'YFinance': 300,    # 5分钟 (无配额，避免Yahoo限流)
+        'Coinbase': 60,     # 1分钟 (溢价指数，实时但无需高频)
     }
 
     @classmethod

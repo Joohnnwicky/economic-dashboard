@@ -29,6 +29,7 @@ import { DollarIndexPanel } from '../indicators/DollarIndexPanel';
 import { GoldPricePanel } from '../indicators/GoldPricePanel';
 import { OilPricePanel } from '../indicators/OilPricePanel';
 import { CryptoPanel } from '../indicators/CryptoPanel';
+import { CoinbasePremiumPanel } from '../indicators/CoinbasePremiumPanel';
 import { ExchangeRatesPanel } from '../indicators/ExchangeRatesPanel';
 import { USIndicesPanel } from '../indicators/USIndicesPanel';
 import { USStocksPanel } from '../indicators/USStocksPanel';
@@ -51,6 +52,7 @@ const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'gold-price': GoldPricePanel,
   'oil-price': OilPricePanel,
   'crypto': CryptoPanel,
+  'coinbase-premium': CoinbasePremiumPanel,
   'exchange-rates': ExchangeRatesPanel,
   'us-indices': USIndicesPanel,
   'us-stocks': USStocksPanel,
@@ -70,6 +72,7 @@ const NEW_PANELS: Set<PanelKey> = new Set<PanelKey>([
   'us-stocks',
   'housing-price',
   'polymarket',
+  'coinbase-premium',
 ]);
 
 // Stable tint per panel keyed by its default position, so dragging doesn't reshuffle colors.
@@ -143,7 +146,7 @@ export function Dashboard() {
         style={{ borderColor: '#000', backgroundColor: '#fff', color: '#000' }}
       >
         <p className="text-xs">
-          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, Alpha Vantage, AkShare, Binance, 东方财富
+          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, Alpha Vantage, AkShare, Binance, Coinbase, 东方财富
         </p>
         <p className="text-xs mt-2">
           <a href="#" className="underline" style={{ color: '#0000ee' }}>Copyright</a>

@@ -10,9 +10,10 @@ const CATEGORY_LABELS: Record<USStockQuote['category'], string> = {
   'mag7': 'Magnificent 7',
   'semiconductor': '半导体扩展',
   'spacex': 'SpaceX',
+  'crypto-stock': '加密概念股',
 };
 
-const CATEGORY_ORDER: USStockQuote['category'][] = ['mag7', 'semiconductor', 'spacex'];
+const CATEGORY_ORDER: USStockQuote['category'][] = ['mag7', 'semiconductor', 'spacex', 'crypto-stock'];
 
 export function USStocksPanel() {
   const { data, isLoading, error } = useUSStocks();

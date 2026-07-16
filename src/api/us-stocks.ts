@@ -5,7 +5,7 @@ import { HistoricalDataPoint } from '../types/indicator';
 export interface USStockQuote {
   symbol: string;
   name: string;
-  category: 'mag7' | 'semiconductor' | 'spacex';
+  category: 'mag7' | 'semiconductor' | 'spacex' | 'crypto-stock';
   value: number;
   change?: {
     value: number;
@@ -37,6 +37,14 @@ export const TRACKED_STOCKS: Array<{
   { symbol: 'TSM', name: '台积电（TSMC）', category: 'semiconductor' },
   // SpaceX (2026-06-12 NASDAQ IPO)
   { symbol: 'SPCX', name: 'SpaceX', category: 'spacex' },
+  // 加密概念股（交易所/持仓/矿企/平台）
+  { symbol: 'COIN', name: 'Coinbase Global', category: 'crypto-stock' },
+  { symbol: 'MSTR', name: '微策略（Strategy）', category: 'crypto-stock' },
+  { symbol: 'RIOT', name: 'Riot Platforms', category: 'crypto-stock' },
+  { symbol: 'MARA', name: 'Marathon Digital', category: 'crypto-stock' },
+  { symbol: 'CLSK', name: 'CleanSpark', category: 'crypto-stock' },
+  { symbol: 'HOOD', name: 'Robinhood', category: 'crypto-stock' },
+  { symbol: 'XYZ', name: 'Block', category: 'crypto-stock' },
 ];
 
 /**
