@@ -31,7 +31,7 @@ export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
         </h4>
         <button
           onClick={onRemove}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[#21262d] transition-opacity"
+          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-black transition-opacity"
           style={{ color: DARK_THEME.textMuted }}
           title="移除"
         >
@@ -59,7 +59,7 @@ export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
       {onViewChart && (
         <button
           onClick={onViewChart}
-          className="mt-2 text-xs px-2 py-1 rounded hover:bg-[#21262d]"
+          className="mt-2 text-xs px-2 py-1 rounded hover:bg-black"
           style={{ color: DARK_THEME.accent[0] }}
         >
           查看趋势

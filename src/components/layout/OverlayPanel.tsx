@@ -46,16 +46,16 @@ export function OverlayPanel() {
     !pbocRate.isLoading;
 
   return (
-    <div className="p-4 bg-[#0d1117] rounded-lg">
-      <h2 className="text-[#c9d1d9] text-lg mb-4">跨市场对比分析</h2>
+    <div className="p-4 bg-white rounded-lg">
+      <h2 className="text-black text-lg mb-4">跨市场对比分析</h2>
 
       {allFailed ? (
-        <div className="flex items-center justify-center h-[400px] text-[#8b949e]">
+        <div className="flex items-center justify-center h-[400px] text-[#4d4d4d]">
           数据加载失败，请检查网络连接或API配置
         </div>
       ) : !hasEnoughData ? (
         <div className="flex items-center justify-center h-[400px]">
-          <div className="animate-spin w-8 h-8 border-2 border-[#58a6ff] border-t-transparent rounded-full"></div>
+          <div className="animate-spin w-8 h-8 border-2 border-[#e91d2a] border-t-transparent rounded-full"></div>
         </div>
       ) : (
         <OverlayComparisonChart availableIndicators={allIndicators} height={450} />
