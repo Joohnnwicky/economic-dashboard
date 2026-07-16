@@ -16,10 +16,19 @@ STATIC_DATA_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'public',
 def get_china_unemployment() -> Optional[Dict]:
     """
     获取中国城镇调查失业率
-    优先尝试东方财富爬虫，失败则降级到静态JSON
+    优先尝试东方财富爬虫，失败则降级到静态JSON。
+    爬虫带负缓存：失败后1小时内不再尝试，避免每次请求都等10s超时
+    （东方财富页面为JS动态加载，爬虫几乎必失败）。
     """
+    now = datetime.now()
+    last_attempt = getattr(get_china_unemployment, '_last_attempt', None)
+    if last_attempt and (now - last_attempt).total_seconds() < 3600:
+        # 负缓存期内：跳过必失败的爬虫，直接用静态JSON
+        return _load_static_json()
+
     # 先尝试爬虫
     result = _scrape_eastmoney()
+    get_china_unemployment._last_attempt = now
     if result:
         return result
 

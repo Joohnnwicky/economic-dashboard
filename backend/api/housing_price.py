@@ -3,7 +3,13 @@
 """
 from fastapi import APIRouter, HTTPException
 from typing import Dict, List
-from services.housing_price_service import get_housing_prices, get_city_price, update_housing_price_cache
+from datetime import datetime
+from services.housing_price_service import (
+    get_housing_prices,
+    get_city_price,
+    update_housing_price_cache,
+    HousingPriceCache,
+)
 
 router = APIRouter()
 
@@ -39,14 +45,27 @@ async def api_get_city_price(city_code: str) -> Dict:
     return data
 
 
+# 防滥用：5分钟内不重复爬取creprice.cn全国20城（最坏需数分钟，且高频请求易被封IP）
+REFRESH_MIN_INTERVAL_SECONDS = 300
+
+
 @router.post("/housing-prices/refresh")
 async def api_refresh_housing_prices() -> Dict:
     """
-    手动刷新房价缓存
+    手动刷新房价缓存。
 
-    Returns:
-        更新后的房价数据
+    距上次爬取不足5分钟则直接返回当前缓存，避免重复爬取20城。
+    （前端有刷新按钮，rate limit 比token鉴权更合适：不违反前端零密钥原则。）
     """
+    if HousingPriceCache.last_update:
+        elapsed = (datetime.now() - HousingPriceCache.last_update).total_seconds()
+        if elapsed < REFRESH_MIN_INTERVAL_SECONDS:
+            data = HousingPriceCache.data or {}
+            return {
+                "message": f"缓存较新（{int(elapsed)}秒前更新），跳过刷新",
+                "updateTime": data.get('updateTime'),
+                "cityCount": len(data.get('national', []))
+            }
     data = update_housing_price_cache()
     return {
         "message": "房价缓存已更新",

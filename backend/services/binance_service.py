@@ -1,6 +1,7 @@
 """
 Binance API代理服务 - 无需API Key，但需要代理绕过地理限制
 """
+import asyncio
 import httpx
 from datetime import datetime
 from typing import Dict, Optional, List
@@ -113,7 +114,7 @@ async def fetch_binance_klines(
 
 async def fetch_multiple_binance_tickers(symbols: List[str]) -> dict:
     """
-    批量获取多个交易对的行情
+    批量获取多个交易对的行情（并发请求）
 
     Args:
         symbols: 交易对列表
@@ -121,11 +122,8 @@ async def fetch_multiple_binance_tickers(symbols: List[str]) -> dict:
     Returns:
         {symbol: ticker_data} 字典
     """
-    results = {}
-    for symbol in symbols:
-        ticker = await fetch_binance_ticker(symbol)
-        results[symbol] = ticker
-    return results
+    tickers = await asyncio.gather(*(fetch_binance_ticker(s) for s in symbols))
+    return dict(zip(symbols, tickers))
 
 
 def normalize_binance_ticker(data: dict, symbol: str) -> dict:
