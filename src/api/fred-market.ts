@@ -109,11 +109,11 @@ export function getInitialClaims(timeRange: TimeRange = '1Y'): Promise<Normalize
   );
 }
 
-/** ISM 制造业 PMI (月频, 50=荣枯线)。 */
+/** 芝加哥联储国家活动指数 CFNAI (月频, 0=趋势线, ISM PMI 已从 FRED 下架以此替代)。 */
 export function getIsmPmi(timeRange: TimeRange = '1Y'): Promise<NormalizedIndicator> {
   return fetchFredSeries(
     FRED_MARKET_SERIES.ISM_PMI, timeRange,
-    'ism-pmi', 'ISM 制造业 PMI（ISM Manufacturing PMI）', 'index', 'monthly',
+    'ism-pmi', '芝加哥联储国家活动指数（CFNAI）', 'index', 'monthly',
   );
 }
 

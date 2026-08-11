@@ -27,8 +27,8 @@ export const FRED_TREASURY_SERIES = {
 export const FRED_MARKET_SERIES = {
   VIX: 'VIXCLS',        // CBOE Volatility Index (VIX) - 恐慌指数, 日频
   INITIAL_CLAIMS: 'ICSA',    // Initial Jobless Claims - 初请失业金, 周频(千人)
-  ISM_PMI: 'NAPM',     // ISM Manufacturing PMI - 制造业PMI, 月频(50=荣枯线)
-  MICH_SENTIMENT: 'UMSCONF', // University of Michigan Consumer Sentiment - 消费者信心, 月频
+  ISM_PMI: 'CFNAI',    // Chicago Fed National Activity Index - 芝加哥联储活动指数, 月频(0=趋势线) [ISM PMI(NAPM)已从 FRED 下架, 以 CFNAI 替代]
+  MICH_SENTIMENT: 'UMCSENT', // University of Michigan Consumer Sentiment - 消费者信心, 月频
   YIELD_SPREAD_10Y2Y: 'T10Y2Y', // 10-Year minus 2-Year Treasury spread - 收益率利差, 日频
   RECESSION: 'USREC',  // NBER based Recession Indicator - 衰退标志, 月频(0/1)
 } as const;

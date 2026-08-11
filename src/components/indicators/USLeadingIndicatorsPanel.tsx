@@ -4,9 +4,9 @@ import { LastUpdated } from '../ui/LastUpdated';
 import { DARK_THEME } from '../../constants/colors';
 import { NormalizedIndicator } from '../../types/indicator';
 
-// PMI: 50 为荣枯线, >50 扩张, <50 收缩
-function pmiBand(v: number) {
-  if (v >= 50) return { label: '扩张', color: DARK_THEME.positive };
+// CFNAI: 0 为趋势线, >0 扩张(高于趋势), <0 收缩(低于趋势)
+function cfnaiBand(v: number) {
+  if (v >= 0) return { label: '扩张', color: DARK_THEME.positive };
   return { label: '收缩', color: DARK_THEME.negative };
 }
 
@@ -86,9 +86,10 @@ export function USLeadingIndicatorsPanel() {
 
       {data.pmi && (
         <MetricRow
-          title="ISM 制造业 PMI"
+          title="芝加哥联储国家活动指数"
           data={data.pmi}
-          band={pmiBand(data.pmi.value)}
+          band={cfnaiBand(data.pmi.value)}
+          fmt={(v: number) => v.toFixed(2)}
         />
       )}
 
@@ -103,7 +104,7 @@ export function USLeadingIndicatorsPanel() {
       {latest && <LastUpdated timestamp={latest.timestamp} />}
 
       <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>
-        数据每月更新 (FRED API · NAPM / UMSCONF) | PMI &gt;50 扩张, &lt;50 收缩
+        数据每月更新 (FRED API · CFNAI / UMCSENT) | CFNAI &gt;0 扩张, &lt;0 收缩
       </p>
     </div>
   );
