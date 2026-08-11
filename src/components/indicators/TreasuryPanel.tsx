@@ -1,11 +1,14 @@
 import { useTreasuryYields } from '../../hooks/useTreasury';
+import { useYieldSpreadHistory } from '../../hooks/useYieldSpreadHistory';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { MiniChart } from '../charts/MiniChart';
+import { YieldSpreadChart } from '../charts/YieldSpreadChart';
 import { DARK_THEME } from '../../constants/colors';
 import { treasuryToNormalizedIndicator } from '../../api/treasury';
 
 export function TreasuryPanel() {
   const { dgs10, dgs2, dgs30, dgs3mo, spread, isLoading, error } = useTreasuryYields('1Y');
+  const { data: spreadHistory } = useYieldSpreadHistory();
 
   if (isLoading && !dgs10) {
     return (
@@ -93,6 +96,20 @@ export function TreasuryPanel() {
         {dgs10 && <MiniChart data={treasuryToNormalizedIndicator(dgs10)} height={80} />}
         {dgs2 && <MiniChart data={treasuryToNormalizedIndicator(dgs2)} height={80} />}
       </div>
+
+      {/* 10Y-2Y 利差历史 + NBER 衰退期阴影 */}
+      {spreadHistory?.spread && spreadHistory.spread.historical.length > 0 && (
+        <div className="space-y-1">
+          <div className="text-xs font-bold" style={{ color: DARK_THEME.text }}>
+            10Y-2Y 利差历史（阴影 = NBER 衰退期）
+          </div>
+          <YieldSpreadChart
+            spread={spreadHistory.spread.historical}
+            recession={spreadHistory.recession?.historical ?? []}
+            height={160}
+          />
+        </div>
+      )}
 
       {/* Update Frequency Notice */}
       <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>

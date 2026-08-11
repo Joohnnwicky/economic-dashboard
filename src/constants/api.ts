@@ -23,6 +23,16 @@ export const FRED_TREASURY_SERIES = {
   DGS3MO: 'DGS3MO', // 3-Month Treasury Constant Maturity Rate
 } as const;
 
+// FRED US Market & Macro Leading Indicators (美股市场与先行指标)
+export const FRED_MARKET_SERIES = {
+  VIX: 'VIXCLS',        // CBOE Volatility Index (VIX) - 恐慌指数, 日频
+  INITIAL_CLAIMS: 'ICSA',    // Initial Jobless Claims - 初请失业金, 周频(千人)
+  ISM_PMI: 'NAPM',     // ISM Manufacturing PMI - 制造业PMI, 月频(50=荣枯线)
+  MICH_SENTIMENT: 'UMSCONF', // University of Michigan Consumer Sentiment - 消费者信心, 月频
+  YIELD_SPREAD_10Y2Y: 'T10Y2Y', // 10-Year minus 2-Year Treasury spread - 收益率利差, 日频
+  RECESSION: 'USREC',  // NBER based Recession Indicator - 衰退标志, 月频(0/1)
+} as const;
+
 // FRED China Economic Indicators Series IDs (中国经济指标)
 export const FRED_CHINA_SERIES = {
   GDP: 'CHNGDPNQDSMEI',       // China Gross Domestic Product (Quarterly)
@@ -62,6 +72,18 @@ export const COINBASE_BASE_URL = `${BACKEND_BASE_URL}/coinbase`;
 
 // 加密牛熊信号 - 通过后端代理（恐惧贪婪+200日均线偏离+PiCycle）
 export const CRYPTO_SIGNALS_BASE_URL = `${BACKEND_BASE_URL}/crypto-signals`;
+
+// 加密市场市占率 + 山寨季 - 通过后端代理（CoinGecko, 1h缓存）
+export const MARKET_DOMINANCE_BASE_URL = `${BACKEND_BASE_URL}/market-dominance`;
+
+// BTC 链上数据 - 通过后端代理（mempool.space, 30min缓存）
+export const ONCHAIN_BASE_URL = `${BACKEND_BASE_URL}/onchain`;
+
+// 经济日历 - 通过后端代理（Finnhub, 1h缓存）
+export const ECONOMIC_CALENDAR_BASE_URL = `${BACKEND_BASE_URL}/economic-calendar`;
+
+// FOMC 会议日历 + 倒计时 - 通过后端代理（公开日程, 1h缓存）
+export const FEDWATCH_BASE_URL = `${BACKEND_BASE_URL}/fedwatch`;
 
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
