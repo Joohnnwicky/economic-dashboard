@@ -22,6 +22,10 @@ from api.polymarket import router as polymarket_router
 from api.yfinance import router as yfinance_router
 from api.coinbase import router as coinbase_router
 from api.crypto_signals import router as crypto_signals_router
+from api.market_dominance import router as market_dominance_router
+from api.onchain import router as onchain_router
+from api.economic_calendar import router as economic_calendar_router
+from api.fedwatch import router as fedwatch_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
@@ -99,6 +103,10 @@ app.include_router(polymarket_router, prefix="/api")
 app.include_router(yfinance_router, prefix="/api")
 app.include_router(coinbase_router, prefix="/api")
 app.include_router(crypto_signals_router, prefix="/api")
+app.include_router(market_dominance_router, prefix="/api")
+app.include_router(onchain_router, prefix="/api")
+app.include_router(economic_calendar_router, prefix="/api")
+app.include_router(fedwatch_router, prefix="/api")
 
 
 @app.get("/")

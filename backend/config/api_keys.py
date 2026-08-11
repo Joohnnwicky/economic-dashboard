@@ -32,6 +32,10 @@ class APIConfig:
         'YFinance': 300,    # 5分钟 (无配额，避免Yahoo限流)
         'Coinbase': 60,     # 1分钟 (溢价指数，实时但无需高频)
         'CryptoSignals': 3600,  # 1小时 (恐惧贪婪/均线，低频)
+        'MarketDominance': 3600,  # 1小时 (CoinGecko 市占率/山寨季)
+        'Onchain': 1800,    # 30分钟 (mempool.space 算力/手续费)
+        'EconomicCalendar': 3600,  # 1小时 (纯计算经济日历, NFP/CPI/PPI/PCE)
+        'FedWatch': 3600,   # 1小时 (CME FedWatch / FOMC 日历)
     }
 
     @classmethod
