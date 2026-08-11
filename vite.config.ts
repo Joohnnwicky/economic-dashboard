@@ -25,12 +25,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/tencent/, ''),
       },
-      // Polymarket Gamma API代理
-      '/api/polymarket': {
-        target: 'https://gamma-api.polymarket.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/polymarket/, ''),
-      },
+      // Polymarket API — 已迁移到后端代理 (/api/backend/polymarket)
     },
   },
   test: {

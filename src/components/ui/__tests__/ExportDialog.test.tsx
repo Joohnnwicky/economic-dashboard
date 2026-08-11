@@ -247,8 +247,8 @@ describe('ExportDialog', () => {
       />
     );
 
-    // Panel should have dark background
-    const panel = container.querySelector('[class*="bg-[#161b22]"]');
+    // Panel should have light background (DARK_THEME.background = #ffffff)
+    const panel = container.querySelector('[class*="bg-white"]');
     expect(panel).toBeInTheDocument();
   });
 });

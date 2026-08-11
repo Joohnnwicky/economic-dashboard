@@ -1,17 +1,31 @@
 """
 Alpha Vantage API代理服务 - 服务端注入API Key，前端不暴露
-配额限制: 25次/天，需要长时间缓存
+配额限制: 25次/天 + 5次/分钟，需要节流 + 长缓存
 """
+import asyncio
+import time
 import httpx
 from datetime import datetime
 from typing import Dict, Optional
 from config.api_keys import APIConfig
 
 
+# 全局节流：5次/分钟 = 至少 13 秒一个请求（留 1 秒余量给抖动）
+# 单进程内共享，按 symbol 串行排队，避免一次刷新 11 只股票把分钟配额打爆
+_AV_THROTTLE_LOCK = asyncio.Lock()
+_AV_LAST_CALL_TS: float = 0.0
+_AV_MIN_INTERVAL_SEC = 13.0
+# 限速/错误响应的负缓存 TTL（秒），避免前端轮询同一个 symbol 反复打 AV
+_AV_ERROR_CACHE_TTL_SEC = 60
+
+
 class AlphaVantageCache:
     """Alpha Vantage数据缓存"""
     _cache: Dict[str, dict] = {}
     _timestamps: Dict[str, datetime] = {}
+    # 错误响应单独缓存，TTL 短
+    _error_cache: Dict[str, dict] = {}
+    _error_timestamps: Dict[str, datetime] = {}
 
     @classmethod
     def get(cls, key: str) -> Optional[dict]:
@@ -33,13 +47,29 @@ class AlphaVantageCache:
         cls._cache[key] = data
         cls._timestamps[key] = datetime.now()
 
+    @classmethod
+    def get_error(cls, key: str) -> Optional[dict]:
+        """获取负缓存（限速/配额错误）"""
+        if key not in cls._error_cache or key not in cls._error_timestamps:
+            return None
+        elapsed = datetime.now() - cls._error_timestamps[key]
+        if elapsed.total_seconds() >= _AV_ERROR_CACHE_TTL_SEC:
+            return None
+        return cls._error_cache[key]
+
+    @classmethod
+    def set_error(cls, key: str, data: dict):
+        """缓存错误响应（短 TTL）"""
+        cls._error_cache[key] = data
+        cls._error_timestamps[key] = datetime.now()
+
 
 async def fetch_alpha_vantage_daily(
     symbol: str,
     outputsize: str = 'compact',
 ) -> dict:
     """
-    从Alpha Vantage获取日线数据
+    从Alpha Vantage获取日线数据（带串行节流）
 
     Args:
         symbol: 股票/ETF代码 (如 'GLD', 'SPY', 'DIA')
@@ -48,31 +78,49 @@ async def fetch_alpha_vantage_daily(
     Returns:
         Alpha Vantage API响应数据
     """
-    # 检查缓存
+    # 检查正缓存（1 小时 TTL）
     cache_key = f"{symbol}_{outputsize}"
     cached = AlphaVantageCache.get(cache_key)
     if cached:
         return cached
 
-    # 构建请求参数
-    params = {
-        'function': 'TIME_SERIES_DAILY',
-        'symbol': symbol,
-        'outputsize': outputsize,
-        'apikey': APIConfig.ALPHA_VANTAGE_API_KEY,
-    }
+    # 检查负缓存（限速/错误，60 秒 TTL）— 避免反复重试触发更严限速
+    cached_error = AlphaVantageCache.get_error(cache_key)
+    if cached_error:
+        return cached_error
 
-    # 发送请求
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(APIConfig.ALPHA_VANTAGE_BASE_URL, params=params)
-        data = response.json()
+    # 串行节流：拿全局锁 + 等距 13 秒
+    global _AV_LAST_CALL_TS
+    async with _AV_THROTTLE_LOCK:
+        now = time.monotonic()
+        wait = _AV_MIN_INTERVAL_SEC - (now - _AV_LAST_CALL_TS)
+        if wait > 0:
+            await asyncio.sleep(wait)
+        _AV_LAST_CALL_TS = time.monotonic()
 
-    # 检查错误响应
+        # 锁释放前发请求，确保下一个请求不会偷跑
+        params = {
+            'function': 'TIME_SERIES_DAILY',
+            'symbol': symbol,
+            'outputsize': outputsize,
+            'apikey': APIConfig.ALPHA_VANTAGE_API_KEY,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                response = await client.get(APIConfig.ALPHA_VANTAGE_BASE_URL, params=params)
+                data = response.json()
+        except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+            err = {'error': f'网络连接失败: {type(e).__name__}', 'symbol': symbol}
+            AlphaVantageCache.set_error(cache_key, err)
+            return err
+
+    # 检查错误响应（频率限制 / 配额耗尽）
     if 'Information' in data or 'Note' in data:
-        # 频率限制或配额限制，不缓存错误
-        return {'error': data.get('Information') or data.get('Note'), 'symbol': symbol}
+        err = {'error': data.get('Information') or data.get('Note'), 'symbol': symbol}
+        AlphaVantageCache.set_error(cache_key, err)
+        return err
 
-    # 缓存结果
+    # 正常数据：长缓存
     if 'Time Series (Daily)' in data:
         AlphaVantageCache.set(cache_key, data)
 

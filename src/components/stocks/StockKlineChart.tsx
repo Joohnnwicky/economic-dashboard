@@ -104,7 +104,7 @@ export function StockKlineChart({ code, name, onClose }: StockKlineChartProps) {
         height: 20,
         bottom: 10,
         backgroundColor: DARK_THEME.background,
-        fillerColor: 'rgba(88, 166, 255, 0.2)',
+        fillerColor: 'rgba(140, 154, 224, 0.25)',
         borderColor: DARK_THEME.gridLine,
         handleStyle: { color: DARK_THEME.accent[0] },
         textStyle: { color: DARK_THEME.textMuted },

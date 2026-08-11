@@ -32,10 +32,10 @@ export function OverlayComparisonChart({
   if (availableIndicators.length === 0) {
     return (
       <div
-        className="bg-[#161b22] rounded-lg p-4 flex items-center justify-center"
+        className="bg-white rounded-lg p-4 flex items-center justify-center"
         style={{ height: `${height}px` }}
       >
-        <p className="text-[#8b949e]">选择指标以进行跨市场对比</p>
+        <p className="text-[#4d4d4d]">选择指标以进行跨市场对比</p>
       </div>
     );
   }
@@ -46,16 +46,16 @@ export function OverlayComparisonChart({
   );
 
   return (
-    <div className="bg-[#161b22] rounded-lg p-4">
+    <div className="bg-white rounded-lg p-4">
       {/* Indicator Selectors */}
       <div className="flex gap-4 mb-4">
         <div className="flex-1">
-          <label className="text-[#8b949e] text-sm mb-1 block">
+          <label className="text-[#4d4d4d] text-sm mb-1 block">
             左侧指标 (Y轴1)
             <select
               value={leftIndicatorId}
               onChange={(e) => setLeftIndicatorId(e.target.value)}
-              className="w-full mt-2 bg-[#0d1117] text-[#c9d1d9] border border-[#21262d] rounded px-3 py-2"
+              className="w-full mt-2 bg-white text-black border border-black rounded px-3 py-2"
             >
               <option value="">-- 选择指标 --</option>
               {availableIndicators.map((ind) => (
@@ -65,12 +65,12 @@ export function OverlayComparisonChart({
           </label>
         </div>
         <div className="flex-1">
-          <label className="text-[#8b949e] text-sm mb-1 block">
+          <label className="text-[#4d4d4d] text-sm mb-1 block">
             右侧指标 (Y轴2)
             <select
               value={rightIndicatorId}
               onChange={(e) => setRightIndicatorId(e.target.value)}
-              className="w-full mt-2 bg-[#0d1117] text-[#c9d1d9] border border-[#21262d] rounded px-3 py-2"
+              className="w-full mt-2 bg-white text-black border border-black rounded px-3 py-2"
             >
               <option value="">-- 选择指标 --</option>
               {rightIndicatorOptions.map((ind) => (

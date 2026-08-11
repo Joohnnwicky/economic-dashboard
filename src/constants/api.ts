@@ -23,15 +23,22 @@ export const FRED_TREASURY_SERIES = {
   DGS3MO: 'DGS3MO', // 3-Month Treasury Constant Maturity Rate
 } as const;
 
+// FRED US Market & Macro Leading Indicators (美股市场与先行指标)
+export const FRED_MARKET_SERIES = {
+  VIX: 'VIXCLS',        // CBOE Volatility Index (VIX) - 恐慌指数, 日频
+  INITIAL_CLAIMS: 'ICSA',    // Initial Jobless Claims - 初请失业金, 周频(千人)
+  ISM_PMI: 'CFNAI',    // Chicago Fed National Activity Index - 芝加哥联储活动指数, 月频(0=趋势线) [ISM PMI(NAPM)已从 FRED 下架, 以 CFNAI 替代]
+  MICH_SENTIMENT: 'UMCSENT', // University of Michigan Consumer Sentiment - 消费者信心, 月频
+  YIELD_SPREAD_10Y2Y: 'T10Y2Y', // 10-Year minus 2-Year Treasury spread - 收益率利差, 日频
+  RECESSION: 'USREC',  // NBER based Recession Indicator - 衰退标志, 月频(0/1)
+} as const;
+
 // FRED China Economic Indicators Series IDs (中国经济指标)
 export const FRED_CHINA_SERIES = {
   GDP: 'CHNGDPNQDSMEI',       // China Gross Domestic Product (Quarterly)
   CPI: 'CHNCPIALLMINMEI',     // China Consumer Price Index
   // IP: 'CHNIPNINDXMEI',     // China Industrial Production Index (series已失效)
 } as const;
-
-// CoinGecko API - 通过后端代理（无key需求）
-export const COINGECKO_BASE_URL = `${BACKEND_BASE_URL}/coingecko`;
 
 // BLS API - 通过后端代理 (去掉尾部斜杠避免307重定向)
 export const BLS_BASE_URL = `${BACKEND_BASE_URL}/bls/timeseries/data`;
@@ -57,6 +64,27 @@ export const ALPHA_VANTAGE_SYMBOLS = {
 // Binance API - 通过后端代理
 export const BINANCE_BASE_URL = `${BACKEND_BASE_URL}/binance`;
 
+// yfinance API - 通过后端代理（无key，无日配额，5分钟缓存）
+export const YFINANCE_BASE_URL = `${BACKEND_BASE_URL}/yfinance`;
+
+// Coinbase API - 通过后端代理（溢价指数 = Coinbase BTC/USD - Binance BTC/USDT）
+export const COINBASE_BASE_URL = `${BACKEND_BASE_URL}/coinbase`;
+
+// 加密牛熊信号 - 通过后端代理（恐惧贪婪+200日均线偏离+PiCycle）
+export const CRYPTO_SIGNALS_BASE_URL = `${BACKEND_BASE_URL}/crypto-signals`;
+
+// 加密市场市占率 + 山寨季 - 通过后端代理（CoinGecko, 1h缓存）
+export const MARKET_DOMINANCE_BASE_URL = `${BACKEND_BASE_URL}/market-dominance`;
+
+// BTC 链上数据 - 通过后端代理（mempool.space, 30min缓存）
+export const ONCHAIN_BASE_URL = `${BACKEND_BASE_URL}/onchain`;
+
+// 经济日历 - 通过后端代理（Finnhub, 1h缓存）
+export const ECONOMIC_CALENDAR_BASE_URL = `${BACKEND_BASE_URL}/economic-calendar`;
+
+// FOMC 会议日历 + 倒计时 - 通过后端代理（公开日程, 1h缓存）
+export const FEDWATCH_BASE_URL = `${BACKEND_BASE_URL}/fedwatch`;
+
 export const RATE_LIMITS = {
   FRED: { maxCallsPerDay: 1000, minIntervalMs: 100, cacheTtlMs: 300000 },
   // BLS free tier = 25 calls/day. 后端已有30分钟缓存+API key配额管控，前端不再硬限速。
@@ -64,5 +92,4 @@ export const RATE_LIMITS = {
   BLS: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 1800000 },
   // Alpha Vantage free tier = 25 calls/day. 同上，后端已缓存1小时，前端不再叠加限速。
   AlphaVantage: { maxCallsPerDay: 25, minIntervalMs: 100, cacheTtlMs: 3600000 },
-  CoinGecko: { maxCallsPerDay: 500, minIntervalMs: 1200, cacheTtlMs: 60000 },
 } as const;

@@ -23,7 +23,7 @@ export function CustomStocksPanel() {
         <p className="mb-2">暂无自选股</p>
         <button
           onClick={() => setSearchOpen(true)}
-          className="px-4 py-2 rounded border hover:bg-[#21262d]"
+          className="px-4 py-2 rounded border hover:bg-black"
           style={{ borderColor: DARK_THEME.accent[0], color: DARK_THEME.accent[0] }}
         >
           + 添加自选股
@@ -45,7 +45,7 @@ export function CustomStocksPanel() {
         <div className="flex gap-2">
           <button
             onClick={() => setSearchOpen(true)}
-            className="px-3 py-1 rounded text-sm hover:bg-[#21262d]"
+            className="px-3 py-1 rounded text-sm hover:bg-black"
             style={{ color: DARK_THEME.accent[0] }}
           >
             + 添加
@@ -53,7 +53,7 @@ export function CustomStocksPanel() {
           {stocks.length > 1 && (
             <button
               onClick={clearAll}
-              className="px-3 py-1 rounded text-sm hover:bg-[#21262d]"
+              className="px-3 py-1 rounded text-sm hover:bg-black"
               style={{ color: DARK_THEME.textMuted }}
             >
               清空
@@ -65,7 +65,7 @@ export function CustomStocksPanel() {
       {/* Loading/Error states */}
       {isLoading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-6 h-6 border-2 border-[#58a6ff] border-t-transparent rounded-full" />
+          <div className="animate-spin w-6 h-6 border-2 border-[#e91d2a] border-t-transparent rounded-full" />
         </div>
       )}
 

@@ -62,7 +62,8 @@ export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProp
 
   // 判断单位类型
   const isPercent = data.unit === '%';  // 美债收益率、CPI等
-  const isPrice = data.unit === 'USD' || data.unit === '美元' || !data.unit;  // 加密货币、价格等
+  // For USD, use standard format
+  const isPrice = data.unit === 'USD' || data.unit === '美元' || data.unit === 'USD/oz' || data.unit === 'USD/barrel' || !data.unit;  // 加密货币、价格等
 
   // 根据数值范围智能格式化纵轴
   const formatYAxisValue = (value: number): string => {
@@ -82,8 +83,8 @@ export function MiniChart({ data, height = 120, isDaily = false }: MiniChartProp
     return value.toFixed(2);
   };
 
-  // tooltip单位
-  const tooltipUnit = isPercent ? '%' : '$';
+  // tooltip单位: 百分比->'%', 价格类->'$', 其他(指数/点数/计数)->无前缀
+  const tooltipUnit = isPercent ? '%' : isPrice ? '$' : '';
 
   const option = {
     backgroundColor: 'transparent',

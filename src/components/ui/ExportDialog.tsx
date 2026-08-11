@@ -53,48 +53,48 @@ export function ExportDialog({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-[#161b22] rounded-lg p-6 w-[600px] max-h-[80vh]">
-        <h2 className="text-[#c9d1d9] text-lg mb-4">数据导出</h2>
+      <div className="bg-white rounded-lg p-6 w-[600px] max-h-[80vh]">
+        <h2 className="text-black text-lg mb-4">数据导出</h2>
 
         {/* Format Selection */}
         <div className="mb-4">
-          <label className="text-[#8b949e] text-sm">导出格式:</label>
+          <label className="text-[#4d4d4d] text-sm">导出格式:</label>
           <div className="flex gap-4 mt-2">
             <label className="flex items-center">
               <input
                 type="radio"
                 checked={exportFormat === 'csv'}
                 onChange={() => setFormat('csv')}
-                className="accent-[#58a6ff]"
+                className="accent-[#e91d2a]"
               />
-              <span className="text-[#c9d1d9] ml-2">CSV</span>
+              <span className="text-black ml-2">CSV</span>
             </label>
             <label className="flex items-center">
               <input
                 type="radio"
                 checked={exportFormat === 'excel'}
                 onChange={() => setFormat('excel')}
-                className="accent-[#58a6ff]"
+                className="accent-[#e91d2a]"
               />
-              <span className="text-[#c9d1d9] ml-2">Excel</span>
+              <span className="text-black ml-2">Excel</span>
             </label>
           </div>
         </div>
 
         {/* Filename Input */}
         <div className="mb-4">
-          <label className="text-[#8b949e] text-sm">文件名:</label>
+          <label className="text-[#4d4d4d] text-sm">文件名:</label>
           <input
             type="text"
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
-            className="mt-2 w-full bg-[#0d1117] text-[#c9d1d9] border border-[#21262d] rounded px-3 py-2"
+            className="mt-2 w-full bg-white text-black border border-black rounded px-3 py-2"
           />
         </div>
 
         {/* Indicator Selection */}
         <div className="mb-4">
-          <label className="text-[#8b949e] text-sm">选择指标:</label>
+          <label className="text-[#4d4d4d] text-sm">选择指标:</label>
           <div className="mt-2 grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto">
             {availableIndicators.map((ind) => (
               <label key={ind.id} className="flex items-center">
@@ -102,9 +102,9 @@ export function ExportDialog({
                   type="checkbox"
                   checked={selectedIndicatorIds.includes(ind.id)}
                   onChange={() => toggleIndicator(ind.id)}
-                  className="accent-[#58a6ff]"
+                  className="accent-[#e91d2a]"
                 />
-                <span className="text-[#c9d1d9] ml-2 text-sm">{ind.name}</span>
+                <span className="text-black ml-2 text-sm">{ind.name}</span>
               </label>
             ))}
           </div>
@@ -112,22 +112,22 @@ export function ExportDialog({
 
         {/* Preview Table */}
         {selectedIndicators.length > 0 && (
-          <div className="mb-4 border border-[#21262d] rounded overflow-hidden">
-            <div className="bg-[#0d1117] p-2 text-[#8b949e] text-sm">
+          <div className="mb-4 border border-black rounded overflow-hidden">
+            <div className="bg-neutral-100 p-2 text-[#4d4d4d] text-sm">
               预览 ({selectedIndicators.length} 个指标)
             </div>
             <div className="max-h-[150px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="bg-[#0d1117] text-[#8b949e]">
+                <thead className="bg-neutral-100 text-[#4d4d4d]">
                   <tr>
                     <th className="p-2">指标</th>
                     <th className="p-2">最新值</th>
                     <th className="p-2">单位</th>
                   </tr>
                 </thead>
-                <tbody className="text-[#c9d1d9]">
+                <tbody className="text-black">
                   {selectedIndicators.map((ind) => (
-                    <tr key={ind.id} className="border-t border-[#21262d]">
+                    <tr key={ind.id} className="border-t border-black">
                       <td className="p-2">{ind.name}</td>
                       <td className="p-2">{ind.value.toFixed(2)}</td>
                       <td className="p-2">{ind.unit}</td>
@@ -143,14 +143,14 @@ export function ExportDialog({
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#21262d] text-[#8b949e] rounded hover:bg-[#30363d]"
+            className="px-4 py-2 bg-black text-white rounded hover:bg-neutral-800"
           >
             取消
           </button>
           <button
             onClick={handleExport}
             disabled={selectedIndicators.length === 0}
-            className="px-4 py-2 bg-[#3fb950] text-[#0d1117] rounded disabled:opacity-50 hover:bg-[#3fb950]/80"
+            className="px-4 py-2 bg-[#2e7d2c] text-white rounded disabled:opacity-50 hover:bg-[#2e7d2c]/80"
           >
             导出
           </button>

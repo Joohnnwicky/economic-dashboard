@@ -71,9 +71,12 @@ async def fetch_bls_series(
     # 发送POST请求
     url = f"{APIConfig.BLS_BASE_URL}/timeseries/data/"
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(url, json=body)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(url, json=body)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'error': f'网络连接失败: {type(e).__name__}'}
 
     # 缓存结果
     if 'Results' in data and 'series' in data['Results']:

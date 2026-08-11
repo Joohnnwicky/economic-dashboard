@@ -11,7 +11,12 @@ export function usePanelOrder() {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed._v === ORDER_VERSION && Array.isArray(parsed.order)) {
-          return parsed.order;
+          const saved = parsed.order as PanelKey[];
+          // 保留用户自定义顺序，过滤已删除面板，追加新增面板
+          const valid = saved.filter((k) => DEFAULT_ORDER.includes(k));
+          const added = DEFAULT_ORDER.filter((k) => !valid.includes(k));
+          const merged = [...valid, ...added];
+          return merged.length > 0 ? merged : DEFAULT_ORDER;
         }
       }
     } catch { /* corrupted */ }

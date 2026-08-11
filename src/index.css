@@ -2,62 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Terminal aesthetic enhancements */
+/* ═══ Dell 1996 design language ═══ */
+
+/* Body: Win95 silver chrome outside the black page frame; Times Roman body copy. */
+body {
+  margin: 0;
+  background-color: #c0c0c0;
+  color: #000000;
+  font-family: 'Times New Roman', 'SimSun', serif;
+  /* Bold: SimSun (Chinese fallback) is thin on white canvas - bold improves legibility. */
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  color-scheme: light;
+}
+
 .terminal-aesthetic {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 
-/* Subtle card glow effect */
-.panel-glow {
-  box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.1);
-  transition: box-shadow 0.2s;
+/* ─── Global override of legacy dark-theme arbitrary-value classes ───
+   Same specificity as Tailwind's generated utilities but declared later in the
+   cascade, so these win and flip every hardcoded #161b22 / #0d1117 / #c9d1d9 /
+   #8b949e / #58a6ff usage to the Dell light palette without touching each file. */
+.bg-\[\#161b22\] { background-color: #ffffff; }
+.bg-\[\#0d1117\] { background-color: #ffffff; }
+.text-\[\#c9d1d9\] { color: #000000; }
+.text-\[\#8b949e\] { color: #4d4d4d; }
+.bg-\[\#58a6ff\] { background-color: #e91d2a; }
+.text-\[\#58a6ff\] { color: #e91d2a; }
+.border-\[\#58a6ff\] { border-color: #e91d2a; }
+.border-\[\#21262d\] { border-color: #000000; }
+.bg-\[\#21262d\] { background-color: #000000; }
+
+/* ─── Dell component utilities ─── */
+
+/* page-frame: literal 8px black border around the viewport content. */
+.dell-frame {
+  border: 8px solid #000000;
 }
 
-.panel-glow:hover {
-  box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.3);
+/* bevel: hard-edge 1px shadow (no soft shadow) - for stickers / photo frames. */
+.dell-bevel {
+  box-shadow: 1px 1px 0 #000000;
 }
 
-/* Smooth transitions */
+/* top-banner: pure-black strip with white Helvetica headline. */
+.dell-banner {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+/* phone-callout: Dell-red text on black, Helvetica Bold. */
+.dell-phone-callout {
+  background-color: #000000;
+  color: #e91d2a;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  border: 1px solid #000000;
+}
+
+/* sticker: yellow tab with black border + bevel (BUY-a-DELL style). */
+.dell-sticker {
+  background-color: #fcc20f;
+  color: #000000;
+  border: 1px solid #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* NEW! burst: angled yellow sticker pinned onto new ribbon-cards. */
+.dell-new-burst {
+  background-color: #fcc20f;
+  color: #000000;
+  border: 1px solid #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  transform: rotate(-15deg);
+  box-shadow: 1px 1px 0 #000000;
+}
+
+/* cert-seal: round red award seal. */
+.dell-cert-seal {
+  background-color: #e91d2a;
+  color: #ffffff;
+  border-radius: 9999px;
+  border: 2px solid #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* ribbon-card title bar: white fill, black Helvetica Bold, 1px black underline. */
+.dell-ribbon-title {
+  background-color: #ffffff;
+  color: #000000;
+  border-bottom: 1px solid #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* Custom scrollbar (light). */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #e0e0e0; }
+::-webkit-scrollbar-thumb { background: #808080; }
+::-webkit-scrollbar-thumb:hover { background: #606060; }
+
 .smooth-transition {
   transition: all 0.15s ease-in-out;
-}
-
-/* Custom scrollbar for dark theme */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #161b22;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #484f58;
-}
-
-/* Base body styles */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #0d1117;
-  color: #c9d1d9;
-}
-
-/* Prevent horizontal scroll */
-body {
-  overflow-x: hidden;
-}
-
-.dark {
-  color-scheme: dark;
 }

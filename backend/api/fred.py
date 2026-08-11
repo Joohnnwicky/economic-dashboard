@@ -26,7 +26,7 @@ async def api_get_fred_series(
     data = await fetch_fred_series(series_id, observation_start, observation_end)
 
     if 'error' in data:
-        raise HTTPException(status_code=500, detail=data['error'])
+        return data
 
     return data
 
@@ -47,6 +47,6 @@ async def api_get_fred_series_normalized(
     normalized = normalize_fred_data(data, series_id)
 
     if 'error' in normalized:
-        raise HTTPException(status_code=500, detail=normalized['error'])
+        return normalized
 
     return normalized

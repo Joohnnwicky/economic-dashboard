@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// 使用nginx代理路径
-const POLYMARKET_GAMMA_URL = '/api/polymarket';
+// 通过后端代理（与其他外部API一致）
+const POLYMARKET_GAMMA_URL = '/api/backend/polymarket';
 
 interface GammaMarket {
   id: string;

@@ -131,7 +131,7 @@ export function FedRateChart({ data, fomcData, timeRange = '1Y', height = 400 }:
           lineStyle: { color: DARK_THEME.accent[0] },
           areaStyle: { color: DARK_THEME.accent[0], opacity: 0.3 },
         },
-        fillerColor: 'rgba(88, 166, 255, 0.2)',
+        fillerColor: 'rgba(140, 154, 224, 0.25)',
         borderColor: DARK_THEME.gridLine,
         handleStyle: {
           color: DARK_THEME.accent[0],

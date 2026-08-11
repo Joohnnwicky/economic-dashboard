@@ -14,7 +14,7 @@ This file guides Claude Code's behavior for this project.
 
 ```
 src/
-├── api/                 # API clients (FRED, BLS, CoinGecko, AlphaVantage, etc.)
+├── api/                 # API clients (FRED, BLS, AlphaVantage, Binance, etc.)
 ├── components/
 │   ├── charts/          # ECharts chart components
 │   ├── layout/          # Dashboard layout
@@ -35,7 +35,7 @@ src/
 | BLS | **25/day** | 30 min |
 | Alpha Vantage | **25/day** | 60 min |
 | FRED | 1000/day | 5-15 min |
-| CoinGecko | 10-50/min | WebSocket |
+| Binance | REST 1200/min | 30s cache |
 
 **Rule:** ALWAYS check cache before API call. Implement rate limiting from Day 1.
 
@@ -58,18 +58,17 @@ This project uses **GSD (Get-Shit-Done)** framework.
 ### Current Status
 
 - **Phase:** 3 of 3 完成 (Gap Closure 已完成)
-- **UAT:** 测试暂停于 Test 3 (WebSocket Reconnection)
-- **新功能:** 中国房价面板已添加
-- **架构重构:** API Key 安全重构进行中 (WIP commit 9a179ea)
+- **UAT:** Gap closure 全部 resolved
+- **新功能:** 中国房价、美股头部股票、Polymarket 面板已添加
+- **架构:** API Key 安全重构已完成（前端零 Key，所有外部 API 经 Python 后端代理）
 - **Roadmap:** `.planning/ROADMAP.md`
 - **Requirements:** `.planning/REQUIREMENTS.md`
 
-### 两个活跃任务
+### 活跃任务
 
 | 任务 | 位置 | 状态 |
 |------|------|------|
 | Phase 03 UAT验证 | `.planning/phases/03-professional-experience/.continue-here.md` | 暂停 (Test 3 blocked) |
-| API Key安全重构 | `.continue-here.md` (项目根目录) | WIP (Phase 1-3完成) |
 
 ### Commands
 
@@ -134,6 +133,22 @@ python -m uvicorn main:app   # 后端 (localhost:8000)
 3. Charts render without freezing
 4. Dark theme is readable (contrast check)
 5. UTC timestamps display correctly in local time
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context (one `CONTEXT.md` + `docs/adr/` at the repo root). See `docs/agents/domain.md`.
 
 ---
 *Last updated: 2026-05-24*

@@ -18,6 +18,14 @@ from api.alphavantage import router as alphavantage_router
 from api.binance import router as binance_router
 from api.oil import router as oil_router
 from api.frankfurter import router as frankfurter_router
+from api.polymarket import router as polymarket_router
+from api.yfinance import router as yfinance_router
+from api.coinbase import router as coinbase_router
+from api.crypto_signals import router as crypto_signals_router
+from api.market_dominance import router as market_dominance_router
+from api.onchain import router as onchain_router
+from api.economic_calendar import router as economic_calendar_router
+from api.fedwatch import router as fedwatch_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
 
@@ -39,12 +47,12 @@ async def lifespan(app: FastAPI):
     # 启动时：加载缓存并启动定时任务
     HousingPriceCache.load_from_file()
 
-    # 金价使用AkShare，首次请求时自动获取并缓存
-    await update_gold_price_cache()
+    # 金价使用AkShare，由 scheduled_gold_update 后台首次获取，不阻塞启动
+    # (AkShare/新浪不可达时会挂起，不能在 lifespan 里 await)
 
-    # 如果房价缓存为空或过期，立即更新
+    # 如果房价缓存为空或过期，后台更新（不阻塞启动，creprice.cn 爬取 21 页耗时）
     if HousingPriceCache.data is None or HousingPriceCache.is_expired():
-        update_housing_price_cache()
+        asyncio.create_task(asyncio.to_thread(update_housing_price_cache))
 
     # 启动定时任务（后台运行）
     task = asyncio.create_task(scheduled_gold_update())
@@ -91,6 +99,14 @@ app.include_router(alphavantage_router, prefix="/api")
 app.include_router(binance_router, prefix="/api")
 app.include_router(oil_router, prefix="/api")
 app.include_router(frankfurter_router, prefix="/api")
+app.include_router(polymarket_router, prefix="/api")
+app.include_router(yfinance_router, prefix="/api")
+app.include_router(coinbase_router, prefix="/api")
+app.include_router(crypto_signals_router, prefix="/api")
+app.include_router(market_dominance_router, prefix="/api")
+app.include_router(onchain_router, prefix="/api")
+app.include_router(economic_calendar_router, prefix="/api")
+app.include_router(fedwatch_router, prefix="/api")
 
 
 @app.get("/")

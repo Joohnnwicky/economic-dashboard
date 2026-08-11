@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 describe('pboc-rates.json', () => {
-  const jsonPath = path.resolve(__dirname, '../../data/pboc-rates.json');
+  const jsonPath = path.resolve(__dirname, '../../../public/data/pboc-rates.json');
 
   it('exists and is valid JSON', () => {
     expect(fs.existsSync(jsonPath)).toBe(true);

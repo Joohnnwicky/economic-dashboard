@@ -1,6 +1,7 @@
 """
 Binance API代理服务 - 无需API Key，但需要代理绕过地理限制
 """
+import asyncio
 import httpx
 from datetime import datetime
 from typing import Dict, Optional, List
@@ -53,9 +54,12 @@ async def fetch_binance_ticker(symbol: str = 'BTCUSDT') -> dict:
     url = f"{APIConfig.BINANCE_BASE_URL}/ticker/24hr"
     params = {'symbol': symbol}
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url, params=params)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'error': f'网络连接失败: {type(e).__name__}', 'symbol': symbol}
 
     # 缓存结果
     if 'lastPrice' in data:
@@ -94,9 +98,12 @@ async def fetch_binance_klines(
         'limit': limit,
     }
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url, params=params)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'klines': [], 'symbol': symbol, 'error': f'网络连接失败: {type(e).__name__}'}
 
     # 缓存结果
     if isinstance(data, list) and len(data) > 0:
@@ -107,7 +114,7 @@ async def fetch_binance_klines(
 
 async def fetch_multiple_binance_tickers(symbols: List[str]) -> dict:
     """
-    批量获取多个交易对的行情
+    批量获取多个交易对的行情（并发请求）
 
     Args:
         symbols: 交易对列表
@@ -115,11 +122,8 @@ async def fetch_multiple_binance_tickers(symbols: List[str]) -> dict:
     Returns:
         {symbol: ticker_data} 字典
     """
-    results = {}
-    for symbol in symbols:
-        ticker = await fetch_binance_ticker(symbol)
-        results[symbol] = ticker
-    return results
+    tickers = await asyncio.gather(*(fetch_binance_ticker(s) for s in symbols))
+    return dict(zip(symbols, tickers))
 
 
 def normalize_binance_ticker(data: dict, symbol: str) -> dict:
@@ -207,9 +211,12 @@ async def fetch_top_volume_symbols(top_n: int = 10) -> list:
 
     url = f"{APIConfig.BINANCE_BASE_URL}/ticker/24hr"
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(url)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(url)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout):
+        return []
 
     if not isinstance(data, list):
         return []

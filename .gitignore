@@ -38,9 +38,20 @@ npm-debug.log*
 *.tsbuildinfo
 .gstack/
 
+# Open Design tool artifacts
+od-prompt.json
+od-response.txt
+public/pixel-preview.html
+
 # Docker images (large tar files)
 *.tar
 *-image.tar
+
+# Local-only deploy script (contains NAS SSH credentials)
+deploy_nas.py
+
+# Claude Code local settings
+.claude/settings.local.json
 
 # Cache files
 *_cache.json

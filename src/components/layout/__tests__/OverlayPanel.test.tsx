@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OverlayPanel } from '../OverlayPanel';
 import * as fedRateHook from '../../../hooks/useFedRate';
 import * as cryptoHook from '../../../hooks/useCrypto';
-import * as employmentHook from '../../../hooks/useEmploymentSubMetrics';
 import * as inflationHook from '../../../hooks/useInflationSubMetrics';
 import * as pceHook from '../../../hooks/usePCEData';
 import * as chineseHook from '../../../hooks/useChineseIndices';
@@ -17,10 +16,6 @@ vi.mock('../../../hooks/useFedRate', () => ({
 
 vi.mock('../../../hooks/useCrypto', () => ({
   useCrypto: vi.fn(),
-}));
-
-vi.mock('../../../hooks/useEmploymentSubMetrics', () => ({
-  useEmploymentSubMetrics: vi.fn(),
 }));
 
 vi.mock('../../../hooks/useInflationSubMetrics', () => ({
@@ -42,7 +37,11 @@ vi.mock('../../../hooks/usePBOCRate', () => ({
 // Mock OverlayComparisonChart
 vi.mock('../../charts/OverlayComparisonChart', () => ({
   OverlayComparisonChart: vi.fn(({ availableIndicators }) => (
-    <div data-testid="overlay-comparison-chart" data-indicator-count={availableIndicators.length}>
+    <div
+      data-testid="overlay-comparison-chart"
+      data-indicator-count={availableIndicators.length}
+      data-indicator-ids={availableIndicators.map((ind: { id?: string }) => ind.id).join(',')}
+    >
       Mocked OverlayComparisonChart
     </div>
   )),
@@ -68,13 +67,6 @@ describe('OverlayPanel', () => {
       isSuccess: true,
     } as any);
 
-    vi.mocked(employmentHook.useEmploymentSubMetrics).mockReturnValue({
-      data: [
-        { id: 'labor', name: '劳动参与率', value: 62.5, unit: '%', timestamp: new Date(), historical: [] },
-      ],
-      isLoading: false,
-    } as any);
-
     vi.mocked(inflationHook.useInflationSubMetrics).mockReturnValue({
       data: [
         { id: 'core-cpi', name: '核心CPI', value: 310.0, unit: 'index', timestamp: new Date(), historical: [] },
@@ -98,7 +90,10 @@ describe('OverlayPanel', () => {
     } as any);
 
     vi.mocked(pbocHook.usePBOCRate).mockReturnValue({
-      data: { id: 'pboc-lpr1y', name: 'LPR 1年', value: 3.45, unit: '%', timestamp: new Date(), historical: [] },
+      data: {
+        lpr: { id: 'pboc-lpr', name: 'LPR 1年', value: 3.45, unit: '%', timestamp: new Date(), historical: [] },
+        omo7d: { id: 'pboc-omo-7d', name: '7天逆回购', value: 1.5, unit: '%', timestamp: new Date(), historical: [] },
+      },
       isLoading: false,
       isSuccess: true,
     } as any);
@@ -129,6 +124,15 @@ describe('OverlayPanel', () => {
     expect(parseInt(indicatorCount || '0')).toBeGreaterThanOrEqual(7);
   });
 
+  it('passes both PBOC indicators to the comparison chart', () => {
+    render(<OverlayPanel />, { wrapper: createWrapper() });
+
+    const chart = screen.getByTestId('overlay-comparison-chart');
+    expect(chart.getAttribute('data-indicator-ids')).toContain('pboc-lpr');
+    expect(chart.getAttribute('data-indicator-ids')).toContain('pboc-omo-7d');
+    expect(chart.getAttribute('data-indicator-ids')).not.toContain('undefined');
+  });
+
   it('shows failed message when all data sources fail', () => {
     // All hooks return no data and not loading
     vi.mocked(fedRateHook.useFedRate).mockReturnValue({
@@ -136,10 +140,6 @@ describe('OverlayPanel', () => {
       data: undefined,
     } as any);
     vi.mocked(cryptoHook.useCrypto).mockReturnValue({
-      isLoading: false,
-      data: [],
-    } as any);
-    vi.mocked(employmentHook.useEmploymentSubMetrics).mockReturnValue({
       isLoading: false,
       data: [],
     } as any);
@@ -183,8 +183,8 @@ describe('OverlayPanel', () => {
   it('applies DARK_THEME colors', () => {
     const { container } = render(<OverlayPanel />, { wrapper: createWrapper() });
 
-    // Panel should have dark background
-    const panel = container.querySelector('[class*="bg-[#0d1117]"]');
+    // Panel should have light background (DARK_THEME.background = #ffffff)
+    const panel = container.querySelector('[class*="bg-white"]');
     expect(panel).toBeInTheDocument();
   });
 });

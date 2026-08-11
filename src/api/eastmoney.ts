@@ -5,19 +5,12 @@ import { parseUTCDate } from '../utils/utc';
 
 // 使用nginx代理路径
 const TENCENT_FINANCE_URL = '/api/tencent';
-const EASTMONEY_KLINE_URL = '/api/eastmoneykline';
 
 // Rate limit configuration
 const TENCENT_RATE_LIMIT = {
   maxCallsPerDay: 1000,
   minIntervalMs: 60000,  // 60 seconds minimum interval
   cacheTtlMs: 3600000,   // 60 minutes cache TTL
-};
-
-const EASTMONEY_KLINE_RATE_LIMIT = {
-  maxCallsPerDay: 100,
-  minIntervalMs: 60000,
-  cacheTtlMs: 3600000,
 };
 
 // A股指数代码映射（东方财富secid格式：市场代码.指数代码）
@@ -30,6 +23,47 @@ const INDEX_SECID_MAP: Record<string, string> = {
 
 // 腾讯财经返回格式: v_s_sh000001="1~上证指数~000001~3400.23~-3.86~-0.09~627233137~131508420~~";
 // 格式: 类型~名称~代码~当前价~涨跌额~涨跌幅~成交量~成交额~~
+
+/**
+ * 解析腾讯财经返回文本为指标数组（纯函数，便于测试）。
+ * 输入为 gbk 解码后的文本，由 getChineseIndices 的 transformResponse 调用。
+ */
+export function parseTencentIndices(text: string): NormalizedIndicator[] {
+  const lines = text.split('\n').filter(line => line.includes('v_s_sh'));
+  const indices: NormalizedIndicator[] = [];
+
+  for (const line of lines) {
+    const match = line.match(/v_s_sh(\d+)="(.+)"/);
+    if (!match || !match[2]) continue;
+
+    const parts = match[2].split('~');
+    if (parts.length < 6) continue;
+
+    const name = parts[1].trim();
+    const price = parseFloat(parts[3]);
+    const change = parseFloat(parts[4]);
+    const changePercent = parseFloat(parts[5]);
+
+    if (isNaN(price)) continue;
+
+    indices.push({
+      id: `sh${match[1]}`,
+      name,
+      value: price,
+      unit: 'index',
+      timestamp: new Date(),
+      change: {
+        value: change,
+        percentage: changePercent,
+        period: 'daily' as const,
+      },
+      historical: [],
+    });
+  }
+
+  return indices;
+}
+
 export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
   // A股主要指数代码: 上证指数、沪深300、上证50
   const symbols = 's_sh000001,s_sh000300,s_sh000016';
@@ -46,42 +80,8 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
               console.error('[Tencent] Invalid response');
               return [];
             }
-
             const decoder = new TextDecoder('gbk');
-            const text = decoder.decode(data);
-            const lines = text.split('\n').filter(line => line.includes('v_s_sh'));
-            const indices: NormalizedIndicator[] = [];
-
-            for (const line of lines) {
-              const match = line.match(/v_s_sh(\d+)="(.+)"/);
-              if (!match || !match[2]) continue;
-
-              const parts = match[2].split('~');
-              if (parts.length < 6) continue;
-
-              const name = parts[1].trim();
-              const price = parseFloat(parts[3]);
-              const change = parseFloat(parts[4]);
-              const changePercent = parseFloat(parts[5]);
-
-              if (isNaN(price)) continue;
-
-              indices.push({
-                id: `sh${match[1]}`,
-                name,
-                value: price,
-                unit: 'index',
-                timestamp: new Date(),
-                change: {
-                  value: change,
-                  percentage: changePercent,
-                  period: 'daily' as const,
-                },
-                historical: [],
-              });
-            }
-
-            return indices;
+            return parseTencentIndices(decoder.decode(data));
           } catch (err) {
             console.error('[Tencent] Transform error:', err);
             return [];
@@ -98,5 +98,3 @@ export async function getChineseIndices(): Promise<NormalizedIndicator[]> {
     return parsedData;
   }, TENCENT_RATE_LIMIT);
 }
-
-// Rate limit configuration

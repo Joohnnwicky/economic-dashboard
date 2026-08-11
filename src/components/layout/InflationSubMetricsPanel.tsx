@@ -29,6 +29,15 @@ export function InflationSubMetricsPanel() {
     );
   }
 
+  // 无数据时优雅降级：显示占位（而非空白 fragment），便于测试定位与用户感知
+  if ((!cpiData.data || cpiData.data.length === 0) && (!pceData.data || pceData.data.length === 0)) {
+    return (
+      <div data-testid="inflation-sub-metrics-panel" className="flex items-center justify-center h-20" style={{ color: DARK_THEME.textMuted }}>
+        暂无通胀数据
+      </div>
+    );
+  }
+
   // Combine CPI and PCE for overlay chart
   const chartSeries = [
     ...(cpiData.data?.filter((d) => d.id.includes('core')).map((d) => ({

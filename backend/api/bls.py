@@ -27,7 +27,7 @@ async def api_get_bls_series(
     data = await fetch_bls_series(seriesid, startyear, endyear)
 
     if 'error' in data:
-        raise HTTPException(status_code=500, detail=data['error'])
+        return data
 
     return data
 

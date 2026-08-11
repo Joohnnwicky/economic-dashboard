@@ -82,9 +82,12 @@ async def fetch_fred_series(
     # 发送请求
     url = f"{APIConfig.FRED_BASE_URL}/series/observations"
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(url, params=params)
+            data = response.json()
+    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout) as e:
+        return {'error': f'网络连接失败: {type(e).__name__}', 'series_id': series_id}
 
     # 缓存结果
     if 'observations' in data:

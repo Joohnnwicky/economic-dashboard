@@ -1,15 +1,19 @@
 import { useUSStocks } from '../../hooks/useUSStocks';
-import { IndicatorCard } from '../ui/IndicatorCard';
 import { DARK_THEME } from '../../constants/colors';
 import { USStockQuote } from '../../api/us-stocks';
+import { MiniChart } from '../charts/MiniChart';
+import { LastUpdated } from '../ui/LastUpdated';
+import { formatPrice } from '../../utils/formatters';
+import { NormalizedIndicator } from '../../types/indicator';
 
 const CATEGORY_LABELS: Record<USStockQuote['category'], string> = {
   'mag7': 'Magnificent 7',
   'semiconductor': '半导体扩展',
-  'spacex-proxy': 'SpaceX 代理',
+  'spacex': 'SpaceX',
+  'crypto-stock': '加密概念股',
 };
 
-const CATEGORY_ORDER: USStockQuote['category'][] = ['mag7', 'semiconductor', 'spacex-proxy'];
+const CATEGORY_ORDER: USStockQuote['category'][] = ['mag7', 'semiconductor', 'spacex', 'crypto-stock'];
 
 export function USStocksPanel() {
   const { data, isLoading, error } = useUSStocks();
@@ -41,28 +45,10 @@ export function USStocksPanel() {
     stocks: data.filter(s => s.category === cat),
   })).filter(g => g.stocks.length > 0);
 
-  // 是否所有股票都被 Alpha Vantage 配额限制
-  const allRateLimited = data.every(s => s.warning);
-
   return (
     <div className="space-y-6">
-      {allRateLimited && (
-        <p
-          className="text-sm p-3 rounded"
-          style={{
-            color: DARK_THEME.textMuted,
-            backgroundColor: 'rgba(248, 199, 0, 0.08)',
-            border: `1px solid rgba(248, 199, 0, 0.2)`,
-          }}
-        >
-          ⚠️ Alpha Vantage 免费配额（25次/天）已用完，数据将在配额刷新后恢复
-        </p>
-      )}
-
       <p className="text-sm" style={{ color: DARK_THEME.textMuted }}>
-        美股头部追踪 · Alpha Vantage 日线收盘价 · 缓存 1 小时
-        <br />
-        SpaceX 通过 DXYZ ETF 代理（持仓近 50% SpaceX，盘中实时反映二级市场估值）
+        美股头部追踪 · 腾讯日线收盘价 · 缓存 5 分钟
       </p>
 
       {grouped.map(group => (
@@ -73,7 +59,7 @@ export function USStocksPanel() {
           >
             {group.label}
           </h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {group.stocks.map(stock => (
               <USStockCard key={stock.symbol} stock={stock} />
             ))}
@@ -95,19 +81,70 @@ function USStockCard({ stock }: { stock: USStockQuote }) {
           {stock.symbol} <span className="text-xs">— {stock.name}</span>
         </h4>
         <span className="text-xs" style={{ color: DARK_THEME.textMuted }}>
-          配额限制中…
+          数据暂不可用
         </span>
       </div>
     );
   }
 
   return (
-    <IndicatorCard
-      title={`${stock.symbol} — ${stock.name}`}
-      value={stock.value}
-      unit="USD"
-      change={stock.change}
-      lastUpdated={stock.timestamp}
-    />
+    <div
+      className="rounded-lg p-4 flex flex-col"
+      style={{ backgroundColor: DARK_THEME.panel }}
+    >
+      <h4 className="text-sm mb-2" style={{ color: DARK_THEME.textMuted }}>
+        {stock.symbol} <span className="text-xs">— {stock.name}</span>
+      </h4>
+
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-bold" style={{ color: DARK_THEME.text }}>
+          {formatPrice(stock.value, 'USD')}
+        </span>
+      </div>
+
+      {stock.change && (
+        <div className="flex items-center gap-2 mt-2">
+          <span
+            style={{
+              color: stock.change.percentage >= 0 ? DARK_THEME.positive : DARK_THEME.negative,
+            }}
+          >
+            {stock.change.percentage >= 0 ? '+' : ''}{stock.change.percentage.toFixed(2)}%
+          </span>
+          <span className="text-sm" style={{ color: DARK_THEME.textMuted }}>
+            (24h)
+          </span>
+        </div>
+      )}
+
+      {stock.historical.length >= 2 && (
+        <div className="mt-3">
+          <MiniChart
+            data={toNormalized(stock)}
+            height={60}
+            isDaily={true}
+          />
+        </div>
+      )}
+
+      <div className="mt-2">
+        <LastUpdated timestamp={stock.timestamp} />
+      </div>
+    </div>
   );
+}
+
+/** 把 USStockQuote 转成 MiniChart 期望的 NormalizedIndicator 形状 */
+function toNormalized(stock: USStockQuote): NormalizedIndicator {
+  return {
+    id: `us-stock-${stock.symbol.toLowerCase()}`,
+    name: stock.symbol,
+    value: stock.value,
+    unit: 'USD',
+    timestamp: stock.timestamp,
+    change: stock.change
+      ? { ...stock.change, period: 'daily' }
+      : undefined,
+    historical: stock.historical,
+  };
 }
