@@ -47,12 +47,12 @@ async def lifespan(app: FastAPI):
     # 启动时：加载缓存并启动定时任务
     HousingPriceCache.load_from_file()
 
-    # 金价使用AkShare，首次请求时自动获取并缓存
-    await update_gold_price_cache()
+    # 金价使用AkShare，由 scheduled_gold_update 后台首次获取，不阻塞启动
+    # (AkShare/新浪不可达时会挂起，不能在 lifespan 里 await)
 
-    # 如果房价缓存为空或过期，立即更新
+    # 如果房价缓存为空或过期，后台更新（不阻塞启动，creprice.cn 爬取 21 页耗时）
     if HousingPriceCache.data is None or HousingPriceCache.is_expired():
-        update_housing_price_cache()
+        asyncio.create_task(asyncio.to_thread(update_housing_price_cache))
 
     # 启动定时任务（后台运行）
     task = asyncio.create_task(scheduled_gold_update())

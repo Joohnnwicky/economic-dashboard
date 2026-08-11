@@ -1,6 +1,7 @@
 """
 金价数据服务 - 使用AkShare获取上海黄金期货主力合约数据（元/克）
 """
+import asyncio
 import akshare as ak
 from typing import Dict, Optional
 from datetime import datetime
@@ -107,13 +108,37 @@ def fetch_gold_price() -> Dict:
         }
 
 
+GOLD_FETCH_TIMEOUT = 30  # AkShare 同步调用挂起时的超时(秒), 避免阻塞事件循环
+
+
 async def get_gold_price() -> Dict:
-    """API路由调用入口"""
-    return fetch_gold_price()
+    """API路由调用入口。AkShare 同步阻塞调用丢线程池, 30s 超时走 fallback。"""
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(fetch_gold_price), timeout=GOLD_FETCH_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        print(f"获取金价超时({GOLD_FETCH_TIMEOUT}s), 返回 fallback")
+        return {
+            'seriesId': 'GOLD_FALLBACK',
+            'name': '国内金价（参考值）',
+            'value': 0,
+            'unit': '元/克',
+            'timestamp': datetime.now().isoformat(),
+            'change': None,
+            'historical': [],
+            'source': 'fallback',
+            'warning': '金价数据获取超时, 请稍后刷新',
+        }
 
 
 async def update_gold_price_cache():
-    """手动刷新缓存"""
+    """手动刷新缓存。超时不抛异常, 留待定时任务重试。"""
     GoldPriceCache._data = None
     GoldPriceCache._timestamp = None
-    return fetch_gold_price()
+    try:
+        await asyncio.wait_for(
+            asyncio.to_thread(fetch_gold_price), timeout=GOLD_FETCH_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        print(f"刷新金价缓存超时({GOLD_FETCH_TIMEOUT}s), 稍后定时任务重试")
