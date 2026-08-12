@@ -204,6 +204,9 @@ yfinance 依赖 Yahoo Finance，部分网络对 Yahoo 不稳定。属数据源�
 **Q: 本地 `npm run build` 报类型错误？**
 `build` 脚本含 `tsc` 类型检查。Docker 构建用 `npx vite build` 跳过 tsc，可正常产出。本地若要绕过，直接 `npx vite build`。
 
+**Q: 部署新版后浏览器仍显示旧页面？**
+浏览器缓存了旧 `index.html`。`nginx.conf` 已对 `index.html` 设 `Cache-Control: no-cache`（带 hash 的 JS/CSS 文件名一变即失效，仍走长缓存）。部署后对页面按 **Ctrl+F5** 强制刷新一次即可；之后每次部署浏览器都会自动回源拿最新入口。
+
 ## 开发指南
 
 ### 添加新指标
