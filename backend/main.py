@@ -2,7 +2,7 @@
 A股数据后端服务 - 使用通达信(mootdx)获取K线和实时行情，AkShare获取中国宏观经济数据，Alpha Vantage获取金价
 """
 from dotenv import load_dotenv
-load_dotenv()  # 加载.env文件中的环境变量
+load_dotenv(override=True)  # .env 优先于系统环境变量(避免旧 DEEPSEEK_API_KEY 等覆盖)
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -28,6 +28,7 @@ from api.economic_calendar import router as economic_calendar_router
 from api.fedwatch import router as fedwatch_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache
+from services.release_scheduler import refresh_releases
 
 # 定时任务：每小时更新金价缓存
 async def scheduled_gold_update():
@@ -39,6 +40,19 @@ async def scheduled_gold_update():
             print(f"定时更新金价失败: {e}")
         # 等待1小时
         await asyncio.sleep(3600)
+
+
+# 定时任务：每日刷新经济指标发布日(官网爬取+LLM兜底)
+async def scheduled_release_refresh():
+    """每日刷新 release_cache.json。启动后延迟60秒首次跑(避开启动高峰), 之后每24小时。"""
+    await asyncio.sleep(60)
+    while True:
+        try:
+            report = await refresh_releases()
+            print(f"定时刷新发布日完成: official={report['official']} llm={report['llm']} fallback={report['fallback']}")
+        except Exception as e:
+            print(f"定时刷新发布日失败: {e}")
+        await asyncio.sleep(86400)
 
 
 @asynccontextmanager
@@ -56,11 +70,13 @@ async def lifespan(app: FastAPI):
 
     # 启动定时任务（后台运行）
     task = asyncio.create_task(scheduled_gold_update())
+    release_task = asyncio.create_task(scheduled_release_refresh())
 
     yield
 
     # 关闭时：取消定时任务
     task.cancel()
+    release_task.cancel()
 
 
 app = FastAPI(

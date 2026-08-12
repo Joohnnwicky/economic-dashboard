@@ -20,6 +20,11 @@ class APIConfig:
     ALPHA_VANTAGE_API_KEY = os.environ.get('ALPHA_VANTAGE_API_KEY', '')
     ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query'
 
+    # DeepSeek LLM (经济日历发布日解析)
+    DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', '')
+    DEEPSEEK_BASE_URL = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com')
+    DEEPSEEK_MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-v4-flash')
+
     # Binance API (加密货币) - 无需密钥，公开API
     BINANCE_BASE_URL = 'https://api.binance.com/api/v3'
 
@@ -36,6 +41,7 @@ class APIConfig:
         'Onchain': 1800,    # 30分钟 (mempool.space 算力/手续费)
         'EconomicCalendar': 3600,  # 1小时 (纯计算经济日历, NFP/CPI/PPI/PCE)
         'FedWatch': 3600,   # 1小时 (CME FedWatch / FOMC 日历)
+        'ReleaseRefresh': 86400,  # 1天 (发布日采集, 每日刷新)
     }
 
     @classmethod

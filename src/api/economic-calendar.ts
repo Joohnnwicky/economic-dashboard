@@ -7,6 +7,7 @@ export interface CalendarEvent {
   event: string | null;
   impact: string | null;      // high / medium / low
   approximate: boolean;       // true=节奏估算(约), false=精确(如 NFP)
+  country: string | null;     // "US" / "CN"
 }
 
 export interface EconomicCalendar {

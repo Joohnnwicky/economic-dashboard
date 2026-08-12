@@ -36,7 +36,7 @@
 | 主要汇率 | Frankfurter API | 1 小时 |
 | 美股指数（道指/纳指/标普 500） | 静态 JSON（每日更新） | 每日 |
 | 美股头部股票（Mag7/半导体/加密概念） | yfinance | 5 分钟 |
-| 经济日历（NFP/CPI/PPI/PCE） | 后端计算 | 1 小时 |
+| 经济日历（中美指标发布日） | 国家统计局 + BLS + DeepSeek 解析 | 每日采集 |
 | 中国股市指数 | 腾讯财经 | 1 小时 |
 | 中国宏观经济指标 | AkShare | 每日 |
 | 中国 PMI 指标 | AkShare | 每日 |
@@ -45,6 +45,16 @@
 | 中国房价行情 | creprice.cn | 1 小时 |
 | 中国央行利率（PBOC LPR/OMO） | 静态 JSON | 手动更新 |
 | Polymarket | Polymarket Gamma API | 1 小时 |
+
+### 经济日历自动采集
+
+经济日历面板分 🇺🇸 美国 / 🇨🇳 中国 两区展示各指标的下一次发布日，发布日通过三层策略自动采集：
+
+1. **官方源抓取** - 中国指标从国家统计局全年日程表（stats.gov.cn）抓取，美国指标从 BLS 官方日历抓取
+2. **DDG + LLM 兜底** - 官方未覆盖时用 DuckDuckGo 搜索 + DeepSeek 解析页面提取具体日期
+3. **节奏估算** - 仍无法命中时按历史节奏估算（如"约每月 13 日"），前端标注"约"
+
+> 后端启动 60 秒后首次采集，之后每 24 小时自动刷新一次；也可通过 `POST /api/economic-calendar/refresh` 手动触发。采集结果持久化到 `backend/data/release_cache.json`。
 
 ### A股自选股
 
@@ -100,6 +110,7 @@
 | **FRED** | 美联储、美债、美元指数、油价 | 1000 次/天 |
 | **BLS** | 美国 CPI / 就业 | 25 次/天 ⚠️ |
 | **Alpha Vantage** | 美股 / 金价（备用） | 25 次/天 ⚠️ |
+| **DeepSeek** | 经济日历发布日 LLM 解析 | 按量计费 |
 
 ### 2. 本地开发
 
@@ -112,7 +123,7 @@ npm install
 cp .env.example .env.local   # 填入 VITE_ 前缀的 key
 
 # 后端配置
-cp .env.example backend/.env # 填入 FRED_API_KEY / BLS_API_KEY / ALPHA_VANTAGE_API_KEY
+cp .env.example backend/.env # 填入 FRED_API_KEY / BLS_API_KEY / ALPHA_VANTAGE_API_KEY / DEEPSEEK_API_KEY
 
 # 启动前端（localhost:5173）
 npm run dev

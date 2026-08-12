@@ -43,3 +43,16 @@ export function toUTC(date: Date): Date {
 export function nowUTC(): Date {
   return toUTC(new Date());
 }
+
+/**
+ * 北京今天的日期字符串 'YYYY-MM-DD'。
+ * 基于 UTC+8 计算, 不依赖浏览器时区, 与后端(Asia/Shanghai)对齐。
+ * 用于经济日历等"按北京日期"做比较的场景。
+ */
+export function beijingTodayStr(): string {
+  const bj = new Date(Date.now() + 8 * 3600000); // UTC+8 时刻
+  const y = bj.getUTCFullYear();
+  const m = String(bj.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(bj.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
