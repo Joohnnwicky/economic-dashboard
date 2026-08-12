@@ -27,7 +27,7 @@ from api.onchain import router as onchain_router
 from api.economic_calendar import router as economic_calendar_router
 from api.fedwatch import router as fedwatch_router
 from services.gold_service import update_gold_price_cache
-from services.housing_price_service import HousingPriceCache, update_housing_price_cache
+from services.housing_price_service import HousingPriceCache, update_housing_price_cache, update_national_ranking_only, update_city_details
 from services.release_scheduler import refresh_releases
 
 # 定时任务：每小时更新金价缓存
@@ -64,9 +64,19 @@ async def lifespan(app: FastAPI):
     # 金价使用AkShare，由 scheduled_gold_update 后台首次获取，不阻塞启动
     # (AkShare/新浪不可达时会挂起，不能在 lifespan 里 await)
 
-    # 如果房价缓存为空或过期，后台更新（不阻塞启动，creprice.cn 爬取 21 页耗时）
-    if HousingPriceCache.data is None or HousingPriceCache.is_expired():
-        asyncio.create_task(asyncio.to_thread(update_housing_price_cache))
+    # 如果房价缓存为空、过期、或排行数据缺失，立即更新排行（快速，2s），
+    # 然后后台更新城市详情（慢速，creprice.cn 间歇性连通）
+    need_update = (
+        HousingPriceCache.data is None
+        or HousingPriceCache.is_expired()
+        or not HousingPriceCache.data.get('national')  # 排行数据缺失也需刷新
+    )
+    if need_update:
+        try:
+            update_national_ranking_only()
+        except Exception as e:
+            print(f"启动时排行更新失败: {e}")
+        asyncio.create_task(asyncio.to_thread(update_city_details))
 
     # 启动定时任务（后台运行）
     task = asyncio.create_task(scheduled_gold_update())
