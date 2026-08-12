@@ -16,6 +16,31 @@ function formatDifficulty(d: number | null): string {
   return `${(d / 1e12).toFixed(2)} T`;
 }
 
+/** 根据历史趋势判断算力水平 */
+function assessHashrate(
+  currentEh: number | null,
+  trend: Array<{ hashrate_eh: number }>,
+): { label: string; color: string } | null {
+  if (currentEh === null || trend.length < 3) return null;
+  const values = trend.map(p => p.hashrate_eh);
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  const ratio = currentEh / avg;
+  if (ratio >= 1.15) return { label: '算力强劲 (ATH 附近)', color: DARK_THEME.positive };
+  if (ratio >= 1.05) return { label: '算力偏高', color: DARK_THEME.positive };
+  if (ratio >= 0.95) return { label: '算力正常', color: DARK_THEME.textMuted };
+  if (ratio >= 0.85) return { label: '算力偏低', color: DARK_THEME.warning };
+  return { label: '算力显著下降', color: DARK_THEME.error };
+}
+
+/** 手续费拥堵等级 */
+function assessFees(satPerVb: number | null): { label: string; color: string } | null {
+  if (satPerVb === null || satPerVb === undefined) return null;
+  if (satPerVb >= 30) return { label: '严重拥堵', color: DARK_THEME.error };
+  if (satPerVb >= 10) return { label: '网络拥堵', color: DARK_THEME.warning };
+  if (satPerVb >= 3) return { label: '正常', color: DARK_THEME.positive };
+  return { label: '空闲', color: DARK_THEME.positive };
+}
+
 export function OnchainPanel() {
   const { data, isLoading, error, isFetching } = useOnchain();
 
@@ -48,6 +73,9 @@ export function OnchainPanel() {
 
   const trend = data.trend || [];
   const hasTrend = trend.length > 1;
+  const hashrateEh = data.hashrate_hs != null ? data.hashrate_hs / 1e18 : null;
+  const hashrateAssess = assessHashrate(hashrateEh, trend);
+  const feeAssess = assessFees(data.hour);
 
   const trendOption = hasTrend ? {
     backgroundColor: 'transparent',
@@ -102,7 +130,14 @@ export function OnchainPanel() {
           <div className="text-3xl font-bold" style={{ color: DARK_THEME.text, fontFamily: 'Arial Black, sans-serif' }}>
             {formatHashrate(data.hashrate_hs)}
           </div>
-          <div className="text-xs mt-1" style={{ color: DARK_THEME.textMuted }}>BTC 网络算力</div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs" style={{ color: DARK_THEME.textMuted }}>BTC 网络算力</span>
+            {hashrateAssess && (
+              <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: hashrateAssess.color, backgroundColor: hashrateAssess.color + '18', border: `1px solid ${hashrateAssess.color}40` }}>
+                {hashrateAssess.label}
+              </span>
+            )}
+          </div>
         </div>
         <div className="text-right">
           <div className="text-lg font-bold" style={{ color: DARK_THEME.text }}>
@@ -118,15 +153,25 @@ export function OnchainPanel() {
       )}
 
       {/* 手续费 */}
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <div className="flex justify-between p-1.5" style={{ border: `1px solid ${DARK_THEME.border}` }}>
-          <span style={{ color: DARK_THEME.textMuted }}>快速</span>
-          <span style={{ color: DARK_THEME.error }}>{data.fastest ?? '-'} sat/vB</span>
+      <div className="space-y-1">
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex justify-between p-1.5" style={{ border: `1px solid ${DARK_THEME.border}` }}>
+            <span style={{ color: DARK_THEME.textMuted }}>快速</span>
+            <span style={{ color: DARK_THEME.error }}>{data.fastest ?? '-'} sat/vB</span>
+          </div>
+          <div className="flex justify-between p-1.5" style={{ border: `1px solid ${DARK_THEME.border}` }}>
+            <span style={{ color: DARK_THEME.textMuted }}>1小时</span>
+            <span style={{ color: DARK_THEME.warning }}>{data.hour ?? '-'} sat/vB</span>
+          </div>
         </div>
-        <div className="flex justify-between p-1.5" style={{ border: `1px solid ${DARK_THEME.border}` }}>
-          <span style={{ color: DARK_THEME.textMuted }}>1小时</span>
-          <span style={{ color: DARK_THEME.warning }}>{data.hour ?? '-'} sat/vB</span>
-        </div>
+        {feeAssess && (
+          <div className="flex items-center gap-1">
+            <span className="text-xs" style={{ color: DARK_THEME.textMuted }}>链上拥堵:</span>
+            <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: feeAssess.color, backgroundColor: feeAssess.color + '18', border: `1px solid ${feeAssess.color}40` }}>
+              {feeAssess.label}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 难度调整 */}
