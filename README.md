@@ -7,31 +7,44 @@
 [![ECharts](https://img.shields.io/badge/ECharts-5.5-AA344D?logo=apache)](https://echarts.apache.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 
-一个本地/内网运行的全球经济指标实时监控看板，整合展示美联储利率、美国通胀、加密货币行情、A股/美股指数、中国央行利率、中国房价等 20 类核心经济指标。采用 **Dell 1996 目录式设计语言**——纯黑页面边框、扁平色块丝带卡片、Arial Black 粗体标题、Times Roman 衬线正文。
+一个本地/内网运行的全球经济指标实时监控看板，整合展示美联储利率、美国通胀、加密货币行情、A股/美股指数、中国央行利率、中国房价等 28 类核心经济指标。采用 **Dell 1996 目录式设计语言**——纯黑页面边框、扁平色块丝带卡片、Arial Black 粗体标题、Times Roman 衬线正文。
 
 > **架构核心：** 前端零 API Key，所有外部 API 经 Python FastAPI 后端代理，兼顾密钥隔离与缓存控量。公网部署不暴露任何凭据。
 
 ## 功能特性
 
-### 20 类指标监控
+### 28 类指标监控
 
-| 类别 | 指标 | 数据源 | 更新频率 |
-|------|------|--------|----------|
-| **美联储** | 联邦基金利率 (FFR)、FOMC 议息目标利率 | FRED | 每日 / 会议后 |
-| **美债** | 2/10/30 年期国债收益率 | FRED | 每日 |
-| **美国通胀** | CPI、核心 CPI、PCE、核心 PCE | BLS / FRED | 月度 |
-| **美元指数** | 美元贸易加权指数 | FRED | 每日 |
-| **大宗商品** | 布伦特/WTI 原油、国内金价（上海黄金期货） | FRED / AkShare | 每日 |
-| **加密货币** | Top10 币种 24h 行情 | Binance REST | 每分钟轮询 |
-| **汇率** | USD/CNY、EUR/USD、GBP/USD 等 | Frankfurter API | 每日 |
-| **美股指数** | 道琼斯、纳斯达克、标普 500 | yfinance | 每日 |
-| **美股头部** | Magnificent 7、半导体、SpaceX | yfinance | 每日 |
-| **A股指数** | 上证、深证、创业板 | 东方财富 / 腾讯财经 | 分钟级 |
-| **中国宏观** | GDP、CPI、PPI、M2、PMI | AkShare（国家统计局） | 月度 / 季度 |
-| **中国贸易/信贷** | 进出口同比、社融信贷 | AkShare | 月度 |
-| **中国房价** | 全国 TOP10 排行 + 城市详情 | creprice.cn（爬虫） | 每日 |
-| **中国央行** | PBOC MLF/LPR/OMO 利率 | 静态数据 | 手动更新 |
-| **预测市场** | Polymarket 热门 | Polymarket Gamma API | 分钟级 |
+| 指标面板 | 数据源 | 更新频率 |
+|------|--------|----------|
+| 美国联邦基金利率（FFR） | FRED | 每日 |
+| FOMC 会议日历与倒计时（FedWatch） | 后端计算（FOMC 公开日程） | 10 分钟 |
+| 市场机制识别（Market Regime） | FRED（VIX + 期限利差 + 衰退） | 1 小时 |
+| 美国国债收益率（2/3/10/30Y） | FRED | 每日 |
+| 美国 CPI | FRED | 每日 |
+| 通胀细分（CPI 细分 + PCE） | BLS + FRED | 30min / 每日 |
+| 初请失业金 | FRED | 1 小时 |
+| 美国先行指标（ISM PMI + 消费者信心） | FRED | 1 小时 |
+| 美元指数 | FRED | 每日 |
+| VIX 恐慌指数 | FRED | 1 小时 |
+| 国内金价（上海黄金期货） | AkShare | 每日 |
+| 油价 | 后端（国内 + 国际） | 1 小时 |
+| 加密货币行情（Top 10） | Binance REST | 1 分钟 |
+| 加密牛熊综合判断 | Coinbase 溢价 + 后端信号 | 1min / 1h |
+| 加密市占率与山寨季 | CoinGecko | 1 小时 |
+| BTC 链上数据 | mempool.space | 30 分钟 |
+| 主要汇率 | Frankfurter API | 1 小时 |
+| 美股指数（道指/纳指/标普 500） | 静态 JSON（每日更新） | 每日 |
+| 美股头部股票（Mag7/半导体/加密概念） | yfinance | 5 分钟 |
+| 经济日历（NFP/CPI/PPI/PCE） | 后端计算 | 1 小时 |
+| 中国股市指数 | 腾讯财经 | 1 小时 |
+| 中国宏观经济指标 | AkShare | 每日 |
+| 中国 PMI 指标 | AkShare | 每日 |
+| 中国贸易数据 | AkShare | 每日 |
+| 中国信贷数据 | AkShare | 每日 |
+| 中国房价行情 | creprice.cn | 1 小时 |
+| 中国央行利率（PBOC LPR/OMO） | 静态 JSON | 手动更新 |
+| Polymarket | Polymarket Gamma API | 1 小时 |
 
 ### A股自选股
 
