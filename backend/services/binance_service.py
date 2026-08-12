@@ -202,6 +202,7 @@ def normalize_binance_klines(data: dict) -> dict:
 async def fetch_top_volume_symbols(top_n: int = 10) -> list:
     """
     获取币安USDT交易对24h交易量排行
+    Binance 被墙时自动 fallback 到 CoinGecko 免费 API
     返回前top_n个交易对的行情数据
     """
     cache_key = f"top_volume_{top_n}"
@@ -214,12 +215,26 @@ async def fetch_top_volume_symbols(top_n: int = 10) -> list:
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.get(url)
+            if response.status_code != 200:
+                raise Exception(f"Binance HTTP {response.status_code}")
+            # Binance may return error JSON even on 200 (geo-block)
             data = response.json()
-    except (httpx.ConnectTimeout, httpx.ConnectError, httpx.ReadTimeout):
-        return []
+            if isinstance(data, dict) and data.get('code') is not None:
+                raise Exception(f"Binance restricted: {data.get('msg', 'unknown')}")
+    except Exception as e:
+        print(f"Binance top-volume 不可用: {e}, 回退到 CoinGecko")
+        from services.coingecko_service import fetch_top_volume_from_coingecko
+        fallback = await fetch_top_volume_from_coingecko(top_n)
+        if fallback:
+            BinanceCache.set(cache_key, fallback)
+        return fallback
 
     if not isinstance(data, list):
-        return []
+        from services.coingecko_service import fetch_top_volume_from_coingecko
+        fallback = await fetch_top_volume_from_coingecko(top_n)
+        if fallback:
+            BinanceCache.set(cache_key, fallback)
+        return fallback
 
     # 只筛选USDT交易对，排除稳定币对
     stablecoins = {'USDT', 'BUSD', 'FDUSD', 'TUSD', 'DAI', 'USDC', 'USD1', 'USTC', 'PYUSD'}

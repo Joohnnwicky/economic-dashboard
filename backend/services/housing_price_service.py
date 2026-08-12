@@ -8,10 +8,63 @@ from datetime import datetime
 import re
 import json
 import os
+import time
+import urllib3
+
+# 禁用 SSL 警告（NAS 网络环境 TLS 握手不稳定时重试 verify=False）
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # 缓存文件路径
 CACHE_FILE = "housing_price_cache.json"
 CACHE_EXPIRE_HOURS = 24  # 每日更新一次
+
+# 重试配置
+MAX_RETRIES = 3
+RETRY_BACKOFF = 2  # 秒, 指数增长: 2, 4, 8
+CITY_DELAY = 1.5  # 城市间请求间隔(秒), 避免被 creprice.cn 限流
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+}
+
+
+def _robust_get(url: str, timeout: int = 20) -> requests.Response:
+    """
+    带重试 + SSL 降级的 HTTP GET。
+    NAS 网络环境访问 creprice.cn 偶发 SSL: UNEXPECTED_EOF_WHILE_READING，
+    首次尝试正常 SSL，失败后降级为 verify=False 再试。
+    """
+    last_error = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            # 第 1-2 次尝试正常 SSL，第 3 次降级
+            verify_ssl = attempt < MAX_RETRIES
+            resp = requests.get(url, headers=HEADERS, timeout=timeout, verify=verify_ssl)
+            resp.encoding = 'utf-8'
+            return resp
+        except requests.exceptions.SSLError as e:
+            last_error = e
+            print(f"  [{url[-40:]}] SSL 错误 (attempt {attempt}/{MAX_RETRIES}): {e}")
+            if attempt == MAX_RETRIES:
+                # 最后一次用 verify=False 再试
+                try:
+                    resp = requests.get(url, headers=HEADERS, timeout=timeout, verify=False)
+                    resp.encoding = 'utf-8'
+                    print(f"  [{url[-40:]}] verify=False 成功")
+                    return resp
+                except Exception as e2:
+                    last_error = e2
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout,
+                requests.exceptions.ConnectTimeout) as e:
+            last_error = e
+            print(f"  [{url[-40:]}] 连接错误 (attempt {attempt}/{MAX_RETRIES}): {e}")
+        if attempt < MAX_RETRIES:
+            sleep_time = RETRY_BACKOFF ** attempt
+            print(f"  [{url[-40:]}] {sleep_time}s 后重试...")
+            time.sleep(sleep_time)
+    raise last_error
 
 # 主要城市代码（拼音首字母缩写）
 MAIN_CITIES = {
@@ -110,15 +163,9 @@ def scrape_national_ranking() -> List[Dict]:
         城市房价列表，包含排名、城市、省份、均价、环比
     """
     url = "https://m.creprice.cn/"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-    }
 
     try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.encoding = 'utf-8'
+        response = _robust_get(url, timeout=20)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         results = []
@@ -172,15 +219,9 @@ def scrape_city_price(city_code: str) -> Dict:
         城市房价详情，包含均价、环比、各区数据
     """
     url = f"https://m.creprice.cn/city/{city_code}.html"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-    }
 
     try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.encoding = 'utf-8'
+        response = _robust_get(url, timeout=20)
 
         city_name = MAIN_CITIES.get(city_code, city_code.upper())
 
@@ -256,12 +297,17 @@ def update_housing_price_cache() -> Dict:
 
     # 爬取全国排行
     national = scrape_national_ranking()
+    print(f"  全国排行: {len(national)} 个城市")
 
-    # 爬取主要城市详情
+    # 爬取主要城市详情（加间隔避免被限流）
     cities = {}
-    for code in MAIN_CITIES.keys():
+    for i, code in enumerate(MAIN_CITIES.keys()):
+        if i > 0:
+            time.sleep(CITY_DELAY)
         city_data = scrape_city_price(code)
         cities[code] = city_data
+        has_data = city_data.get('secondHandPrice') is not None
+        print(f"  [{i+1}/{len(MAIN_CITIES)}] {MAIN_CITIES[code]}: {'OK' if has_data else 'FAIL'}")
 
     result = {
         'national': national,

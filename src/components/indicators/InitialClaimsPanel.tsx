@@ -4,9 +4,9 @@ import { LastUpdated } from '../ui/LastUpdated';
 import { DARK_THEME } from '../../constants/colors';
 import { formatChineseNumber } from '../../utils/formatters';
 
-// FRED ICSA 单位为千人, 乘 1000 后按中文万/亿展示
-function formatClaims(thousands: number): string {
-  return formatChineseNumber(thousands * 1000);
+// FRED ICSA 单位为实际人数(人), 按中文万/亿展示
+function formatClaims(value: number): string {
+  return formatChineseNumber(value);
 }
 
 export function InitialClaimsPanel() {
