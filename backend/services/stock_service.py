@@ -1,8 +1,11 @@
 """
 股票数据服务 - 获取K线和实时行情
 """
+import time
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
+from zoneinfo import ZoneInfo
+
 import pandas as pd
 from models.indicator import (
     NormalizedIndicator,
@@ -14,6 +17,21 @@ from services.tdx_client import tdx_client, get_market_code, get_stock_name
 import logging
 
 logger = logging.getLogger(__name__)
+
+# A股休市期间行情不再变化，对实时行情做 TTL 缓存（前端休市已降频，
+# 此处是第二道保险：多标签/多页面轮询时也只打到通达信一次）
+_QUOTE_CACHE: Dict[str, Tuple[float, NormalizedIndicator]] = {}
+_QUOTE_CACHE_TTL_CLOSED = 300  # 休市缓存 5 分钟
+_BJ_TZ = ZoneInfo('Asia/Shanghai')
+
+
+def is_ashare_market_open() -> bool:
+    """A股交易时段（北京时间周一~周五，含集合竞价与收盘缓冲）。法定节假日未覆盖。"""
+    now = datetime.now(_BJ_TZ)
+    if now.weekday() >= 5:
+        return False
+    minutes = now.hour * 60 + now.minute
+    return (9 * 60 + 15 <= minutes < 11 * 60 + 30) or (12 * 60 + 55 <= minutes < 15 * 60 + 5)
 
 
 def get_kline_data(
@@ -39,13 +57,21 @@ def get_kline_data(
         freq_map = {'daily': 9, 'weekly': 5, 'monthly': 4}
         frequency = freq_map.get(period, 9)
 
-        # 获取K线数据 (使用 bars 方法)
-        result = client.bars(
-            symbol=code,
-            frequency=frequency,
-            start=0,
-            offset=limit
-        )
+        # 指数（999999=上证指数）用 index_bars, 个股用 bars
+        if code.startswith('9'):
+            result = client.index_bars(
+                symbol=code,
+                frequency=frequency,
+                start=0,
+                offset=limit
+            )
+        else:
+            result = client.bars(
+                symbol=code,
+                frequency=frequency,
+                start=0,
+                offset=limit
+            )
 
         if result is None or (hasattr(result, 'empty') and result.empty):
             logger.warning(f"获取K线数据失败: {code}, result empty")
@@ -107,9 +133,82 @@ def get_kline_data(
         return None
 
 
+def _cache_quote(code: str, quote: NormalizedIndicator) -> None:
+    """休市时段写入行情缓存（交易时段数据实时变化，不缓存）"""
+    if not is_ashare_market_open():
+        _QUOTE_CACHE[code] = (time.monotonic(), quote)
+
+
+def _quote_from_row(code: str, row) -> Optional[NormalizedIndicator]:
+    """从通达信行情 DataFrame 行构造 NormalizedIndicator"""
+    current_price = float(row.get('price', 0))
+    prev_close = float(row.get('last_close', current_price))
+
+    if prev_close > 0:
+        change_pct = (current_price - prev_close) / prev_close * 100
+        change_value = current_price - prev_close
+    else:
+        change_pct = 0
+        change_value = 0
+
+    name = str(row.get('name', get_stock_name(code)))
+
+    return NormalizedIndicator(
+        id=f"stock-{code}",
+        name=name,
+        value=current_price,
+        unit="CNY",
+        timestamp=datetime.now(),
+        change=Change(
+            value=change_value,
+            percentage=change_pct,
+            period="daily",
+        ),
+        historical=[],  # 实时行情没有历史数据
+    )
+
+
+def _fetch_quotes_batch(codes: List[str]) -> Dict[str, NormalizedIndicator]:
+    """一次 TDX 请求获取多只行情（mootdx quotes 原生支持代码列表）"""
+    client = tdx_client.get_client()
+    df = client.quotes(symbol=codes)
+    if df is None or (hasattr(df, 'empty') and df.empty) or len(df) == 0:
+        return {}
+
+    # 返回的 code 列可能是裸6位或带市场后缀，两种键都建映射
+    row_map: Dict[str, object] = {}
+    for _, row in df.iterrows():
+        raw = str(row.get('code', '')).strip()
+        if not raw:
+            continue
+        row_map[raw] = row
+        if raw.startswith(('6', '9', '5')):
+            row_map[f"{raw}.SH"] = row
+        elif raw.startswith(('8', '4')):
+            row_map[f"{raw}.BJ"] = row
+        else:
+            row_map[f"{raw}.SZ"] = row
+
+    out: Dict[str, NormalizedIndicator] = {}
+    for code in codes:
+        # 注意不能用 `get(a) or get(b)`：pandas Series 的布尔判断会抛 ValueError
+        row = row_map.get(code)
+        if row is None:
+            row = row_map.get(code.split('.')[0])
+        if row is not None:
+            try:
+                quote = _quote_from_row(code, row)
+                if quote is not None:
+                    out[code] = quote
+            except Exception as e:
+                logger.warning(f"解析行情行失败: {code}, {e}")
+    return out
+
+
 def get_quote_data(code: str) -> Optional[NormalizedIndicator]:
     """
     获取股票实时行情（包含当日涨跌）
+    休市时段返回 5 分钟 TTL 缓存，交易时段直连通达信实时获取。
 
     Args:
         code: 6位股票代码
@@ -117,48 +216,19 @@ def get_quote_data(code: str) -> Optional[NormalizedIndicator]:
     Returns:
         NormalizedIndicator 格式的数据
     """
+    market_open = is_ashare_market_open()
+    if not market_open:
+        hit = _QUOTE_CACHE.get(code)
+        if hit is not None and (time.monotonic() - hit[0]) < _QUOTE_CACHE_TTL_CLOSED:
+            return hit[1]
+
     try:
-        client = tdx_client.get_client()
-
-        # 获取实时行情 (使用 quotes 方法)
-        result = client.quotes(symbol=[code])
-
-        if result is None or (hasattr(result, 'empty') and result.empty):
+        quote = _fetch_quotes_batch([code]).get(code)
+        if quote is None:
             logger.warning(f"获取实时行情失败: {code}")
             return None
-
-        # result 是 DataFrame，取第一行
-        row = result.iloc[0] if len(result) > 0 else None
-        if row is None:
-            return None
-
-        # DataFrame 列名: code, name, price, open, high, low, volume 等
-        current_price = float(row.get('price', 0))
-        prev_close = float(row.get('last_close', current_price))  # 前收盘价
-
-        # 计算涨跌幅（相对于前收盘价）
-        if prev_close > 0:
-            change_pct = (current_price - prev_close) / prev_close * 100
-            change_value = current_price - prev_close
-        else:
-            change_pct = 0
-            change_value = 0
-
-        name = str(row.get('name', get_stock_name(code)))
-
-        return NormalizedIndicator(
-            id=f"stock-{code}",
-            name=name,
-            value=current_price,
-            unit="CNY",
-            timestamp=datetime.now(),
-            change=Change(
-                value=change_value,
-                percentage=change_pct,
-                period="daily",
-            ),
-            historical=[],  # 实时行情没有历史数据
-        )
+        _cache_quote(code, quote)
+        return quote
 
     except Exception as e:
         logger.error(f"获取实时行情异常: {code}, {e}")
@@ -177,6 +247,31 @@ def search_stocks(keyword: str) -> List[StockSearchResult]:
     """
     # 扩展股票列表（沪深主板、中小板、创业板常用股票）
     stock_list = [
+        # 指数
+        ('999999', '上证指数', 'sh'),
+
+        # 军工板块
+        ('600151', '航天机电', 'sh'),
+        ('002414', '高德红外', 'sz'),
+        ('000065', '北方国际', 'sz'),
+        ('600879', '航天电子', 'sh'),
+        ('600184', '光电股份', 'sh'),
+        ('000738', '航发控制', 'sz'),
+        ('002246', '北化股份', 'sz'),
+        ('600072', '中船科技', 'sh'),
+        ('600877', '电科芯片', 'sh'),
+        ('000901', '航天科技', 'sz'),
+        ('600765', '中航重机', 'sh'),
+        ('600862', '中航高科', 'sh'),
+        ('600967', '内蒙一机', 'sh'),
+        ('600480', '凌云股份', 'sh'),
+        ('600271', '航天信息', 'sh'),
+        ('600372', '中航机载', 'sh'),
+        ('002204', '大连重工', 'sz'),
+        ('600262', '北方股份', 'sh'),
+        ('600435', '北方导航', 'sh'),
+        ('600698', '湖南天雁', 'sh'),
+
         # 上证主板 (600xxx)
         ('600519', '贵州茅台', 'sh'),
         ('600036', '招商银行', 'sh'),
@@ -395,18 +490,47 @@ def search_stocks(keyword: str) -> List[StockSearchResult]:
 
 def get_batch_quotes(codes: List[str]) -> List[NormalizedIndicator]:
     """
-    批量获取多只股票的实时行情
+    批量获取多只股票实时行情
+    一次 TDX 请求取全部代码（6次往返→1次），为盘中秒级轮询铺路；
+    休市时段优先命中 5 分钟 TTL 缓存；批量失败的代码回退逐只获取。
 
     Args:
         codes: 股票代码列表
 
     Returns:
-        行情数据列表
+        行情数据列表（与入参同序，失败的代码跳过）
     """
-    results = []
-    for code in codes:
-        quote = get_quote_data(code)
-        if quote:
-            results.append(quote)
+    if not codes:
+        return []
 
-    return results
+    market_open = is_ashare_market_open()
+    now = time.monotonic()
+    results: Dict[str, NormalizedIndicator] = {}
+    pending: List[str] = []
+
+    if not market_open:
+        for c in codes:
+            hit = _QUOTE_CACHE.get(c)
+            if hit is not None and (now - hit[0]) < _QUOTE_CACHE_TTL_CLOSED:
+                results[c] = hit[1]
+            else:
+                pending.append(c)
+    else:
+        pending = list(codes)
+
+    if pending:
+        try:
+            fetched = _fetch_quotes_batch(pending)
+            for c, q in fetched.items():
+                results[c] = q
+                _cache_quote(c, q)
+            missing = [c for c in pending if c not in results]
+        except Exception as e:
+            logger.warning(f"批量行情失败, 回退逐只获取: {e}")
+            missing = pending
+        for c in missing:
+            q = get_quote_data(c)
+            if q is not None:
+                results[c] = q
+
+    return [results[c] for c in codes if c in results]

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getYieldSpread, getRecessionFlag } from '../api/fred-market';
 import { NormalizedIndicator } from '../types/indicator';
 import { useDashboardStore } from '../stores/dashboardStore';
@@ -17,6 +17,7 @@ export function useYieldSpreadHistory() {
 
   const query = useQuery({
     queryKey: ['yield-spread-history', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<YieldSpreadHistory> => {
       const [spreadRes, recessionRes] = await Promise.allSettled([
         getYieldSpread(timeRange),

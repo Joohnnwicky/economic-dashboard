@@ -2,6 +2,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// 后端代理目标可用环境变量覆盖（默认 localhost:8000；端口被占时可 BACKEND_TARGET=http://localhost:8001 npm run dev）
+const BACKEND_TARGET = process.env.BACKEND_TARGET || 'http://localhost:8000'
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -9,7 +12,7 @@ export default defineConfig({
     proxy: {
       // Python后端代理 (所有API请求通过后端)
       '/api/backend': {
-        target: 'http://localhost:8000',
+        target: BACKEND_TARGET,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/backend/, '/api'),
       },

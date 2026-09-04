@@ -1,7 +1,8 @@
 import ReactECharts from 'echarts-for-react';
 import { NormalizedIndicator } from '../../types/indicator';
 import { DARK_THEME } from '../../constants/colors';
-import { formatChartDate, formatPercentage, formatChineseNumber, formatLargeNumber } from '../../utils/formatters';
+import { formatChartDate, formatPercentage, formatChineseNumber, formatLargeNumber, sliceByTimeRange } from '../../utils/formatters';
+import { useDashboardStore } from '../../stores/dashboardStore';
 import { TimeRange } from '../../types/api';
 
 interface LineChartProps {
@@ -14,6 +15,8 @@ interface LineChartProps {
 // 根据单位选择格式化函数
 function formatValue(value: number, unit: string): string {
   switch (unit) {
+    case '亿元':
+      return value.toLocaleString('zh-CN');
     case '%':
       return formatPercentage(value);
     case 'K':
@@ -26,7 +29,11 @@ function formatValue(value: number, unit: string): string {
   }
 }
 
-export function LineChart({ data, timeRange = '1Y', height = 400, gridLeft }: LineChartProps) {
+export function LineChart({ data, height = 400, gridLeft }: LineChartProps) {
+  // 顶部 FilterBar 的时间范围选择器驱动所有 LineChart（timeRange prop 仅作兼容保留）
+  const globalRange = useDashboardStore((state) => state.timeRange);
+  const effectiveRange = globalRange;
+  data = { ...data, historical: sliceByTimeRange(data.historical, globalRange) };
   // 如果传入gridLeft则使用，否则根据unit确定默认值
   // K单位: 千人转万/亿（如1584949 -> 1.58亿）
   // index单位: 指数值（如130.34），需要显示完整的3位数
@@ -39,7 +46,7 @@ export function LineChart({ data, timeRange = '1Y', height = 400, gridLeft }: Li
     grid: { left: finalGridLeft, right: '5%', top: '10%', bottom: '30%' },
     xAxis: {
       type: 'category',
-      data: data.historical.map((d) => formatChartDate(d.timestamp, timeRange)),
+      data: data.historical.map((d) => formatChartDate(d.timestamp, effectiveRange)),
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: { color: DARK_THEME.textMuted },
     },

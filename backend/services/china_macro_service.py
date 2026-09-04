@@ -1,11 +1,13 @@
 """
-中国宏观经济数据服务 - 使用AkShare获取国家统计局数据
+中国宏观经济数据服务 - Tushare 结构化数据优先，AkShare 网页解析回退
 """
 import akshare as ak
 from typing import Dict, List, Optional
 from datetime import datetime
 import pandas as pd
 import re
+
+from services import tushare_service
 
 
 # ============================================================
@@ -231,6 +233,14 @@ def get_china_gdp() -> Optional[Dict]:
     cached = ChinaMacroCache.get('gdp')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_gdp()
+        if result:
+            ChinaMacroCache.set('gdp', result)
+            return result
+    except Exception as e:
+        print(f"Tushare GDP 失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_gdp()
         historical = []
@@ -268,6 +278,14 @@ def get_china_cpi() -> Optional[Dict]:
     cached = ChinaMacroCache.get('cpi')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_cpi()
+        if result:
+            ChinaMacroCache.set('cpi', result)
+            return result
+    except Exception as e:
+        print(f"Tushare CPI 失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_cpi()
         historical = []
@@ -304,6 +322,14 @@ def get_china_ppi() -> Optional[Dict]:
     cached = ChinaMacroCache.get('ppi')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_ppi()
+        if result:
+            ChinaMacroCache.set('ppi', result)
+            return result
+    except Exception as e:
+        print(f"Tushare PPI 失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_ppi()
         historical = []
@@ -340,6 +366,14 @@ def get_china_m2() -> Optional[Dict]:
     cached = ChinaMacroCache.get('m2')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_m2()
+        if result:
+            ChinaMacroCache.set('m2', result)
+            return result
+    except Exception as e:
+        print(f"Tushare M2 失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_supply_of_money()
         historical = []
@@ -379,6 +413,14 @@ def get_china_pmi_nbs_mfg() -> Optional[Dict]:
     cached = ChinaMacroCache.get('pmi_nbs_mfg')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_pmi_manufacturing()
+        if result:
+            ChinaMacroCache.set('pmi_nbs_mfg', result)
+        return result
+    except Exception as e:
+        print(f"Tushare 制造业PMI失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_pmi()
         # 列: [0]月份 [1]制造业-指数 [2]制造业-同比增长 [3]非制造业-指数 [4]非制造业-同比增长
@@ -397,6 +439,14 @@ def get_china_pmi_nbs_non_mfg() -> Optional[Dict]:
     cached = ChinaMacroCache.get('pmi_nbs_non_mfg')
     if cached:
         return cached
+    # 优先 Tushare 结构化数据
+    try:
+        result = tushare_service.get_pmi_non_manufacturing()
+        if result:
+            ChinaMacroCache.set('pmi_nbs_non_mfg', result)
+        return result
+    except Exception as e:
+        print(f"Tushare 非制造业PMI失败, 回退 AkShare: {e}")
     try:
         df = ak.macro_china_pmi()
         # 列: [0]月份 [3]非制造业-指数

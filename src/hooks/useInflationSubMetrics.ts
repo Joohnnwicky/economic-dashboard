@@ -1,4 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, keepPreviousData } from '@tanstack/react-query';
 import { useDashboardStore } from '../stores/dashboardStore';
 import { fetchBLSSeries } from '../api/bls';
 import { NormalizedIndicator, HistoricalDataPoint } from '../types/indicator';
@@ -28,6 +28,7 @@ export function useInflationSubMetrics() {
     queries: [
       {
         queryKey: ['bls', 'cpi-components', timeRange],
+        placeholderData: keepPreviousData,
         queryFn: async () => {
           const seriesIds = Object.values(CPI_COMPONENT_SERIES);
           const data: Record<string, BLSSeriesData> = await fetchBLSSeries(seriesIds, timeRange);

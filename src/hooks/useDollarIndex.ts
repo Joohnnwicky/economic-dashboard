@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getDollarIndex } from '../api/forex';
 import { TimeRange } from '../types/api';
 import { useDashboardStore } from '../stores/dashboardStore';
@@ -12,6 +12,7 @@ export function useDollarIndex() {
 
   const query = useQuery({
     queryKey: ['dollar-index', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const data = await getDollarIndex(timeRange);
       return data;

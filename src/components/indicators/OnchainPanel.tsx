@@ -111,7 +111,7 @@ export function OnchainPanel() {
         if (!arr || arr.length === 0) return '';
         const [ts, val] = arr[0].value;
         const d = new Date(ts);
-        return `${format(d, 'MM-dd HH:mm')}<br/>算力: ${val.toFixed(1)} EH/s`;
+        return `${format(d, 'MM-dd')}<br/>算力: ${val.toFixed(1)} EH/s`;
       },
     },
   } : null;

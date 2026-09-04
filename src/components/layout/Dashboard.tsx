@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -20,12 +19,14 @@ import { RIBBON_TINTS } from '../../constants/colors';
 import { DashboardItem } from './DashboardItem';
 import { FilterBar } from './FilterBar';
 import { OverlayPanel } from './OverlayPanel';
+import { CausalGraphSection } from '../causal/CausalGraphSection';
 
 // Import all panel content components
 import { FedRatePanel } from '../indicators/FedRatePanel';
 import { FedWatchPanel } from '../indicators/FedWatchPanel';
 import { MarketRegimePanel } from '../indicators/MarketRegimePanel';
 import { TreasuryPanel } from '../indicators/TreasuryPanel';
+import { TreasurySelloffPanel } from '../indicators/TreasurySelloffPanel';
 import { InflationPanel } from '../indicators/InflationPanel';
 import { InflationSubMetricsPanel } from './InflationSubMetricsPanel';
 import { InitialClaimsPanel } from '../indicators/InitialClaimsPanel';
@@ -49,6 +50,10 @@ import { ChinaTradePanel } from '../indicators/ChinaTradePanel';
 import { ChinaCreditPanel } from '../indicators/ChinaCreditPanel';
 import { HousingPricePanel } from '../indicators/HousingPricePanel';
 import { CustomStocksPanel } from '../stocks/CustomStocksPanel';
+import { AShareRadarPanel } from '../stocks/AShareRadarPanel';
+import { AShareMarginPanel } from '../stocks/AShareMarginPanel';
+import { DefenseSectorPanel } from '../stocks/DefenseSectorPanel';
+import { ChinaRatesPanel } from '../indicators/ChinaRatesPanel';
 import { PBOCRatePanel } from '../indicators/PBOCRatePanel';
 import { PolymarketPanel } from '../indicators/PolymarketPanel';
 
@@ -57,6 +62,7 @@ const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'fedwatch': FedWatchPanel,
   'market-regime': MarketRegimePanel,
   'treasury': TreasuryPanel,
+  'treasury-selloff': TreasurySelloffPanel,
   'inflation': InflationPanel,
   'inflation-sub': InflationSubMetricsPanel,
   'initial-claims': InitialClaimsPanel,
@@ -80,12 +86,20 @@ const COMPONENT_MAP: Record<PanelKey, React.ComponentType> = {
   'china-credit': ChinaCreditPanel,
   'housing-price': HousingPricePanel,
   'custom-stocks': CustomStocksPanel,
+  'a-share-radar': AShareRadarPanel,
+  'a-share-margin': AShareMarginPanel,
+  'defense-sector': DefenseSectorPanel,
+  'china-rates': ChinaRatesPanel,
   'pboc-rate': PBOCRatePanel,
   'polymarket': PolymarketPanel,
 };
 
 // Panels flagged with a yellow "NEW!" burst sticker (recent additions).
 const NEW_PANELS: Set<PanelKey> = new Set<PanelKey>([
+  'a-share-radar',
+  'a-share-margin',
+  'defense-sector',
+  'china-rates',
   'us-stocks',
   'housing-price',
   'polymarket',
@@ -165,6 +179,10 @@ export function Dashboard() {
       </DndContext>
 
       <div className="mt-4">
+        <CausalGraphSection />
+      </div>
+
+      <div className="mt-4">
         <OverlayPanel />
       </div>
 
@@ -173,7 +191,7 @@ export function Dashboard() {
         style={{ borderColor: '#000', backgroundColor: '#fff', color: '#000' }}
       >
         <p className="text-xs">
-          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, Alpha Vantage, AkShare, Binance, Coinbase, 东方财富
+          全球经济指标看板 v1.0 · 数据来源: FRED, BLS, Alpha Vantage, AkShare, Tushare, 通达信, Binance, Coinbase, 东方财富
         </p>
         <p className="text-xs mt-2">
           快捷键: Alt+1..9 跳转对应面板 ·

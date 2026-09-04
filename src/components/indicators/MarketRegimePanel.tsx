@@ -47,7 +47,7 @@ export function MarketRegimePanel() {
       </div>
 
       <p className="text-xs" style={{ color: DARK_THEME.textMuted }}>
-        基于 VIX + 10Y-2Y 利差规则引擎 | 非投资建议, 仅供宏观态势参考
+        基于 VIX（美股标普500期权波动率）+ 10Y-2Y 利差（美债收益率曲线）规则引擎 | 非投资建议, 仅供宏观态势参考
       </p>
     </div>
   );

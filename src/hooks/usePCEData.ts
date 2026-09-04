@@ -1,4 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, keepPreviousData } from '@tanstack/react-query';
 import { useDashboardStore } from '../stores/dashboardStore';
 import { getPCEData } from '../api/fred-extended';
 import { NormalizedIndicator } from '../types/indicator';
@@ -15,6 +15,7 @@ export function usePCEData() {
     queries: [
       {
         queryKey: ['fred', 'PCEPI', timeRange],
+        placeholderData: keepPreviousData,
         queryFn: () => getPCEData('PCEPI', timeRange),
         staleTime: 24 * 60 * 60 * 1000,       // 24小时（FRED数据月度更新）
         gcTime: 7 * 24 * 60 * 60 * 1000,         // 7天
@@ -23,6 +24,7 @@ export function usePCEData() {
       },
       {
         queryKey: ['fred', 'PCEPILFE', timeRange],
+        placeholderData: keepPreviousData,
         queryFn: () => getPCEData('PCEPILFE', timeRange),
         staleTime: 24 * 60 * 60 * 1000,      // 24小时（FRED数据月度更新）
         gcTime: 7 * 24 * 60 * 60 * 1000,       // 7天

@@ -72,3 +72,22 @@ export function formatChartDate(date: Date, timeRange: TimeRange): string {
       return format(date, 'yyyy-MM-dd', { locale: zhCN });
   }
 }
+
+/**
+ * 按全局时间范围切片历史数据（顶部 FilterBar 选择器驱动所有趋势图）。
+ * 切片后不足 2 个点（如月度/季度宏观数据配短窗口）时回退全量，避免空图。
+ */
+const RANGE_DAYS: Partial<Record<TimeRange, number>> = {
+  '1M': 31,
+  '3M': 92,
+  '6M': 183,
+  '1Y': 366,
+};
+
+export function sliceByTimeRange<T extends { timestamp: Date | string }>(points: T[], range: TimeRange): T[] {
+  const days = RANGE_DAYS[range];
+  if (!days) return points; // ALL 或未知范围
+  const cutoff = Date.now() - days * 24 * 3600 * 1000;
+  const sliced = points.filter((p) => new Date(p.timestamp).getTime() >= cutoff);
+  return sliced.length >= 2 ? sliced : points;
+}

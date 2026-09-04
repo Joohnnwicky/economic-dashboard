@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getCPI } from '../api/fred';
 import { downsampleData } from '../utils/downsampling';
 import { TimeRange } from '../types/api';
@@ -6,6 +6,7 @@ import { TimeRange } from '../types/api';
 export function useCpiData(timeRange: TimeRange = '1Y') {
   const query = useQuery({
     queryKey: ['cpi', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const data = await getCPI(timeRange);
       if (data.historical.length > 365) {

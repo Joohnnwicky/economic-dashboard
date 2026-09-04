@@ -56,3 +56,7 @@ deploy_nas.py
 # Cache files
 *_cache.json
 housing_price_cache.json
+
+# Session/scratch
+.scratch/
+.claude/

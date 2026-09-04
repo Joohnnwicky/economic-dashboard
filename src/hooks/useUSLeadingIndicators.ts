@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getIsmPmi, getMichiganSentiment } from '../api/fred-market';
 import { NormalizedIndicator } from '../types/indicator';
 import { useDashboardStore } from '../stores/dashboardStore';
@@ -18,6 +18,7 @@ export function useUSLeadingIndicators() {
 
   const query = useQuery({
     queryKey: ['us-leading', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<USLeadingIndicators> => {
       const [pmiRes, sentimentRes] = await Promise.allSettled([
         getIsmPmi(timeRange),

@@ -2,7 +2,8 @@ import ReactECharts from 'echarts-for-react';
 import { NormalizedIndicator } from '../../types/indicator';
 import { DARK_THEME } from '../../constants/colors';
 import { alignTimestamps } from '../../utils/data-alignment';
-import { formatChartDate } from '../../utils/formatters';
+import { formatChartDate, sliceByTimeRange } from '../../utils/formatters';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 interface SeriesConfig {
   data: NormalizedIndicator;
@@ -21,14 +22,19 @@ interface MultiSeriesChartProps {
   timeRange?: '1D' | '1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL';
 }
 
-export function MultiSeriesChart({
-  series,
-  height = 400,
-  showLegend = true,
-  timeRange = '1Y',
-}: MultiSeriesChartProps) {
+export function MultiSeriesChart({ series, height = 400, showLegend = true }: MultiSeriesChartProps) {
+  // 顶部 FilterBar 的时间范围选择器驱动所有 MultiSeriesChart（timeRange prop 仅作兼容保留）
+  const globalRange = useDashboardStore((state) => state.timeRange);
+  // 切片后月度对齐点过少（宏观数据配短窗口）则回退全量，避免空图
+  let ranged = series.map((s) => ({
+    ...s,
+    data: { ...s.data, historical: sliceByTimeRange(s.data.historical, globalRange) },
+  }));
+  if (alignTimestamps(ranged.map((s) => s.data)).length < 3) {
+    ranged = series;
+  }
   // Handle empty data
-  const hasData = series.some((s) => s.data.historical.length > 0);
+  const hasData = ranged.some((s) => s.data.historical.length > 0);
   if (!hasData) {
     return (
       <div
@@ -49,36 +55,36 @@ export function MultiSeriesChart({
   }
 
   // Check if right axis is needed
-  const hasRightAxis = series.some((s) => s.axisPosition === 'right');
+  const hasRightAxis = ranged.some((s) => s.axisPosition === 'right');
 
   // Get aligned timestamps for x-axis
-  const alignedTimestamps = alignTimestamps(series.map((s) => s.data));
+  const alignedTimestamps = alignTimestamps(ranged.map((s) => s.data));
 
   // Build yAxis array
   const yAxis = [
     // Left axis (always present)
     {
       type: 'value' as const,
-      name: series.find((s) => s.axisPosition === 'left')?.data.unit || '',
+      name: ranged.find((s) => s.axisPosition === 'left')?.data.unit || '',
       nameTextStyle: { color: DARK_THEME.textMuted },
       position: 'left' as const,
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: { color: DARK_THEME.textMuted },
       splitLine: { lineStyle: { color: DARK_THEME.gridLine, opacity: 0.3 } },
-      ...series.find((s) => s.axisPosition === 'left')?.yAxisConfig,
+      ...ranged.find((s) => s.axisPosition === 'left')?.yAxisConfig,
     },
     // Right axis (optional)
     ...(hasRightAxis
       ? [
           {
             type: 'value' as const,
-            name: series.find((s) => s.axisPosition === 'right')?.data.unit || '',
+            name: ranged.find((s) => s.axisPosition === 'right')?.data.unit || '',
             nameTextStyle: { color: DARK_THEME.textMuted },
             position: 'right' as const,
             axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
             axisLabel: { color: DARK_THEME.textMuted },
             splitLine: { show: false },
-            ...series.find((s) => s.axisPosition === 'right')?.yAxisConfig,
+            ...ranged.find((s) => s.axisPosition === 'right')?.yAxisConfig,
           },
         ]
       : []),
@@ -109,7 +115,7 @@ export function MultiSeriesChart({
   };
 
   // Build chart series
-  const chartSeries = series.map((s, index) => ({
+  const chartSeries = ranged.map((s, index) => ({
     type: 'line' as const,
     name: s.data.name,
     data: buildAlignedData(s.data),
@@ -138,7 +144,7 @@ export function MultiSeriesChart({
       : { show: false },
     xAxis: {
       type: 'category' as const,
-      data: alignedTimestamps.map((d) => formatChartDate(d, timeRange)),
+      data: alignedTimestamps.map((d) => formatChartDate(d, globalRange)),
       axisLine: { lineStyle: { color: DARK_THEME.gridLine } },
       axisLabel: { color: DARK_THEME.textMuted },
     },

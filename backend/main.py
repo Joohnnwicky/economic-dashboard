@@ -26,6 +26,7 @@ from api.market_dominance import router as market_dominance_router
 from api.onchain import router as onchain_router
 from api.economic_calendar import router as economic_calendar_router
 from api.fedwatch import router as fedwatch_router
+from api.tushare import router as tushare_router
 from services.gold_service import update_gold_price_cache
 from services.housing_price_service import HousingPriceCache, update_housing_price_cache, update_national_ranking_only, update_city_details
 from services.release_scheduler import refresh_releases
@@ -133,6 +134,7 @@ app.include_router(market_dominance_router, prefix="/api")
 app.include_router(onchain_router, prefix="/api")
 app.include_router(economic_calendar_router, prefix="/api")
 app.include_router(fedwatch_router, prefix="/api")
+app.include_router(tushare_router, prefix="/api")
 
 
 @app.get("/")

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getVix } from '../api/fred-market';
 import { useDashboardStore } from '../stores/dashboardStore';
 
@@ -11,6 +11,7 @@ export function useVix() {
 
   const query = useQuery({
     queryKey: ['vix', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const data = await getVix(timeRange);
       return data;

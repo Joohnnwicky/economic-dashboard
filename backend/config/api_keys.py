@@ -25,6 +25,10 @@ class APIConfig:
     DEEPSEEK_BASE_URL = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com')
     DEEPSEEK_MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-v4-flash')
 
+    # Tushare Pro (中国宏观经济结构化数据)
+    TUSHARE_TOKEN = os.environ.get('TUSHARE_TOKEN', '')
+    TUSHARE_BASE_URL = 'http://api.tushare.pro'
+
     # Binance API (加密货币) - 无需密钥，公开API
     BINANCE_BASE_URL = 'https://api.binance.com/api/v3'
 

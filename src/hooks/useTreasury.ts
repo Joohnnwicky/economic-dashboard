@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getTreasuryYields, calculateYieldCurveSpread } from '../api/treasury';
 import { TimeRange } from '../types/api';
 
@@ -9,6 +9,7 @@ import { TimeRange } from '../types/api';
 export function useTreasuryYields(timeRange: TimeRange = '1Y') {
   const query = useQuery({
     queryKey: ['treasury-yields', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const yields = await getTreasuryYields(timeRange);
       const spread = calculateYieldCurveSpread(yields.dgs10, yields.dgs2);

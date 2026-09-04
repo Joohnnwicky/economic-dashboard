@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { IndicatorCard } from '../ui/IndicatorCard';
 import { DARK_THEME } from '../../constants/colors';
 
@@ -7,6 +7,7 @@ import { DARK_THEME } from '../../constants/colors';
  *
  * 美股在中国白天是闭市状态（美股交易时间：21:30-04:00 北京时间）
  * 所以使用静态JSON数据展示最近收盘价，每日更新即可
+ * 数据走 react-query 并参与 localStorage 持久化，刷新页面秒出不再转圈
  */
 
 interface StaticUSIndex {
@@ -20,23 +21,21 @@ interface StaticUSIndex {
   note: string;
 }
 
-export function USIndicesPanel() {
-  const [indices, setIndices] = useState<StaticUSIndex[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function fetchStaticIndices(): Promise<StaticUSIndex[]> {
+  const res = await fetch('/data/us-indices-latest.json');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
-  useEffect(() => {
-    // Load static US indices data from JSON file
-    fetch('/data/us-indices-latest.json')
-      .then(res => res.json())
-      .then(data => {
-        setIndices(data);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error('[US Indices] Failed to load static data:', err);
-        setIsLoading(false);
-      });
-  }, []);
+export function USIndicesPanel() {
+  const { data: indices = [], isLoading } = useQuery({
+    queryKey: ['us-indices-static'],
+    queryFn: fetchStaticIndices,
+    staleTime: 12 * 60 * 60 * 1000,   // 静态每日更新数据
+    gcTime: 24 * 60 * 60 * 1000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
   if (isLoading) {
     return (

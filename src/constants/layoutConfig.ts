@@ -3,6 +3,7 @@ export const PANEL_KEYS = {
   FEDWATCH: 'fedwatch',
   MARKET_REGIME: 'market-regime',
   TREASURY: 'treasury',
+  TREASURY_SELLOFF: 'treasury-selloff',
   INFLATION: 'inflation',
   INFLATION_SUB: 'inflation-sub',
   INITIAL_CLAIMS: 'initial-claims',
@@ -28,6 +29,10 @@ export const PANEL_KEYS = {
   CUSTOM_STOCKS: 'custom-stocks',
   PBOC_RATE: 'pboc-rate',
   POLYMARKET: 'polymarket',
+  A_SHARE_RADAR: 'a-share-radar',
+  CHINA_RATES: 'china-rates',
+  A_SHARE_MARGIN: 'a-share-margin',
+  DEFENSE_SECTOR: 'defense-sector',
 } as const;
 
 export type PanelKey = typeof PANEL_KEYS[keyof typeof PANEL_KEYS];
@@ -35,14 +40,15 @@ export type PanelKey = typeof PANEL_KEYS[keyof typeof PANEL_KEYS];
 export const PANEL_TITLES: Record<PanelKey, string> = {
   [PANEL_KEYS.FED_RATE]: '美国联邦基金利率（FFR）',
   [PANEL_KEYS.FEDWATCH]: 'FOMC 会议日历与倒计时（FedWatch）',
-  [PANEL_KEYS.MARKET_REGIME]: '市场机制识别（Market Regime）',
+  [PANEL_KEYS.MARKET_REGIME]: '市场机制识别（美股 VIX × 美债利差）',
   [PANEL_KEYS.TREASURY]: '美国国债收益率（US Treasury Yields）',
+  [PANEL_KEYS.TREASURY_SELLOFF]: '美债抛售监控（Treasury Selloff）',
   [PANEL_KEYS.INFLATION]: '美国消费者物价指数（CPI）',
   [PANEL_KEYS.INFLATION_SUB]: '通胀细分指标（CPI & PCE）',
   [PANEL_KEYS.INITIAL_CLAIMS]: '初请失业金（Initial Jobless Claims）',
   [PANEL_KEYS.US_LEADING]: '美国先行指标（ISM PMI & 消费者信心）',
   [PANEL_KEYS.DOLLAR_INDEX]: '美元指数（US Dollar Index）',
-  [PANEL_KEYS.VIX]: 'VIX 恐慌指数（CBOE Volatility Index）',
+  [PANEL_KEYS.VIX]: 'VIX 恐慌指数（标普500期权 · 美股）',
   [PANEL_KEYS.GOLD_PRICE]: '国内金价（Gold Price）',
   [PANEL_KEYS.OIL_PRICE]: '油价（Oil Price）',
   [PANEL_KEYS.CRYPTO]: '加密货币行情（Crypto Top 10）',
@@ -62,37 +68,62 @@ export const PANEL_TITLES: Record<PanelKey, string> = {
   [PANEL_KEYS.CUSTOM_STOCKS]: '自选股',
   [PANEL_KEYS.PBOC_RATE]: '中国央行利率（PBOC Interest Rates）',
   [PANEL_KEYS.POLYMARKET]: 'Polymarket',
+  [PANEL_KEYS.A_SHARE_RADAR]: 'A股自选股雷达（Tushare）',
+  [PANEL_KEYS.CHINA_RATES]: '中国利率与流动性（SHIBOR & LPR）',
+  [PANEL_KEYS.A_SHARE_MARGIN]: '两融余额（Margin Trading）',
+  [PANEL_KEYS.DEFENSE_SECTOR]: '军工行业指数（中证军工 × 上证）',
 };
 
-// Default panel order (left column then right column from original layout)
-export const DEFAULT_ORDER: PanelKey[] = [
+// 面板分区顺序：① 经济日历 ② 中国A股+中国经济指标 ③ 加密货币 ④ 美国宏观 ⑤ 美股
+const CHINA_GROUP: PanelKey[] = [
+  PANEL_KEYS.CUSTOM_STOCKS,
+  PANEL_KEYS.A_SHARE_RADAR,
+  PANEL_KEYS.CHINESE_INDICES,
+  PANEL_KEYS.DEFENSE_SECTOR,
+  PANEL_KEYS.A_SHARE_MARGIN,
+  PANEL_KEYS.CHINA_MACRO,
+  PANEL_KEYS.CHINA_PMI,
+  PANEL_KEYS.CHINA_TRADE,
+  PANEL_KEYS.CHINA_CREDIT,
+  PANEL_KEYS.CHINA_RATES,
+  PANEL_KEYS.PBOC_RATE,
+  PANEL_KEYS.HOUSING_PRICE,
+];
+
+const CRYPTO_GROUP: PanelKey[] = [
+  PANEL_KEYS.CRYPTO,
+  PANEL_KEYS.COINBASE_PREMIUM,
+  PANEL_KEYS.MARKET_DOMINANCE,
+  PANEL_KEYS.ONCHAIN,
+];
+
+const US_MACRO_GROUP: PanelKey[] = [
   PANEL_KEYS.FED_RATE,
   PANEL_KEYS.FEDWATCH,
-  PANEL_KEYS.MARKET_REGIME,
   PANEL_KEYS.TREASURY,
+  PANEL_KEYS.TREASURY_SELLOFF,
   PANEL_KEYS.INFLATION,
   PANEL_KEYS.INFLATION_SUB,
   PANEL_KEYS.INITIAL_CLAIMS,
   PANEL_KEYS.US_LEADING,
   PANEL_KEYS.DOLLAR_INDEX,
-  PANEL_KEYS.VIX,
   PANEL_KEYS.GOLD_PRICE,
   PANEL_KEYS.OIL_PRICE,
-  PANEL_KEYS.CRYPTO,
-  PANEL_KEYS.COINBASE_PREMIUM,
-  PANEL_KEYS.MARKET_DOMINANCE,
-  PANEL_KEYS.ONCHAIN,
   PANEL_KEYS.EXCHANGE_RATES,
+  PANEL_KEYS.POLYMARKET,
+];
+
+const US_STOCK_GROUP: PanelKey[] = [
+  PANEL_KEYS.MARKET_REGIME,
+  PANEL_KEYS.VIX,
   PANEL_KEYS.US_INDICES,
   PANEL_KEYS.US_STOCKS,
+];
+
+export const DEFAULT_ORDER: PanelKey[] = [
   PANEL_KEYS.ECONOMIC_CALENDAR,
-  PANEL_KEYS.CHINESE_INDICES,
-  PANEL_KEYS.CHINA_MACRO,
-  PANEL_KEYS.CHINA_PMI,
-  PANEL_KEYS.CHINA_TRADE,
-  PANEL_KEYS.CHINA_CREDIT,
-  PANEL_KEYS.HOUSING_PRICE,
-  PANEL_KEYS.CUSTOM_STOCKS,
-  PANEL_KEYS.PBOC_RATE,
-  PANEL_KEYS.POLYMARKET,
+  ...CHINA_GROUP,
+  ...CRYPTO_GROUP,
+  ...US_MACRO_GROUP,
+  ...US_STOCK_GROUP,
 ];

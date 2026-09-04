@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getInitialClaims } from '../api/fred-market';
 import { useDashboardStore } from '../stores/dashboardStore';
 
@@ -11,6 +11,7 @@ export function useInitialClaims() {
 
   const query = useQuery({
     queryKey: ['initial-claims', timeRange],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const data = await getInitialClaims(timeRange);
       return data;

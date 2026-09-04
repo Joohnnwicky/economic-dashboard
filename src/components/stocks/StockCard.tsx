@@ -1,15 +1,33 @@
+import { useEffect, useRef, useState } from 'react';
 import { NormalizedIndicator } from '../../types/indicator';
 import { DARK_THEME } from '../../constants/colors';
+import { StockSparkline } from './StockSparkline';
 
 interface StockCardProps {
+  code: string;
   data: NormalizedIndicator;
-  onViewChart?: () => void;
   onRemove?: () => void;
 }
 
-export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
-  const isPositive = data.change?.percentage >= 0;
+export function StockCard({ code, data, onRemove }: StockCardProps) {
+  const isPositive = (data.change?.percentage ?? 0) >= 0;
   const changeColor = isPositive ? DARK_THEME.positive : DARK_THEME.negative;
+
+  // 价格变动时的跳色提示：涨闪红 / 跌闪绿，900ms 后回到黑色（原地更新不闪烁）
+  const [tickDir, setTickDir] = useState<0 | 1 | -1>(0);
+  const prevValue = useRef<number | null>(null);
+
+  useEffect(() => {
+    const prev = prevValue.current;
+    prevValue.current = data.value;
+    if (prev === null || prev === data.value) return;
+    setTickDir(data.value > prev ? 1 : -1);
+    const timer = setTimeout(() => setTickDir(0), 900);
+    return () => clearTimeout(timer);
+  }, [data.value]);
+
+  const priceColor =
+    tickDir === 0 ? DARK_THEME.text : tickDir > 0 ? DARK_THEME.positive : DARK_THEME.negative;
 
   const formatValue = (val: number) => {
     if (val >= 100) return val.toFixed(2);
@@ -40,7 +58,7 @@ export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
       </div>
 
       {/* Price */}
-      <div className="text-xl font-bold" style={{ color: DARK_THEME.text }}>
+      <div className="text-xl font-bold transition-colors duration-500" style={{ color: priceColor }}>
         {formatValue(data.value)}
       </div>
 
@@ -55,16 +73,10 @@ export function StockCard({ data, onViewChart, onRemove }: StockCardProps) {
         </div>
       )}
 
-      {/* View Chart button - always show, K-line fetched on demand */}
-      {onViewChart && (
-        <button
-          onClick={onViewChart}
-          className="mt-2 text-xs px-2 py-1 rounded hover:bg-black"
-          style={{ color: DARK_THEME.accent[0] }}
-        >
-          查看趋势
-        </button>
-      )}
+      {/* 近90日迷你走势图（常显，悬停可看价格） */}
+      <div className="mt-2">
+        <StockSparkline code={code} color={changeColor} />
+      </div>
     </div>
   );
 }
